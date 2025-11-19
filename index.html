@@ -432,6 +432,18 @@
       color: var(--text-muted);
       margin-top: 6px;
     }
+
+    .result-actions {
+      margin-top: 10px;
+    }
+
+    .result-actions .btn-secondary {
+      display: inline-block;
+      text-align: center;
+      width: 100%;
+      max-width: 260px;
+      flex: none;
+    }
   </style>
 </head>
 <body>
@@ -512,6 +524,9 @@
             </div>
 
             <div class="button-row">
+              <button class="btn-secondary" type="button" onclick="resetForm()">
+                Reset
+              </button>
               <button class="btn-primary" type="button" onclick="nextStep()">
                 Next: Training Scope
               </button>
@@ -580,6 +595,9 @@
             <div class="button-row">
               <button class="btn-secondary" type="button" onclick="prevStep()">
                 Back
+              </button>
+              <button class="btn-secondary" type="button" onclick="resetForm()">
+                Reset
               </button>
               <button class="btn-primary" type="button" onclick="nextStep()">
                 Next: Expected Impact
@@ -706,6 +724,10 @@
           <p class="result-summary" id="summaryText">
             Complete all three steps and click “Calculate ROI” to see an estimate based on industry benchmarks.
           </p>
+
+          <div class="result-actions">
+            <a href="" class="btn-secondary">Download the Full Report</a>
+          </div>
 
           <p class="disclaimer">
             This model provides directional guidance for HR and business leaders. For budgeting, use it alongside your own cost and performance data.
