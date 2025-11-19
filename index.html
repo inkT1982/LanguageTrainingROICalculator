@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Speexx Language Training ROI Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Roboto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent: #FF7900;
+      --bg: #020617;
+      --text-light: #FFFFFF;
+      --text-muted: #9ca3af;
+      --card-border: rgba(148,163,184,0.3);
+      --shadow-soft: 0 24px 40px rgba(15, 23, 42, 0.45);
+      --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      color: var(--text-light);
+      line-height: 1.4;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px 48px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 0 8px;
+    }
+
+    header h1 {
+      margin: 0 0 16px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #cbd5f5;
+      max-width: 640px;
+      margin-inline: auto;
+    }
+
+    .main-card {
+      background: linear-gradient(135deg, #020617 0, #020617 40%, #111827 100%);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--card-border);
+      display: grid;
+      gap: 32px;
+    }
+
+    @media (min-width: 900px) {
+      .main-card {
+        grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);
+      }
+    }
+
+    /* FORM PANEL (LEFT) */
+
+    .form-panel {
+      background: rgba(15,23,42,0.96);
+      border-radius: 20px;
+      padding: 26px 22px 26px;
+      border: 1px solid rgba(31,41,55,0.9);
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .steps-header {
+      margin-bottom: 18px;
+    }
+
+    .steps-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .steps-subtitle {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Progress bar */
+
+    .progress-wrapper {
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(31,41,55,0.9);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      transition: width 0.25s ease-out;
+    }
+
+    .progress-label {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .step {
+      padding-top: 24px;
+      margin-top: 22px;
+      border-top: 1px solid rgba(55,65,81,0.85);
+      display: none; /* hidden by default, JS will show active one */
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .step:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .step-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #f97316;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .step-hint {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+    }
+
+    .field small {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.84rem;
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.6);
+    }
+
+    .radio-group,
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-top: 4px;
+      font-size: 0.8rem;
+    }
+
+    .radio-group label,
+    .checkbox-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      row-gap: 12px;
+      column-gap: 12px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .impact-grid {
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      }
+    }
+
+    .impact-grid label {
+      align-items: flex-start;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      color: #111827;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.8);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15,23,42,0.9);
+    }
+
+    /* RESULT PANEL (RIGHT) */
+
+    .result-panel {
+      background: radial-gradient(circle at top left, rgba(255,121,0,0.28), transparent 60%);
+      border-radius: 20px;
+      padding: 28px 22px 28px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .result-header-eyebrow {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .result-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .roi-main-value {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .roi-main-number {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #f97316;
+    }
+
+    .roi-main-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .roi-tagline {
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      margin-top: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.76rem;
+      background: rgba(15,23,42,0.95);
+      color: #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.5);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .result-pill {
+      background: rgba(15,23,42,0.95);
+      border-radius: 10px;
+      padding: 10px 11px;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .result-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .result-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    .result-summary {
+      font-size: 0.82rem;
+      color: #d1d5db;
+      margin-top: 16px;
+    }
+
+    .disclaimer {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="page">
+      <header>
+        <h1>Speexx Language Training ROI Calculator</h1>
+        <p>Estimate the potential return of investing in language training for your organisation. Answer three short steps and explore different scenarios.</p>
+      </header>
+
+      <div class="main-card">
+        <!-- LEFT: FORM PANEL -->
+        <section class="form-panel">
+          <div class="steps-header">
+            <div class="steps-title">Describe Your Situation</div>
+            <div class="steps-subtitle">We’ll guide you through 3 simple steps.</div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-wrapper">
+            <div class="progress-track">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-label">
+              <span id="progressText">Step 1 of 3</span>
+              <span id="progressHint">Company Profile</span>
+            </div>
+          </div>
+
+          <!-- STEP 1 -->
+          <div class="step active" data-step="1">
+            <div class="step-header">
+              <div class="step-badge">1</div>
+              <div>
+                <div class="step-title">Company Profile</div>
+                <div class="step-hint">We’ll use this to align with typical industry benchmarks.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Region</label>
+              <select id="region">
+                <option value="na">North America (NA)</option>
+                <option value="emea" selected>Europe, Middle East and Africa (EMEA)</option>
+                <option value="apac">Asia-Pacific (APAC)</option>
+                <option value="latam">Latin America (LATAM)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Company Size</label>
+              <select id="companySize">
+                <option value="1-50">1–50 Employees</option>
+                <option value="51-250" selected>51–250 Employees</option>
+                <option value="251-1000">251–1000 Employees</option>
+                <option value="1000+">1000+ Employees</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Industry</label>
+              <select id="industry">
+                <option value="automotive">Automotive</option>
+                <option value="banking_finance">Banking and Finance</option>
+                <option value="education">Education</option>
+                <option value="energy">Energy</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="healthcare_pharma">Healthcare and Pharma</option>
+                <option value="hospitality">Hospitality</option>
+                <option value="it">Information Technology</option>
+                <option value="manufacturing_hitech">Manufacturing and Hitech</option>
+                <option value="oil_gas">Oil and Gas</option>
+                <option value="public_sector">Public Sector</option>
+                <option value="retail">Retail</option>
+                <option value="telecommunication">Telecommunication</option>
+                <option value="transport_logistics">Transport and Logistics</option>
+              </select>
+            </div>
+
+            <div class="button-row">
+              <button class="btn-primary" type="button" onclick="nextStep()">
+                Next: Training Scope
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step" data-step="2">
+            <div class="step-header">
+              <div class="step-badge">2</div>
+              <div>
+                <div class="step-title">Training Scope</div>
+                <div class="step-hint">Who will be involved and how intensive the training is.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Number of Employees</label>
+              <input type="number" id="learners" value="50" min="1" />
+            </div>
+
+            <div class="field">
+              <label>Programme Intensity</label>
+              <div class="radio-group">
+                <label><input type="radio" name="intensity" value="light"> Light</label>
+                <label><input type="radio" name="intensity" value="standard" checked> Standard</label>
+                <label><input type="radio" name="intensity" value="intensive"> Intensive</label>
+              </div>
+              <small>We estimate typical benchmark costs per learner if you don’t provide your own.</small>
+            </div>
+
+            <div class="field">
+              <label>Estimated Training Cost per Employee per Year</label>
+              <input
+                type="number"
+                id="costPerLearner"
+                min="0"
+                placeholder="e.g. 1500"
+              />
+              <small>If you’re not sure, leave this empty or keep “I don’t know” checked to use benchmarks.</small>
+              <div class="radio-group" style="margin-top: 8px;">
+                <label>
+                  <input type="checkbox" id="costUnknown" checked />
+                  I don’t know – use benchmark estimates
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Languages in the Program</label>
+              <div class="checkbox-group impact-grid" id="languageGroup">
+                <label><input type="checkbox" value="english" checked> English</label>
+                <label><input type="checkbox" value="spanish"> Spanish</label>
+                <label><input type="checkbox" value="french"> French</label>
+                <label><input type="checkbox" value="german"> German</label>
+                <label><input type="checkbox" value="mandarin"> Mandarin Chinese</label>
+                <label><input type="checkbox" value="portuguese"> Portuguese</label>
+                <label><input type="checkbox" value="japanese"> Japanese</label>
+                <label><input type="checkbox" value="arabic"> Arabic</label>
+                <label><input type="checkbox" value="italian"> Italian</label>
+                <label><input type="checkbox" value="dutch"> Dutch</label>
+              </div>
+              <small>You can select one or several languages based on your global footprint.</small>
+            </div>
+
+            <div class="button-row">
+              <button class="btn-secondary" type="button" onclick="prevStep()">
+                Back
+              </button>
+              <button class="btn-primary" type="button" onclick="nextStep()">
+                Next: Expected Impact
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="step" data-step="3">
+            <div class="step-header">
+              <div class="step-badge">3</div>
+              <div>
+                <div class="step-title">Expected Impact</div>
+                <div class="step-hint">Where do you most want to see change?</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Strategic Importance</label>
+              <div class="radio-group">
+                <label><input type="radio" name="importance" value="low"> Low</label>
+                <label><input type="radio" name="importance" value="medium" checked> Medium</label>
+                <label><input type="radio" name="importance" value="high"> High</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Main Impact Areas</label>
+              <div class="checkbox-group impact-grid" id="impactGroup">
+                <label>
+                  <input type="checkbox" value="emp_communication" checked>
+                  Improve employee communication skills
+                </label>
+                <label>
+                  <input type="checkbox" value="emp_confidence">
+                  Boost employee confidence &amp; engagement
+                </label>
+                <label>
+                  <input type="checkbox" value="customer_comm">
+                  Enhance customer communication
+                </label>
+                <label>
+                  <input type="checkbox" value="intl_collaboration">
+                  Support international collaboration
+                </label>
+                <label>
+                  <input type="checkbox" value="productivity">
+                  Increase overall productivity
+                </label>
+                <label>
+                  <input type="checkbox" value="team_collaboration">
+                  Improve team collaboration
+                </label>
+                <label>
+                  <input type="checkbox" value="culture_inclusion">
+                  Strengthen company culture &amp; inclusion
+                </label>
+                <label>
+                  <input type="checkbox" value="fewer_miscommunications">
+                  Reduce miscommunication issues
+                </label>
+                <label>
+                  <input type="checkbox" value="onboarding">
+                  Improve onboarding for multilingual employees
+                </label>
+                <label>
+                  <input type="checkbox" value="global_expansion">
+                  Support global expansion or cross-border work
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Time Horizon</label>
+              <div class="radio-group">
+                <label><input type="radio" name="horizon" value="6m"> 6 Months</label>
+                <label><input type="radio" name="horizon" value="12m" checked> 12 Months</label>
+                <label><input type="radio" name="horizon" value="24m"> 24 Months</label>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="btn-secondary" type="button" onclick="prevStep()">
+                Back
+              </button>
+              <button class="btn-primary" type="button" onclick="calculateROI()">
+                Calculate ROI
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: RESULT PANEL -->
+        <section class="result-panel">
+          <div class="result-header-eyebrow">Your Scenario</div>
+          <div class="result-title">Estimated Return on Investment</div>
+
+          <div class="roi-main-value">
+            <div class="roi-main-number" id="roiValue">0%</div>
+            <div class="roi-main-label">ROI</div>
+          </div>
+          <p class="roi-tagline" id="roiTagline">
+            Start by filling in the steps on the left to see your scenario.
+          </p>
+
+          <span id="confidenceChip" class="badge">
+            Medium confidence
+          </span>
+
+          <div class="result-grid">
+            <div class="result-pill">
+              <div class="result-label">Estimated Annual Benefit</div>
+              <div class="result-value" id="benefitValue">€0</div>
+            </div>
+            <div class="result-pill">
+              <div class="result-label">Per €1 Invested</div>
+              <div class="result-value" id="perEuroValue">€0.00</div>
+            </div>
+          </div>
+
+          <p class="result-summary" id="summaryText">
+            Adjust the inputs on the left and click “Calculate ROI” to see an estimate based on industry benchmarks.
+          </p>
+
+          <p class="disclaimer">
+            This model provides directional guidance for HR and business leaders. For budgeting, use it alongside your own cost and performance data.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function showStep(step) {
+      currentStep = step;
+
+      // Toggle step visibility
+      const steps = document.querySelectorAll('.step');
+      steps.forEach((s) => {
+        const stepNum = parseInt(s.getAttribute('data-step'), 10);
+        s.classList.toggle('active', stepNum === currentStep);
+      });
+
+      // Update progress bar
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      const progressHint = document.getElementById('progressHint');
+
+      const percent = (currentStep / totalSteps) * 100;
+      progressBar.style.width = percent + '%';
+      progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+
+      let hint = '';
+      if (currentStep === 1) hint = 'Company Profile';
+      if (currentStep === 2) hint = 'Training Scope';
+      if (currentStep === 3) hint = 'Expected Impact';
+
+      progressHint.textContent = hint;
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        showStep(currentStep + 1);
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+    }
+
+    function calculateROI() {
+      const companySize = document.getElementById('companySize').value;
+      const industry = document.getElementById('industry').value;
+      const learners = parseInt(document.getElementById('learners').value || '0', 10);
+
+      const intensity = document.querySelector('input[name="intensity"]:checked').value;
+      const importance = document.querySelector('input[name="importance"]:checked').value;
+      const horizon = document.querySelector('input[name="horizon"]:checked').value;
+
+      const impactCheckboxes = document.querySelectorAll('#impactGroup input[type="checkbox"]:checked');
+      const impacts = Array.from(impactCheckboxes).map(cb => cb.value);
+
+      const languageCheckboxes = document.querySelectorAll('#languageGroup input[type="checkbox"]:checked');
+      const languages = Array.from(languageCheckboxes).map(cb => cb.value);
+
+      // --- Cost logic: manual override vs benchmark ---
+      const intensityCost = {
+        light: 500,
+        standard: 1500,
+        intensive: 3000
+      }[intensity];
+
+      const sizeFactor = {
+        '1-50': 1.1,
+        '51-250': 1.0,
+        '251-1000': 0.9,
+        '1000+': 0.8
+      }[companySize];
+
+      const costUnknown = document.getElementById('costUnknown').checked;
+      const manualCostInput = parseFloat(
+        document.getElementById('costPerLearner').value || '0'
+      );
+
+      let costPerLearner;
+      if (!costUnknown && manualCostInput > 0) {
+        costPerLearner = manualCostInput;   // Use user-provided cost
+      } else {
+        costPerLearner = intensityCost * sizeFactor;  // Use benchmark cost
+      }
+
+      const totalCost = learners * costPerLearner;
+
+      // --- ROI multipliers ---
+      const baseMultiplier = 2.0;
+
+      const industryBonus = {
+        'automotive': 0.3,
+        'banking_finance': 0.5,
+        'education': 0.3,
+        'energy': 0.2,
+        'entertainment': 0.3,
+        'healthcare_pharma': 0.5,
+        'hospitality': 0.6,
+        'it': 0.5,
+        'manufacturing_hitech': 0.4,
+        'oil_gas': 0.3,
+        'public_sector': 0.2,
+        'retail': 0.4,
+        'telecommunication': 0.5,
+        'transport_logistics': 0.3
+      }[industry];
+
+      const importanceFactor = { low: 0.8, medium: 1.0, high: 1.2 }[importance];
+      const timeFactor = { '6m': 0.6, '12m': 1.0, '24m': 1.3 }[horizon];
+
+      // Impact bonus: each impact adds 0.1, capped at +0.5
+      const impactBonus = Math.min(0.1 * impacts.length, 0.5);
+
+      // Language bonus: more languages = more global impact, modestly
+      const extraLanguages = Math.max(languages.length - 1, 0);
+      const languageBonus = Math.min(0.05 * extraLanguages, 0.2);
+
+      let effectiveMultiplier =
+        baseMultiplier * importanceFactor * timeFactor +
+        industryBonus + impactBonus + languageBonus;
+
+      // Cap multiplier to avoid silly numbers
+      effectiveMultiplier = Math.min(effectiveMultiplier, 6.0);
+
+      const totalBenefit = totalCost * effectiveMultiplier;
+      const roiPct = totalCost > 0 ? ((totalBenefit - totalCost) / totalCost) * 100 : 0;
+      const returnPerEuro = totalCost > 0 ? totalBenefit / totalCost : 0;
+
+      // --- Confidence heuristic ---
+      let confidence = 'Low';
+      if (learners > 0 && impacts.length >= 2) confidence = 'Medium';
+      if (learners > 0 && impacts.length >= 3 && horizon !== '6m') confidence = 'High';
+
+      // --- Dynamic ROI tagline ---
+      let roiTagline = '';
+      if (totalCost === 0) {
+        roiTagline = 'Enter at least one employee to train to see your scenario.';
+      } else if (roiPct < 50) {
+        roiTagline = 'Conservative scenario – useful as a low-end estimate or pilot phase.';
+      } else if (roiPct < 150) {
+        roiTagline = 'Solid business case – language training is likely to pay off clearly.';
+      } else {
+        roiTagline = 'High-impact scenario – strong potential upside if the program is well executed.';
+      }
+
+      const fmtMoney = val =>
+        '€' + (Math.round(val / 100) * 100).toLocaleString('en-US');
+
+      // Update UI
+      document.getElementById('benefitValue').textContent = fmtMoney(totalBenefit);
+      document.getElementById('roiValue').textContent = Math.round(roiPct) + '%';
+      document.getElementById('perEuroValue').textContent = '€' + returnPerEuro.toFixed(2);
+      document.getElementById('roiTagline').textContent = roiTagline;
+
+      document.getElementById('summaryText').textContent =
+        totalCost > 0
+          ? `For every €1 invested in language training, this scenario suggests a return of approximately €${returnPerEuro.toFixed(2)} over the selected time horizon.`
+          : 'Please enter at least one employee to train to see an estimate.';
+
+      const chip = document.getElementById('confidenceChip');
+      chip.textContent = confidence + ' confidence';
+    }
+
+    // Initialise on load
+    showStep(1);
+    calculateROI(); // so the right side has initial numbers
+  </script>
+</body>
+</html>
