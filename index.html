@@ -21,9 +21,7 @@
       --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.2);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -94,9 +92,7 @@
       box-shadow: var(--shadow-subtle);
     }
 
-    .steps-header {
-      margin-bottom: 18px;
-    }
+    .steps-header { margin-bottom: 18px; }
 
     .steps-title {
       font-size: 0.95rem;
@@ -144,12 +140,10 @@
       padding-top: 24px;
       margin-top: 22px;
       border-top: 1px solid rgba(55,65,81,0.85);
-      display: none; /* hidden by default, JS will show active one */
+      display: none;
     }
 
-    .step.active {
-      display: block;
-    }
+    .step.active { display: block; }
 
     .step:first-of-type {
       border-top: none;
@@ -188,9 +182,7 @@
       color: var(--text-muted);
     }
 
-    .field {
-      margin-bottom: 18px;
-    }
+    .field { margin-bottom: 18px; }
 
     .field label {
       display: block;
@@ -253,9 +245,7 @@
       }
     }
 
-    .impact-grid label {
-      align-items: flex-start;
-    }
+    .impact-grid label { align-items: flex-start; }
 
     .button-row {
       display: flex;
@@ -276,14 +266,8 @@
       box-shadow: 0 10px 25px rgba(15,23,42,0.8);
     }
 
-    .btn-primary:hover:enabled {
-      filter: brightness(1.05);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
+    .btn-primary:hover:enabled { filter: brightness(1.05); }
+    .btn-primary:disabled { opacity: 0.6; cursor: default; }
 
     .btn-secondary {
       flex: 1;
@@ -297,19 +281,24 @@
       cursor: pointer;
     }
 
-    .btn-secondary:hover {
-      background: rgba(15,23,42,0.9);
+    .btn-secondary:hover { background: rgba(15,23,42,0.9); }
+
+    /* Small reset pill: does not stretch */
+    .btn-reset {
+      flex: 0 0 auto;
+      padding-inline: 12px;
+      font-size: 0.78rem;
+      white-space: nowrap;
     }
 
     /* Mobile: stack buttons full-width */
-
     @media (max-width: 720px) {
       .button-row {
         flex-direction: column;
       }
-
       .button-row .btn-primary,
-      .button-row .btn-secondary {
+      .button-row .btn-secondary,
+      .button-row .btn-reset {
         width: 100%;
         flex: none;
       }
@@ -328,9 +317,7 @@
       transition: opacity 0.2s ease-out, transform 0.2s ease-out;
     }
 
-    .result-panel.calculating {
-      opacity: 0.9;
-    }
+    .result-panel.calculating { opacity: 0.9; }
 
     .result-panel.calculating .roi-main-number,
     .result-panel.calculating .result-value {
@@ -339,7 +326,7 @@
 
     @keyframes pulse {
       from { opacity: 0.4; }
-      to { opacity: 1; }
+      to   { opacity: 1; }
     }
 
     .result-header-eyebrow {
@@ -524,7 +511,7 @@
             </div>
 
             <div class="button-row">
-              <button class="btn-secondary" type="button" onclick="resetForm()">
+              <button class="btn-secondary btn-reset" type="button" onclick="resetForm()">
                 Reset
               </button>
               <button class="btn-primary" type="button" onclick="nextStep()">
@@ -566,13 +553,7 @@
                 min="0"
                 placeholder="e.g. 1500"
               />
-              <small>If you’re not sure, leave this empty or keep “I don’t know” checked to use benchmarks.</small>
-              <div class="radio-group" style="margin-top: 8px;">
-                <label>
-                  <input type="checkbox" id="costUnknown" checked />
-                  I don’t know – use benchmark estimates
-                </label>
-              </div>
+              <small>If you’re not sure, leave this field blank and we’ll use benchmark estimates based on your settings.</small>
             </div>
 
             <div class="field">
@@ -596,7 +577,7 @@
               <button class="btn-secondary" type="button" onclick="prevStep()">
                 Back
               </button>
-              <button class="btn-secondary" type="button" onclick="resetForm()">
+              <button class="btn-secondary btn-reset" type="button" onclick="resetForm()">
                 Reset
               </button>
               <button class="btn-primary" type="button" onclick="nextStep()">
@@ -683,7 +664,7 @@
               <button class="btn-secondary" type="button" onclick="prevStep()">
                 Back
               </button>
-              <button class="btn-secondary" type="button" onclick="resetForm()">
+              <button class="btn-secondary btn-reset" type="button" onclick="resetForm()">
                 Reset
               </button>
               <button class="btn-primary" type="button" id="calculateBtn" onclick="calculateROI()">
@@ -738,81 +719,52 @@
   </div>
 
   <script>
+    // ---- CONFIG CONSTANTS ----
+    const INTENSITY_COST = { light: 500, standard: 1500, intensive: 3000 };
+    const SIZE_FACTOR = { '1-50': 1.1, '51-250': 1.0, '251-1000': 0.9, '1000+': 0.8 };
+    const SIZE_HEADCOUNT = { '1-50': 30, '51-250': 150, '251-1000': 600, '1000+': 2000 };
+    const INDUSTRY_BONUS = {
+      automotive: 0.3,
+      banking_finance: 0.5,
+      education: 0.3,
+      energy: 0.2,
+      entertainment: 0.3,
+      healthcare_pharma: 0.5,
+      hospitality: 0.6,
+      it: 0.5,
+      manufacturing_hitech: 0.4,
+      oil_gas: 0.3,
+      public_sector: 0.2,
+      retail: 0.4,
+      telecommunication: 0.5,
+      transport_logistics: 0.3
+    };
+    const IMPORTANCE_FACTOR = { low: 0.8, medium: 1.0, high: 1.2 };
+    const TIME_FACTOR = { '6m': 0.6, '12m': 1.0, '24m': 1.3 };
+    const LANGUAGE_WEIGHTS = {
+      english: 1.0,
+      mandarin: 0.9,
+      spanish: 0.8,
+      german: 0.7,
+      french: 0.7,
+      portuguese: 0.6,
+      arabic: 0.6,
+      japanese: 0.6,
+      italian: 0.4,
+      dutch: 0.4
+    };
+
     let currentStep = 1;
     const totalSteps = 3;
     let isCalculating = false;
 
-    function showStep(step) {
-      currentStep = step;
+    const getSelectedRadio = (name) =>
+      document.querySelector(`input[name="${name}"]:checked`)?.value;
 
-      // Toggle step visibility
-      const steps = document.querySelectorAll('.step');
-      steps.forEach((s) => {
-        const stepNum = parseInt(s.getAttribute('data-step'), 10);
-        s.classList.toggle('active', stepNum === currentStep);
-      });
+    const fmtMoney = (val) =>
+      '€' + (Math.round(val / 100) * 100).toLocaleString('en-US');
 
-      // Update progress bar
-      const progressBar = document.getElementById('progressBar');
-      const progressText = document.getElementById('progressText');
-      const progressHint = document.getElementById('progressHint');
-
-      const percent = (currentStep / totalSteps) * 100;
-      progressBar.style.width = percent + '%';
-      progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
-
-      let hint = '';
-      if (currentStep === 1) hint = 'Company Profile';
-      if (currentStep === 2) hint = 'Training Scope';
-      if (currentStep === 3) hint = 'Expected Impact';
-
-      progressHint.textContent = hint;
-    }
-
-    function nextStep() {
-      if (currentStep < totalSteps) {
-        showStep(currentStep + 1);
-      }
-    }
-
-    function prevStep() {
-      if (currentStep > 1) {
-        showStep(currentStep - 1);
-      }
-    }
-
-    function resetForm() {
-      // Step 1 defaults
-      document.getElementById('region').value = 'emea';
-      document.getElementById('companySize').value = '51-250';
-      document.getElementById('industry').value = 'education';
-
-      // Step 2 defaults
-      document.getElementById('learners').value = 50;
-      document.querySelectorAll('input[name="intensity"]').forEach(r => {
-        r.checked = (r.value === 'standard');
-      });
-      document.getElementById('costPerLearner').value = '';
-      document.getElementById('costUnknown').checked = true;
-
-      // Languages: English only
-      document.querySelectorAll('#languageGroup input[type="checkbox"]').forEach(cb => {
-        cb.checked = (cb.value === 'english');
-      });
-
-      // Step 3 defaults
-      document.querySelectorAll('input[name="importance"]').forEach(r => {
-        r.checked = (r.value === 'medium');
-      });
-      document.querySelectorAll('input[name="horizon"]').forEach(r => {
-        r.checked = (r.value === '12m');
-      });
-
-      document.querySelectorAll('#impactGroup input[type="checkbox"]').forEach(cb => {
-        cb.checked = (cb.value === 'emp_communication');
-      });
-
-      // Reset result panel
+    function resetResultsCard() {
       const roiValue = document.getElementById('roiValue');
       const benefitValue = document.getElementById('benefitValue');
       const perEuroValue = document.getElementById('perEuroValue');
@@ -831,8 +783,68 @@
       resultPanel.classList.remove('calculating');
       if (calcBtn) calcBtn.disabled = false;
       isCalculating = false;
+    }
 
-      // Back to step 1
+    function showStep(step) {
+      currentStep = step;
+
+      document.querySelectorAll('.step').forEach((s) => {
+        const stepNum = parseInt(s.getAttribute('data-step'), 10);
+        s.classList.toggle('active', stepNum === currentStep);
+      });
+
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      const progressHint = document.getElementById('progressHint');
+
+      const percent = (currentStep / totalSteps) * 100;
+      progressBar.style.width = percent + '%';
+      progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+
+      const hintMap = {
+        1: 'Company Profile',
+        2: 'Training Scope',
+        3: 'Expected Impact'
+      };
+      progressHint.textContent = hintMap[currentStep] || '';
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) showStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 1) showStep(currentStep - 1);
+    }
+
+    function resetForm() {
+      // Step 1 defaults
+      document.getElementById('region').value = 'emea';
+      document.getElementById('companySize').value = '51-250';
+      document.getElementById('industry').value = 'education';
+
+      // Step 2 defaults
+      document.getElementById('learners').value = 50;
+      document.querySelectorAll('input[name="intensity"]').forEach(r => {
+        r.checked = (r.value === 'standard');
+      });
+      document.getElementById('costPerLearner').value = '';
+      document.querySelectorAll('#languageGroup input[type="checkbox"]').forEach(cb => {
+        cb.checked = (cb.value === 'english');
+      });
+
+      // Step 3 defaults
+      document.querySelectorAll('input[name="importance"]').forEach(r => {
+        r.checked = (r.value === 'medium');
+      });
+      document.querySelectorAll('input[name="horizon"]').forEach(r => {
+        r.checked = (r.value === '12m');
+      });
+      document.querySelectorAll('#impactGroup input[type="checkbox"]').forEach(cb => {
+        cb.checked = (cb.value === 'emp_communication');
+      });
+
+      resetResultsCard();
       showStep(1);
     }
 
@@ -843,9 +855,9 @@
       const industry = document.getElementById('industry').value;
       const learners = parseInt(document.getElementById('learners').value || '0', 10);
 
-      const intensity = document.querySelector('input[name="intensity"]:checked').value;
-      const importance = document.querySelector('input[name="importance"]:checked').value;
-      const horizon = document.querySelector('input[name="horizon"]:checked').value;
+      const intensity = getSelectedRadio('intensity');
+      const importance = getSelectedRadio('importance');
+      const horizon = getSelectedRadio('horizon');
 
       const impactCheckboxes = document.querySelectorAll('#impactGroup input[type="checkbox"]:checked');
       const impacts = Array.from(impactCheckboxes).map(cb => cb.value);
@@ -862,17 +874,12 @@
       const resultPanel = document.getElementById('resultPanel');
       const calcBtn = document.getElementById('calculateBtn');
 
-      // Validate required inputs:
-      // - at least 1 learner
-      // - at least 1 impact area
-      // - at least 1 language
       const isComplete =
         learners > 0 &&
         impacts.length > 0 &&
         languages.length > 0;
 
       if (!isComplete) {
-        // Clear numbers and show guidance
         roiValue.textContent = '—';
         benefitValue.textContent = '—';
         perEuroValue.textContent = '—';
@@ -885,10 +892,10 @@
         return;
       }
 
-      // Start "calculating" animation
+      // Start animation
       isCalculating = true;
       resultPanel.classList.add('calculating');
-      if (calcBtn) calcBtn.disabled = true;
+      calcBtn.disabled = true;
 
       roiValue.textContent = '…';
       benefitValue.textContent = '…';
@@ -896,126 +903,74 @@
       roiTagline.textContent = 'Calculating your scenario…';
       summaryText.textContent = 'We are applying your inputs to typical industry benchmarks. This only takes a moment.';
 
-      // Delay results by 2 seconds to show animation
       setTimeout(() => {
-        // --- Cost logic: manual override vs benchmark ---
-        const intensityCost = {
-          light: 500,
-          standard: 1500,
-          intensive: 3000
-        }[intensity];
+        // ----- COST -----
+        const sizeFactor = SIZE_FACTOR[companySize] ?? 1.0;
+        const intensityCost = INTENSITY_COST[intensity] ?? 1500;
 
-        const sizeFactor = {
-          '1-50': 1.1,
-          '51-250': 1.0,
-          '251-1000': 0.9,
-          '1000+': 0.8
-        }[companySize];
+        const manualCostInput = parseFloat(document.getElementById('costPerLearner').value || '0');
 
-        const costUnknown = document.getElementById('costUnknown').checked;
-        const manualCostInput = parseFloat(
-          document.getElementById('costPerLearner').value || '0'
-        );
+        // Benchmark cost per learner (for reference)
+        const benchmarkCostPerLearner = intensityCost * sizeFactor;
 
-        let costPerLearner;
-        if (!costUnknown && manualCostInput > 0) {
-          costPerLearner = manualCostInput;   // Use user-provided cost
-        } else {
-          costPerLearner = intensityCost * sizeFactor;  // Use benchmark cost
-        }
+        // Actual cost per learner (manual if provided, otherwise benchmark)
+        const costPerLearner = (manualCostInput > 0)
+          ? manualCostInput
+          : benchmarkCostPerLearner;
 
         const totalCost = learners * costPerLearner;
 
-        // --- Readiness factor: learners vs estimated company size ---
-        const sizeHeadcount = {
-          '1-50': 30,
-          '51-250': 150,
-          '251-1000': 600,
-          '1000+': 2000
-        };
-        const estHeadcount = sizeHeadcount[companySize] || 150;
+        // ----- READINESS -----
+        const estHeadcount = SIZE_HEADCOUNT[companySize] ?? 150;
         const participationRate = estHeadcount > 0 ? (learners / estHeadcount) : 0;
 
         let readinessFactor;
-        if (participationRate < 0.05) readinessFactor = 0.8;        // very small pilot
-        else if (participationRate < 0.15) readinessFactor = 1.0;   // typical coverage
-        else if (participationRate < 0.4) readinessFactor = 1.1;    // strong rollout
-        else readinessFactor = 1.15;                                // very strong learning culture
+        if (participationRate < 0.05)      readinessFactor = 0.8;
+        else if (participationRate < 0.15) readinessFactor = 1.0;
+        else if (participationRate < 0.4)  readinessFactor = 1.1;
+        else                               readinessFactor = 1.15;
 
-        // --- Industry bonus ---
-        const industryBonusMap = {
-          'automotive': 0.3,
-          'banking_finance': 0.5,
-          'education': 0.3,
-          'energy': 0.2,
-          'entertainment': 0.3,
-          'healthcare_pharma': 0.5,
-          'hospitality': 0.6,
-          'it': 0.5,
-          'manufacturing_hitech': 0.4,
-          'oil_gas': 0.3,
-          'public_sector': 0.2,
-          'retail': 0.4,
-          'telecommunication': 0.5,
-          'transport_logistics': 0.3
-        };
-        const industryBonus = industryBonusMap[industry] || 0.3;
+        // ----- MULTIPLIERS & BONUSES -----
+        const industryBonus = INDUSTRY_BONUS[industry] ?? 0.3;
+        const importanceFactor = IMPORTANCE_FACTOR[importance] ?? 1.0;
+        const timeFactor = TIME_FACTOR[horizon] ?? 1.0;
 
-        // --- Importance & time factors ---
-        const importanceFactor = { low: 0.8, medium: 1.0, high: 1.2 }[importance];
-        const timeFactor = { '6m': 0.6, '12m': 1.0, '24m': 1.3 }[horizon];
-
-        // --- Impact bonus: each impact adds 0.1, capped at +0.5 ---
         const impactBonus = Math.min(0.1 * impacts.length, 0.5);
-
-        // --- Language bonus: value of language portfolio, not just count ---
-        const languageWeights = {
-          english: 1.0,
-          mandarin: 0.9,
-          spanish: 0.8,
-          german: 0.7,
-          french: 0.7,
-          portuguese: 0.6,
-          arabic: 0.6,
-          japanese: 0.6,
-          italian: 0.4,
-          dutch: 0.4
-        };
 
         let languageScore = 0;
         languages.forEach(lang => {
-          languageScore += (languageWeights[lang] || 0.4);
+          languageScore += (LANGUAGE_WEIGHTS[lang] ?? 0.4);
         });
-
-        // Diminishing returns & clamp to reasonable range
         let normalizedLanguage = Math.sqrt(languageScore || 0.4);
         normalizedLanguage = Math.max(normalizedLanguage, 0.8);
         normalizedLanguage = Math.min(normalizedLanguage, 2.0);
+        const languageBonus = (normalizedLanguage - 1) * 0.2;
 
-        const languageBonus = (normalizedLanguage - 1) * 0.2;  // roughly -0.04 to +0.2
+        // ---- Cost efficiency: how far from benchmark cost? ----
+        let costEfficiency = benchmarkCostPerLearner / costPerLearner;
+        if (!isFinite(costEfficiency) || costEfficiency <= 0) costEfficiency = 1;
+        // Clamp so we don't get unrealistic ROI jumps
+        costEfficiency = Math.max(0.7, Math.min(costEfficiency, 1.3));
 
-        // --- Base multiplier with readiness factor ---
         const baseMultiplier = 2.0;
         let effectiveMultiplier =
-          baseMultiplier * importanceFactor * timeFactor * readinessFactor;
+          baseMultiplier * importanceFactor * timeFactor * readinessFactor
+          * costEfficiency
+          + industryBonus + impactBonus + languageBonus;
 
-        // Additive bonuses
-        effectiveMultiplier += industryBonus + impactBonus + languageBonus;
-
-        // Cap multiplier to avoid silly numbers
         effectiveMultiplier = Math.min(effectiveMultiplier, 6.0);
 
         const totalBenefit = totalCost * effectiveMultiplier;
         const roiPct = totalCost > 0 ? ((totalBenefit - totalCost) / totalCost) * 100 : 0;
         const returnPerEuro = totalCost > 0 ? totalBenefit / totalCost : 0;
 
-        // --- Confidence heuristic ---
+        // Confidence
         let confidence = 'Low';
         if (learners > 0 && impacts.length >= 2) confidence = 'Medium';
         if (learners > 0 && impacts.length >= 3 && horizon !== '6m') confidence = 'High';
 
-        // --- Dynamic ROI tagline ---
-        let roiTaglineText = '';
+        // Tagline
+        let roiTaglineText;
         if (totalCost === 0) {
           roiTaglineText = 'Enter at least one learner to see your scenario.';
         } else if (roiPct < 50) {
@@ -1026,10 +981,7 @@
           roiTaglineText = 'High-impact scenario – strong potential upside if the program is well executed.';
         }
 
-        const fmtMoney = val =>
-          '€' + (Math.round(val / 100) * 100).toLocaleString('en-US');
-
-        // Update UI with real numbers
+        // Update UI
         roiValue.textContent = isFinite(roiPct) ? Math.round(roiPct) + '%' : '—';
         benefitValue.textContent = isFinite(totalBenefit) ? fmtMoney(totalBenefit) : '—';
         perEuroValue.textContent = isFinite(returnPerEuro) ? '€' + returnPerEuro.toFixed(2) : '—';
@@ -1042,15 +994,15 @@
 
         confidenceChip.textContent = confidence + ' confidence';
 
-        // Stop animation
         resultPanel.classList.remove('calculating');
-        if (calcBtn) calcBtn.disabled = false;
+        calcBtn.disabled = false;
         isCalculating = false;
       }, 2000);
     }
 
-    // Initialise on load
-    showStep(1);
+    document.addEventListener('DOMContentLoaded', () => {
+      showStep(1);
+    });
   </script>
 </body>
 </html>
