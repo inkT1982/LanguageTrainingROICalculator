@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Language Training ROI Calculator</title>
+  <title>Speexx Language Training ROI Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Roboto -->
@@ -450,13 +450,13 @@
   <div class="shell">
     <div class="page">
       <header>
-        <h1>Language Training ROI Calculator</h1>
+        <h1>Speexx Language Training ROI Calculator</h1>
         <p>Estimate the potential return of investing in language training for your organisation. Answer three short steps and explore different scenarios.</p>
       </header>
 
-      <div class="main-card">
+      <main class="main-card">
         <!-- LEFT: FORM PANEL -->
-        <section class="form-panel">
+        <section class="form-panel" aria-label="ROI input steps">
           <div class="steps-header">
             <div class="steps-title">Describe Your Situation</div>
             <div class="steps-subtitle">We’ll guide you through 3 simple steps.</div>
@@ -484,7 +484,7 @@
             </div>
 
             <div class="field">
-              <label>Region</label>
+              <label for="region">Region</label>
               <select id="region">
                 <option value="na">North America (NA)</option>
                 <option value="emea" selected>Europe, Middle East and Africa (EMEA)</option>
@@ -494,7 +494,7 @@
             </div>
 
             <div class="field">
-              <label>Company Size</label>
+              <label for="companySize">Company Size</label>
               <select id="companySize">
                 <option value="1-50">1–50 Employees</option>
                 <option value="51-250" selected>51–250 Employees</option>
@@ -504,7 +504,7 @@
             </div>
 
             <div class="field">
-              <label>Industry</label>
+              <label for="industry">Industry</label>
               <select id="industry">
                 <option value="automotive">Automotive</option>
                 <option value="banking_finance">Banking and Finance</option>
@@ -544,7 +544,7 @@
             </div>
 
             <div class="field">
-              <label>Number of Learners</label>
+              <label for="learners">Number of Learners</label>
               <input type="number" id="learners" value="50" min="1" />
             </div>
 
@@ -559,7 +559,7 @@
             </div>
 
             <div class="field">
-              <label>Estimated Training Cost per Employee per Year</label>
+              <label for="costPerLearner">Estimated Training Cost per Learner per Year</label>
               <input
                 type="number"
                 id="costPerLearner"
@@ -629,11 +629,11 @@
               <div class="checkbox-group impact-grid" id="impactGroup">
                 <label>
                   <input type="checkbox" value="emp_communication" checked>
-                  Improve employee communication skills
+                  Improve learner communication skills
                 </label>
                 <label>
                   <input type="checkbox" value="emp_confidence">
-                  Boost employee confidence &amp; engagement
+                  Boost learner confidence &amp; engagement
                 </label>
                 <label>
                   <input type="checkbox" value="customer_comm">
@@ -694,7 +694,7 @@
         </section>
 
         <!-- RIGHT: RESULT PANEL -->
-        <section class="result-panel" id="resultPanel">
+        <section class="result-panel" id="resultPanel" aria-label="Estimated ROI">
           <div class="result-header-eyebrow">Your Scenario</div>
           <div class="result-title">Estimated Return on Investment</div>
 
@@ -702,15 +702,15 @@
             <div class="roi-main-number" id="roiValue">—</div>
             <div class="roi-main-label">ROI</div>
           </div>
-          <p class="roi-tagline" id="roiTagline">
+          <p class="roi-tagline" id="roiTagline" aria-live="polite">
             Start by filling in the steps on the left and calculating your scenario.
           </p>
 
-          <span id="confidenceChip" class="badge">
+          <span id="confidenceChip" class="badge" aria-live="polite">
             —
           </span>
 
-          <div class="result-grid">
+          <div class="result-grid" aria-live="polite">
             <div class="result-pill">
               <div class="result-label">Estimated Annual Benefit</div>
               <div class="result-value" id="benefitValue">—</div>
@@ -721,7 +721,7 @@
             </div>
           </div>
 
-          <p class="result-summary" id="summaryText">
+          <p class="result-summary" id="summaryText" aria-live="polite">
             Complete all three steps and click “Calculate ROI” to see an estimate based on industry benchmarks.
           </p>
 
@@ -733,7 +733,7 @@
             This model provides directional guidance for HR and business leaders. For budgeting, use it alongside your own cost and performance data.
           </p>
         </section>
-      </div>
+      </main>
     </div>
   </div>
 
@@ -863,7 +863,7 @@
       const calcBtn = document.getElementById('calculateBtn');
 
       // Validate required inputs:
-      // - at least 1 employee
+      // - at least 1 learner
       // - at least 1 impact area
       // - at least 1 language
       const isComplete =
@@ -876,8 +876,8 @@
         roiValue.textContent = '—';
         benefitValue.textContent = '—';
         perEuroValue.textContent = '—';
-        roiTagline.textContent = 'Please complete all steps (at least one employee, one language, and one impact area) before calculating.';
-        summaryText.textContent = 'Make sure you have added at least one employee, selected at least one language, and chosen where you expect impact.';
+        roiTagline.textContent = 'Please complete all steps (at least one learner, one language, and one impact area) before calculating.';
+        summaryText.textContent = 'Make sure you have added at least one learner, selected at least one language, and chosen where you expect impact.';
         confidenceChip.textContent = '—';
         resultPanel.classList.remove('calculating');
         if (calcBtn) calcBtn.disabled = false;
@@ -926,10 +926,24 @@
 
         const totalCost = learners * costPerLearner;
 
-        // --- ROI multipliers ---
-        const baseMultiplier = 2.0;
+        // --- Readiness factor: learners vs estimated company size ---
+        const sizeHeadcount = {
+          '1-50': 30,
+          '51-250': 150,
+          '251-1000': 600,
+          '1000+': 2000
+        };
+        const estHeadcount = sizeHeadcount[companySize] || 150;
+        const participationRate = estHeadcount > 0 ? (learners / estHeadcount) : 0;
 
-        const industryBonus = {
+        let readinessFactor;
+        if (participationRate < 0.05) readinessFactor = 0.8;        // very small pilot
+        else if (participationRate < 0.15) readinessFactor = 1.0;   // typical coverage
+        else if (participationRate < 0.4) readinessFactor = 1.1;    // strong rollout
+        else readinessFactor = 1.15;                                // very strong learning culture
+
+        // --- Industry bonus ---
+        const industryBonusMap = {
           'automotive': 0.3,
           'banking_finance': 0.5,
           'education': 0.3,
@@ -944,21 +958,49 @@
           'retail': 0.4,
           'telecommunication': 0.5,
           'transport_logistics': 0.3
-        }[industry];
+        };
+        const industryBonus = industryBonusMap[industry] || 0.3;
 
+        // --- Importance & time factors ---
         const importanceFactor = { low: 0.8, medium: 1.0, high: 1.2 }[importance];
         const timeFactor = { '6m': 0.6, '12m': 1.0, '24m': 1.3 }[horizon];
 
-        // Impact bonus: each impact adds 0.1, capped at +0.5
+        // --- Impact bonus: each impact adds 0.1, capped at +0.5 ---
         const impactBonus = Math.min(0.1 * impacts.length, 0.5);
 
-        // Language bonus: more languages = more global impact, modestly
-        const extraLanguages = Math.max(languages.length - 1, 0);
-        const languageBonus = Math.min(0.05 * extraLanguages, 0.2);
+        // --- Language bonus: value of language portfolio, not just count ---
+        const languageWeights = {
+          english: 1.0,
+          mandarin: 0.9,
+          spanish: 0.8,
+          german: 0.7,
+          french: 0.7,
+          portuguese: 0.6,
+          arabic: 0.6,
+          japanese: 0.6,
+          italian: 0.4,
+          dutch: 0.4
+        };
 
+        let languageScore = 0;
+        languages.forEach(lang => {
+          languageScore += (languageWeights[lang] || 0.4);
+        });
+
+        // Diminishing returns & clamp to reasonable range
+        let normalizedLanguage = Math.sqrt(languageScore || 0.4);
+        normalizedLanguage = Math.max(normalizedLanguage, 0.8);
+        normalizedLanguage = Math.min(normalizedLanguage, 2.0);
+
+        const languageBonus = (normalizedLanguage - 1) * 0.2;  // roughly -0.04 to +0.2
+
+        // --- Base multiplier with readiness factor ---
+        const baseMultiplier = 2.0;
         let effectiveMultiplier =
-          baseMultiplier * importanceFactor * timeFactor +
-          industryBonus + impactBonus + languageBonus;
+          baseMultiplier * importanceFactor * timeFactor * readinessFactor;
+
+        // Additive bonuses
+        effectiveMultiplier += industryBonus + impactBonus + languageBonus;
 
         // Cap multiplier to avoid silly numbers
         effectiveMultiplier = Math.min(effectiveMultiplier, 6.0);
@@ -975,7 +1017,7 @@
         // --- Dynamic ROI tagline ---
         let roiTaglineText = '';
         if (totalCost === 0) {
-          roiTaglineText = 'Enter at least one employee to train to see your scenario.';
+          roiTaglineText = 'Enter at least one learner to see your scenario.';
         } else if (roiPct < 50) {
           roiTaglineText = 'Conservative scenario – useful as a low-end estimate or pilot phase.';
         } else if (roiPct < 150) {
@@ -996,7 +1038,7 @@
         summaryText.textContent =
           totalCost > 0
             ? `For every €1 invested in language training, this scenario suggests a return of approximately €${returnPerEuro.toFixed(2)} over the selected time horizon.`
-            : 'Please enter at least one employee to train to see an estimate.';
+            : 'Please enter at least one learner to see an estimate.';
 
         confidenceChip.textContent = confidence + ' confidence';
 
