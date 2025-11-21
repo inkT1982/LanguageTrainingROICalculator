@@ -1,0 +1,186 @@
+  - name: Setup Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: '20'
+
+  # Step 1: Install PDF Generation Tool (e.g., Puppeteer)
+  # This step represents installing the necessary tools to generate the PDF 
+  # based on a custom HTML template.
+  - name: Install Dependencies
+    run: npm install puppeteer
+
+  # Step 2: Generate PDF using dynamic and static content
+  # This is the conceptual core step that addresses all user requirements.
+  - name: Create and Generate PDF
+    id: pdf_generator
+    run: |
+      # The input JSON payload from the HTML form (via repository_dispatch)
+      PAYLOAD='${{ github.event.inputs.client_payload }}'
+      
+      # Static Content (Pre-written text not on the calculator page)
+      STATIC_INTRO="## Why Language Training is Key to Global Success"
+      STATIC_BODY="Global expansion and effective international collaboration hinge on strong communication. Investing in dedicated language training platforms like Speexx minimizes operational risk from miscommunication, boosts employee confidence, and accelerates global market penetration. This report summarizes your custom scenario and the potential ROI for your organization."
+
+      # SVG Logo (XML is base64 encoded to easily pass through environment vars/scripts)
+      # Note: The SVG is scaled to 104.22px x 22.5px in the final PDF template.
+      SVG_LOGO_BASE64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iRWJlbmVfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMjAwIDI1OSI+CiAgPHJlZjMgY2xhc3M9InN0MCI+CiAgICAgIGZpbGw6ICNmZjc5MDA7CiAgPC9yZWY+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIxMDA1LjcyIDE5Mi42IDEwNjMuMjQgMTkyLjYgMTEwMi4wMiAxMzMuNTIgMTE0MS42NCAxOTIuNiAxMjAwIDE5Mi42IDExMzEuMiA5My4wNiAxMTkyLjY4IDUuNjQgMTEzNS4yOCA1LjY0IDExMDIuODYgNTQuMjcgMTA2OS43MiA1LjY0IDEwMTEuMzcgNS42NCAxMDcyLjk2IDkzLjkgMTAwNS43MiAxOTIuNiIvPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04MDEuODQsMTkyLjZINzQ0LjQ1bC0zOC43OC01OS4wOC0zOC43OCw1OS4wOEg2MS42bDY4LjU2LTk5LjU0LTYxLjQ4LTg3LjQxSDcwOC4xOWwzMi40Mi00OC41MSwzMy4xNCw0OC41MUg4NzMuMjRsLTYxLjQ4LDg4Ljk3LDY2LjI4LDk3Ljk4eiIvPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik02NjguMzIsNzkuMzdjLjg0LTE0LjUzLDEwLjU3LTM5LjYyLDQyLjg3LTM5LjYyLDI1LjEsMCwzNi4zOCwxMy44MSw0MS4zLDM5LjYyaC04NC4xN1pNODAzLjUyLDExMS42N2MzLjI0LTU3LjM5LTI3LjUtMTEwLjgzLTkwLjY1LTExMC44My01Ni42NywwLTk1LjQ2LDQyLjg3LTk1LjQ2LDk4LjdzMzYuMzgsOTguNyw5NS40Niw5OC43YzQyLjAzLDAsNzIuODgtMTguNjEsODcuNDEtNjMuMTZoLTQ1LjI3Yy0zLjI0LDExLjI5LTIwLjE3LDI0LjI1LTQwLjQ2LDI0LjI1LTI4LjM0LDAtNDQuNTUtMTQuNTMtNDYuMTEtNDcuNzloMTM1LjA4di4xMnoiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDYyLjc2LDc5LjM3Yy44NC0xNC41MywxMC41Ny0zOS42Miw0Mi44Ny0zOS42MiwyNS4xLDAsMzYuMzgsMTMuODEsNDEuMywzOS42MmgtODQuMTdaTTU5Ny45NiwxMTEuNjdjMy4yNC01Ny4zOS0yNy41LTExMC44My05MC42NS0xMTAuODMtNTYuNjcsMC05NS40Niw0Mi44Ny05NS40Niw5OC43czM2LjM4LDk4LjcsOTUuNDYsOTguN2M0Mi4wMywwLDcyLjg4LTE4LjYxLDg3LjQxLTYzLjE2aC00NS4yN2MtMy4yNCwxMS4yOS0yMC4xNywyNC4yNS00MC40NiwyNC4yNS0yOC4zNCwwLTQ0LjU1LTE0LjUzLTQ2LjExLTQ3Ljc5aDEzNS4wOHYuMTJ6Ii8+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTI5Ni45NCwxNTguNjJjLTMzLjE0LDAtNDQuNTUtMjkuMTgtNDQuNTUtNTkuMDhzMTAuNTctNjAuNjQsNDQuNTUtNjAuNjQsNDQuNTUsMzAuNzQsNDQuNTUsNjAuNjRjMCwzMC43NC0xMS40MSw1OS4wOC00NC41NSw1OS4wOE0yMDIuMiw2OWg1MS43NXYtODkuODFoLjg0YzEyLjEzLDE4LjYxLDMzLjk4LDI4LjM0LDU1LjgzLDI4LjM0LDU0Ljk5LDAsODIuNDktNDYuOTUsODIuNDktOTYuMywwLTUzLjQzLTI2LjY2LTEwMC4zOC04NS4wMS0xMDAuMzgtMjMuNDEsMC00My43MSw4Ljg5LTU1LjgzLDI5LjE4aC0xLjU2VjUuNzZoLTQ4LjUxdjI1My4yM2gwWiIvPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0wLDEzMS45NmMuNCw0OS4zNSw0NC41NSw2NS41Niw4OC4yNSw2NS41NnM4NS43My0xNi4yMSw4NS43My02NS41NmMwLTM0LjgyLTI5LjE4LTQ1LjI3LTU5LjA4LTUyLjU5LTI5LjE4LTcuMzItNTguMjMtOS43My01OC4yMy0yNy41LDAtMTUuMzcsMTcuMDUtMTcuMDUsMjguMzQtMTcuMDUsMTguNjEsMCwzMy45OCw1LjY0LDM0LjgyLDI1LjFoNDguMzlDMTY0LjE0LDEzLjgxLDEyNi45MiwwLDg1LjczLDBTMy45NiwxMi4xMywzLjk2LDU5LjkyYzAsMzMuMTQsMjkuOSw0My43MSw1OS4wOCw1MC4xOSwzNy4yMiw4LjA0LDU4LjIzLDEzLjgxLDU4LjIzLDI5LjE4LDAsMTcuNzctMTguNjEsMjQuMjUtMzMuOTgsMjQuMjUtMjAuMTcsMC0zOC43OC04Ljg5LTM5LjYyLTMxLjU4SDBaIi8+Cjwvc3ZnPg=="
+      
+      # HTML Template that combines static and dynamic data
+      # It includes placeholders like {{ROI_PERCENTAGE}}, {{STATIC_INTRO}}, etc.
+      # The logo is placed using absolute positioning in the header.
+      REPORT_TEMPLATE="<!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset='UTF-8'>
+          <title>ROI Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            .report-header { 
+                position: relative; 
+                height: 90px; 
+                border-bottom: 2px solid #FF7900; 
+                padding: 0 57px; 
+                margin-bottom: 30px;
+            }
+            .logo { 
+                position: absolute; 
+                top: 32px; /* Y: 32px from top margin (72px) - 40px offset = 32px */
+                left: 57px; 
+                width: 104.22px; 
+                height: 22.5px;
+            }
+            .content { padding: 0 57px; }
+            h1 { color: #FF7900; font-size: 24px; }
+            h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px; }
+            .result-box { border: 1px solid #FF7900; padding: 20px; border-radius: 8px; margin-top: 20px; }
+            .key-value { margin-bottom: 10px; }
+            .key-value strong { display: inline-block; width: 180px; color: #555; }
+          </style>
+        </head>
+        <body>
+          <div class='report-header'>
+            <!-- SVG Logo placed at X: 57px, Y: 32px relative to top of report area -->
+            <img class='logo' src='data:image/svg+xml;base64,${SVG_LOGO_BASE64}' alt='Speexx Logo'/>
+          </div>
+
+          <div class='content'>
+            <h1>ROI Calculation Report: {{ROI_PERCENTAGE}}</h1>
+            
+            <!-- STATIC CONTENT -->
+            <h2>{{STATIC_INTRO}}</h2>
+            <p>{{STATIC_BODY}}</p>
+
+            <!-- DYNAMIC CONTENT: RESULTS -->
+            <h2>Your Scenario Results</h2>
+            <div class='result-box'>
+              <div class='key-value'><strong>ROI Percentage:</strong> {{ROI_PERCENTAGE}}</div>
+              <div class='key-value'><strong>Annual Benefit:</strong> {{ANNUAL_BENEFIT}}</div>
+              <div class='key-value'><strong>Total Investment:</strong> {{TOTAL_INVESTMENT}}</div>
+              <div class='key-value'><strong>Return Per €1:</strong> {{RETURN_PER_EURO}}</div>
+              <div class='key-value'><strong>Confidence Level:</strong> {{CONFIDENCE_LEVEL}}</div>
+              <p style='margin-top: 15px; font-style: italic;'>{{TAGLINE}}</p>
+            </div>
+            
+            <!-- DYNAMIC CONTENT: INPUTS -->
+            <h2>Input Parameters</h2>
+            <div class='key-value'><strong>Region:</strong> {{REGION}}</div>
+            <div class='key-value'><strong>Company Size:</strong> {{COMPANY_SIZE}}</div>
+            <div class='key-value'><strong>Industry:</strong> {{INDUSTRY}}</div>
+            <div class='key-value'><strong>Learners:</strong> {{LEARNERS}}</div>
+            <div class='key-value'><strong>Programme Intensity:</strong> {{INTENSITY}}</div>
+            <div class='key-value'><strong>Cost Per Learner:</strong> {{COST_PER_LEARNER}}</div>
+            <div class='key-value'><strong>Time Horizon:</strong> {{TIME_HORIZON}}</div>
+            <div class='key-value'><strong>Languages:</strong> {{LANGUAGES}}</div>
+            <div class='key-value'><strong>Impact Areas:</strong> {{IMPACT_AREAS}}</div>
+          </div>
+        </body>
+      </html>"
+
+      # Use Node.js to process the payload and generate the PDF
+      cat <<EOF > generate_pdf.js
+      const puppeteer = require('puppeteer');
+      const fs = require('fs');
+
+      const payload = JSON.parse(fs.readFileSync('payload.json', 'utf8'));
+
+      // Extract dynamic data from payload
+      const results = payload.results || {};
+      const inputs = payload.inputs || {};
+
+      // Use the template and replace placeholders with dynamic/static content
+      let html = \`${REPORT_TEMPLATE}\`;
+      
+      // Replace dynamic results
+      html = html.replace('{{ROI_PERCENTAGE}}', results.roiPercentage || 'N/A');
+      html = html.replace('{{ANNUAL_BENEFIT}}', results.annualBenefit || 'N/A');
+      html = html.replace('{{TOTAL_INVESTMENT}}', results.totalInvestment || 'N/A');
+      html = html.replace('{{RETURN_PER_EURO}}', results.returnPerEuro || 'N/A');
+      html = html.replace('{{CONFIDENCE_LEVEL}}', results.confidenceLevel || 'N/A');
+      html = html.replace('{{TAGLINE}}', results.tagline || '');
+
+      // Replace dynamic inputs
+      html = html.replace('{{REGION}}', inputs.region || 'N/A');
+      html = html.replace('{{COMPANY_SIZE}}', inputs.companySize || 'N/A');
+      html = html.replace('{{INDUSTRY}}', inputs.industry || 'N/A');
+      html = html.replace('{{LEARNERS}}', inputs.learners || 'N/A');
+      html = html.replace('{{INTENSITY}}', inputs.intensity || 'N/A');
+      html = html.replace('{{COST_PER_LEARNER}}', inputs.costPerLearner || 'N/A');
+      html = html.replace('{{TIME_HORIZON}}', inputs.horizon || 'N/A');
+      html = html.replace('{{LANGUAGES}}', (inputs.languages || []).join(', ') || 'N/A');
+      html = html.replace('{{IMPACT_AREAS}}', (inputs.impactAreas || []).join(', ') || 'N/A');
+
+      // Replace static content
+      html = html.replace('{{STATIC_INTRO}}', \`${STATIC_INTRO}\`);
+      html = html.replace('{{STATIC_BODY}}', \`${STATIC_BODY}\`);
+
+
+      async function generatePdf() {
+        // Launch the browser
+        const browser = await puppeteer.launch({ 
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+        });
+        const page = await browser.newPage();
+        
+        // Set content and wait for it to load
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+
+        // Generate PDF with required margins and footer/header setup
+        await page.pdf({
+          path: 'roi_report.pdf',
+          format: 'A4',
+          printBackground: true,
+          margin: {
+            top: '72px',    /* 72px Top Margin */
+            right: '57px',  /* 57px Right Margin */
+            bottom: '57px', /* 57px Bottom Margin */
+            left: '57px'    /* 57px Left Margin */
+          },
+          displayHeaderFooter: true,
+          footerTemplate: '<div style="font-size: 8px; margin-left: 57px; width: 100%; text-align: left;">Report Generated on ' + new Date().toLocaleDateString() + ' | Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
+          headerTemplate: '<div style="height: 0;"></div>' // Empty header, logo is in body content
+        });
+
+        await browser.close();
+        console.log('PDF generated successfully as roi_report.pdf');
+      }
+
+      generatePdf().catch(err => {
+        console.error('PDF Generation Error:', err);
+        process.exit(1);
+      });
+      EOF
+
+      # Create the payload file
+      echo "$PAYLOAD" > payload.json
+      
+      # Run the PDF generation script
+      node generate_pdf.js
+
+  # Step 3: Upload the generated PDF as an artifact
+  - name: Upload PDF Artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: roi-full-report
+      path: roi_report.pdf
+      retention-days: 5
