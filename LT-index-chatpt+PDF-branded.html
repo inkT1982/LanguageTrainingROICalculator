@@ -5,12 +5,10 @@
   <title>Speexx Language Training ROI Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-  <!-- html2canvas & jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -442,21 +440,20 @@
       flex: none;
     }
 
-    /* ====== PDF TEMPLATE + PAGINATION ====== */
+    /* ====== PDF TEMPLATE ROOT (HIDDEN OFF-SCREEN) ====== */
 
-    /* Both source and pages container share this: hidden off-screen */
     .pdf-template {
-      position: absolute;
-      left: -9999px;
-      top: 0;
-      width: 794px; /* A4 width at ~96dpi */
+      width: 794px;   /* A4 width at ~96dpi */
       background: #ffffff;
       color: #111827;
       font-family: 'Roboto', Arial, sans-serif;
+      position: absolute;
+      left: -9999px;          /* keep it out of view but renderable */
+      top: 0;
       pointer-events: none;
     }
 
-    /* Individual PDF pages (auto-generated) */
+    /* Individual PDF pages */
     .pdf-page {
       position: relative;
       width: 794px;
@@ -466,7 +463,7 @@
     }
 
     .pdf-page + .pdf-page {
-      margin-top: 20px; /* Only affects DOM, not PDF layout */
+      margin-top: 20px; /* only affects DOM, pdf uses captured image */
     }
 
     /* Logo on each page */
@@ -474,13 +471,14 @@
       position: absolute;
       left: 57px;
       top: 32px;
-      width: 104.22px; /* width; height handled by aspect ratio */
+      width: 104.22px;
+      height: 22.5px;
     }
 
     .pdf-logo-img {
-      display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
+      display: block;
     }
 
     /* Content margins on each page */
@@ -576,11 +574,6 @@
 
     .pdf-inner li {
       margin-bottom: 6px;
-    }
-
-    /* Grouping for pagination */
-    .pdf-section {
-      margin-bottom: 18px;
     }
   </style>
 </head>
@@ -875,104 +868,113 @@
     </div>
   </div>
 
-  <!-- ========== HIDDEN PDF SOURCE CONTENT (ONE LONG FLOW) ========== -->
-  <div id="pdf-report-source" class="pdf-template" aria-hidden="true">
-    <!-- SECTION 1: TITLE + SUMMARY -->
-    <section class="pdf-section">
-      <h1>Speexx Language Training ROI Report</h1>
-      <p>Report generated on: <span id="reportDate"></span></p>
-
-      <div class="pdf-summary-box">
-        <h2>Estimated Return on Investment (ROI)</h2>
-        <p class="pdf-summary-value" id="pdfRoiValue"></p>
-        <p class="pdf-summary-label">
-          Estimated ROI over <span id="pdfTimeHorizon"></span>
-        </p>
+  <!-- ========== HIDDEN PDF TEMPLATE (2 PAGES) ========== -->
+  <div id="pdf-report-template" class="pdf-template" aria-hidden="true">
+    <!-- PAGE 1 -->
+    <div class="pdf-page" id="pdf-page-1">
+      <div class="pdf-logo">
+        <img class="pdf-logo-img" alt="Speexx logo" />
       </div>
 
-      <div class="pdf-block">
-        <h2>Summary of Financial Outcomes</h2>
-        <table class="pdf-table">
-          <thead>
-            <tr>
-              <th style="width: 30%;">Metric</th>
-              <th style="width: 28%;">Value</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Estimated Annual Benefit</td>
-              <td id="pdfBenefitValue"></td>
-              <td>Based on industry benchmarks and selected impact areas.</td>
-            </tr>
-            <tr>
-              <td>Estimated Total Investment</td>
-              <td id="pdfTotalCost"></td>
-              <td>
-                Cost of training for <span id="pdfLearnerCount"></span> learners,
-                based on your inputs or benchmark estimates.
-              </td>
-            </tr>
-            <tr>
-              <td>Return per €1 Invested</td>
-              <td id="pdfPerEuroValue"></td>
-              <td>The value returned for every Euro spent on language training.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="pdf-inner">
+        <h1>Speexx Language Training ROI Report</h1>
+        <p>Report generated on: <span id="reportDate"></span></p>
+
+        <div class="pdf-summary-box">
+          <h2>Estimated Return on Investment (ROI)</h2>
+          <p class="pdf-summary-value" id="pdfRoiValue"></p>
+          <p class="pdf-summary-label">
+            Estimated ROI over <span id="pdfTimeHorizon"></span>
+          </p>
+        </div>
+
+        <div class="pdf-block">
+          <h2>Summary of Financial Outcomes</h2>
+          <table class="pdf-table">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Metric</th>
+                <th style="width: 28%;">Value</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Estimated Annual Benefit</td>
+                <td id="pdfBenefitValue"></td>
+                <td>Based on industry benchmarks and selected impact areas.</td>
+              </tr>
+              <tr>
+                <td>Estimated Total Investment</td>
+                <td id="pdfTotalCost"></td>
+                <td>
+                  Cost of training for <span id="pdfLearnerCount"></span> learners,
+                  based on your inputs or benchmark estimates.
+                </td>
+              </tr>
+              <tr>
+                <td>Return per €1 Invested</td>
+                <td id="pdfPerEuroValue"></td>
+                <td>The value returned for every Euro spent on language training.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pdf-block">
+          <h2>Your Scenario Settings</h2>
+
+          <table class="pdf-table">
+            <thead>
+              <tr><th colspan="2">Company Profile</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Region</td><td id="pdfRegion"></td></tr>
+              <tr><td>Company Size</td><td id="pdfCompanySize"></td></tr>
+              <tr><td>Industry</td><td id="pdfIndustry"></td></tr>
+            </tbody>
+          </table>
+
+          <table class="pdf-table">
+            <thead>
+              <tr><th colspan="2">Training Scope</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Number of Learners</td><td id="pdfLearners"></td></tr>
+              <tr><td>Programme Intensity</td><td id="pdfIntensity"></td></tr>
+              <tr><td>Cost per Learner (Estimated)</td><td id="pdfCostPerLearner"></td></tr>
+              <tr><td>Languages in Program</td><td id="pdfLanguages"></td></tr>
+            </tbody>
+          </table>
+
+          <table class="pdf-table">
+            <thead>
+              <tr><th colspan="2">Expected Impact</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Strategic Importance</td><td id="pdfImportance"></td></tr>
+              <tr><td>Time Horizon</td><td id="pdfHorizon"></td></tr>
+              <tr><td>Main Impact Areas</td><td id="pdfImpacts"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pdf-block">
+          <p>
+            Generated by the Speexx ROI Calculator on
+            <span id="reportDateFooter"></span>.
+          </p>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- SECTION 2: SCENARIO SETTINGS -->
-    <section class="pdf-section">
-      <div class="pdf-block">
-        <h2>Your Scenario Settings</h2>
-
-        <table class="pdf-table">
-          <thead>
-            <tr><th colspan="2">Company Profile</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Region</td><td id="pdfRegion"></td></tr>
-            <tr><td>Company Size</td><td id="pdfCompanySize"></td></tr>
-            <tr><td>Industry</td><td id="pdfIndustry"></td></tr>
-          </tbody>
-        </table>
-
-        <table class="pdf-table">
-          <thead>
-            <tr><th colspan="2">Training Scope</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Number of Learners</td><td id="pdfLearners"></td></tr>
-            <tr><td>Programme Intensity</td><td id="pdfIntensity"></td></tr>
-            <tr><td>Cost per Learner (Estimated)</td><td id="pdfCostPerLearner"></td></tr>
-            <tr><td>Languages in Program</td><td id="pdfLanguages"></td></tr>
-          </tbody>
-        </table>
-
-        <table class="pdf-table">
-          <thead>
-            <tr><th colspan="2">Expected Impact</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Strategic Importance</td><td id="pdfImportance"></td></tr>
-            <tr><td>Time Horizon</td><td id="pdfHorizon"></td></tr>
-            <tr><td>Main Impact Areas</td><td id="pdfImpacts"></td></tr>
-          </tbody>
-        </table>
-
-        <p>
-          Generated by the Speexx ROI Calculator on
-          <span id="reportDateFooter"></span>.
-        </p>
+    <!-- PAGE 2 -->
+    <div class="pdf-page" id="pdf-page-2">
+      <div class="pdf-logo">
+        <img class="pdf-logo-img" alt="Speexx logo" />
       </div>
-    </section>
 
-    <!-- SECTION 3: HOW TO USE -->
-    <section class="pdf-section">
-      <div class="pdf-block">
+      <div class="pdf-inner">
         <h2>How to Use This ROI Report</h2>
         <p>
           Use this ROI report as a conversation starter between HR, L&amp;D, and
@@ -980,102 +982,96 @@
           training initiatives into financial terms that are easy to compare with
           other investments.
         </p>
+
+        <div class="pdf-block">
+          <h3>1. Align on Objectives</h3>
+          <p>
+            Clarify where you expect the most impact: improved collaboration,
+            better customer communication, reduced risk, or higher productivity.
+            The scenario settings in this report reflect the focus areas you
+            selected in the calculator.
+          </p>
+
+          <ul>
+            <li>Share the “Your Scenario Settings” section with business owners.</li>
+            <li>Review whether the chosen impact areas match current priorities.</li>
+            <li>Adjust the scenario in the calculator if strategic priorities change.</li>
+          </ul>
+        </div>
+
+        <div class="pdf-block">
+          <h3>2. Connect to Internal KPIs</h3>
+          <p>
+            Wherever possible, connect the financial values in this report to
+            metrics you already track internally. For example, you may link the
+            estimated benefit to:
+          </p>
+          <ul>
+            <li>Customer satisfaction and NPS scores.</li>
+            <li>Resolution time and first-contact resolution in service teams.</li>
+            <li>Sales cycle length or conversion rates in international deals.</li>
+            <li>Engagement and retention KPIs in HR dashboards.</li>
+          </ul>
+        </div>
+
+        <div class="pdf-block">
+          <h3>3. Adjust Assumptions Over Time</h3>
+          <p>
+            The figures in this report are based on benchmark data and scenario
+            assumptions, not on your actual results. As your language program
+            matures, you can:
+          </p>
+          <ul>
+            <li>Update participation numbers and cost per learner.</li>
+            <li>Re-run the calculator with more precise internal data.</li>
+            <li>Compare estimated benefits with realised outcomes.</li>
+          </ul>
+        </div>
+
+        <div class="pdf-block">
+          <h2>Methodology and Disclaimer</h2>
+          <p>
+            This report provides directional guidance for HR and business leaders to
+            assess the potential value of language training. The results are
+            calculated based on aggregated global data and recognised industry
+            benchmarks. Actual results for individual businesses may differ
+            significantly based on market, customer base, execution quality, and
+            other factors. Speexx cannot guarantee the exact results shown in this
+            calculation.
+          </p>
+
+          <h3>Key Calculation Drivers</h3>
+          <ul>
+            <li>
+              <strong>Total Cost</strong>: Based on your number of learners and the
+              estimated cost per learner (either manually entered or derived from
+              benchmarks that consider intensity, region, industry and company size).
+            </li>
+            <li>
+              <strong>Effective Multiplier</strong>: Combines factors such as
+              strategic importance, time horizon, industry bonus and scope
+              complexity (languages and impact areas selected) to derive the
+              estimated total benefit.
+            </li>
+            <li>
+              <strong>ROI</strong>: Calculated as (Total Benefit − Total Cost) ÷
+              Total Cost.
+            </li>
+          </ul>
+
+          <p>
+            Use these calculations as input to your planning process, not as a
+            substitute for internal financial modelling or professional advice.
+          </p>
+        </div>
       </div>
-
-      <div class="pdf-block">
-        <h3>1. Align on Objectives</h3>
-        <p>
-          Clarify where you expect the most impact: improved collaboration,
-          better customer communication, reduced risk, or higher productivity.
-          The scenario settings in this report reflect the focus areas you
-          selected in the calculator.
-        </p>
-
-        <ul>
-          <li>Share the “Your Scenario Settings” section with business owners.</li>
-          <li>Review whether the chosen impact areas match current priorities.</li>
-          <li>Adjust the scenario in the calculator if strategic priorities change.</li>
-        </ul>
-      </div>
-
-      <div class="pdf-block">
-        <h3>2. Connect to Internal KPIs</h3>
-        <p>
-          Wherever possible, connect the financial values in this report to
-          metrics you already track internally. For example, you may link the
-          estimated benefit to:
-        </p>
-        <ul>
-          <li>Customer satisfaction and NPS scores.</li>
-          <li>Resolution time and first-contact resolution in service teams.</li>
-          <li>Sales cycle length or conversion rates in international deals.</li>
-          <li>Engagement and retention KPIs in HR dashboards.</li>
-        </ul>
-      </div>
-
-      <div class="pdf-block">
-        <h3>3. Adjust Assumptions Over Time</h3>
-        <p>
-          The figures in this report are based on benchmark data and scenario
-          assumptions, not on your actual results. As your language program
-          matures, you can:
-        </p>
-        <ul>
-          <li>Update participation numbers and cost per learner.</li>
-          <li>Re-run the calculator with more precise internal data.</li>
-          <li>Compare estimated benefits with realised outcomes.</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- SECTION 4: METHODOLOGY -->
-    <section class="pdf-section">
-      <div class="pdf-block">
-        <h2>Methodology and Disclaimer</h2>
-        <p>
-          This report provides directional guidance for HR and business leaders to
-          assess the potential value of language training. The results are
-          calculated based on aggregated global data and recognised industry
-          benchmarks. Actual results for individual businesses may differ
-          significantly based on market, customer base, execution quality, and
-          other factors. Speexx cannot guarantee the exact results shown in this
-          calculation.
-        </p>
-
-        <h3>Key Calculation Drivers</h3>
-        <ul>
-          <li>
-            <strong>Total Cost</strong>: Based on your number of learners and the
-            estimated cost per learner (either manually entered or derived from
-            benchmarks that consider intensity, region, industry and company size).
-          </li>
-          <li>
-            <strong>Effective Multiplier</strong>: Combines factors such as
-            strategic importance, time horizon, industry bonus and scope
-            complexity (languages and impact areas selected) to derive the
-            estimated total benefit.
-          </li>
-          <li>
-            <strong>ROI</strong>: Calculated as (Total Benefit − Total Cost) ÷
-            Total Cost.
-          </li>
-        </ul>
-
-        <p>
-          Use these calculations as input to your planning process, not as a
-          substitute for internal financial modelling or professional advice.
-        </p>
-      </div>
-    </section>
+    </div>
   </div>
 
-  <!-- ========== PDF PAGES CONTAINER (AUTO-FILLED) ========== -->
-  <div id="pdf-pages-container" class="pdf-template" aria-hidden="true"></div>
-
   <script>
-    // ---- INLINE SPEEXX LOGO SVG ----
+    // ---- INLINE SPEEXX LOGO SVG AS STRING ----
     const SPEEXX_LOGO_SVG = `<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1200 259" preserveAspectRatio="xMidYMid meet">
+<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1200 259">
   <defs>
     <style>
       .st0 { fill: #ff7900; }
@@ -1089,18 +1085,18 @@
   <path d="M0,131.96c2.4,49.35,44.55,65.56,88.25,65.56s85.73-16.21,85.73-65.56c0-34.82-29.18-45.27-59.08-52.59-29.18-7.32-58.23-9.73-58.23-27.5,0-15.37,17.05-17.05,28.34-17.05,18.61,0,33.98,5.64,34.82,25.1h48.39C164.14,13.81,126.92,0,85.73,0S3.96,12.13,3.96,59.92c0,33.14,29.9,43.71,59.08,50.19,37.22,8.04,58.23,13.81,58.23,29.18,0,17.77-18.61,24.25-33.98,24.25-20.17,0-38.78-8.89-39.62-31.58H0Z"/>
 </svg>`;
 
-    let SPEEXX_LOGO_URL = null;
-    function ensureLogoUrl() {
-      if (!SPEEXX_LOGO_URL) {
-        const blob = new Blob([SPEEXX_LOGO_SVG], {
-          type: 'image/svg+xml;charset=utf-8'
-        });
-        SPEEXX_LOGO_URL = URL.createObjectURL(blob);
-      }
-      return SPEEXX_LOGO_URL;
+    function initPdfLogo() {
+      const blob = new Blob([SPEEXX_LOGO_SVG], {
+        type: 'image/svg+xml;charset=utf-8'
+      });
+      const url = URL.createObjectURL(blob);
+
+      document.querySelectorAll('.pdf-logo-img').forEach(img => {
+        img.src = url;
+      });
     }
 
-    // ---- ROI CONFIG ----
+    // ---- CONFIG CONSTANTS ----
     const INTENSITY_COST = { light: 500, standard: 1500, intensive: 3000 };
 
     const SIZE_FACTOR = {
@@ -1527,14 +1523,12 @@
         resultPanel.removeAttribute('aria-busy');
         calcBtn.disabled = false;
         if (calcStatus) calcStatus.classList.add('hidden');
-        const downloadBtn2 = document.getElementById('downloadButton');
-        if (downloadBtn2) downloadBtn2.disabled = false;
+        if (downloadBtn) downloadBtn.disabled = false;
         isCalculating = false;
       }, 2000);
     }
 
-    // ---- POPULATE PDF SOURCE CONTENT ----
-    function populateReportSource(data) {
+    function populateReportTemplate(data) {
       const d = new Date().toLocaleDateString();
       document.getElementById('reportDate').textContent = d;
       document.getElementById('reportDateFooter').textContent = d;
@@ -1589,60 +1583,6 @@
         impactNames || 'None selected';
     }
 
-    // ---- PAGE TEMPLATE CREATION ----
-    function createPdfPage() {
-      const page = document.createElement('div');
-      page.className = 'pdf-page';
-
-      const logoWrapper = document.createElement('div');
-      logoWrapper.className = 'pdf-logo';
-      const logoImg = document.createElement('img');
-      logoImg.className = 'pdf-logo-img';
-      logoImg.alt = 'Speexx logo';
-      logoImg.src = ensureLogoUrl();
-      logoWrapper.appendChild(logoImg);
-      page.appendChild(logoWrapper);
-
-      const inner = document.createElement('div');
-      inner.className = 'pdf-inner';
-      page.appendChild(inner);
-
-      return { page, inner };
-    }
-
-    // ---- BUILD MULTI-PAGE PDF DOM FROM SOURCE ----
-    function buildPdfPages() {
-      const pagesContainer = document.getElementById('pdf-pages-container');
-      const source = document.getElementById('pdf-report-source');
-      pagesContainer.innerHTML = '';
-
-      const sections = Array.from(source.querySelectorAll('.pdf-section'));
-      if (sections.length === 0) return pagesContainer;
-
-      // First page
-      let { page, inner } = createPdfPage();
-      pagesContainer.appendChild(page);
-
-      // Measure available height inside .pdf-inner
-      const maxHeight = inner.clientHeight || 994; // fallback
-
-      sections.forEach(secOriginal => {
-        const sec = secOriginal.cloneNode(true);
-        inner.appendChild(sec);
-
-        if (inner.scrollHeight > maxHeight) {
-          // Remove section from current page and move to new page
-          inner.removeChild(sec);
-          ({ page, inner } = createPdfPage());
-          pagesContainer.appendChild(page);
-          inner.appendChild(sec);
-        }
-      });
-
-      return pagesContainer;
-    }
-
-    // ---- PDF DOWNLOAD ----
     function downloadReport() {
       if (!lastCalculationData || isCalculating) {
         alert('Please run the calculation and wait for it to finish first.');
@@ -1653,12 +1593,11 @@
       downloadButton.disabled = true;
       downloadButton.textContent = 'Generating PDF...';
 
-      populateReportSource(lastCalculationData);
-      const pagesContainer = buildPdfPages();
-      const pages = Array.from(pagesContainer.querySelectorAll('.pdf-page'));
+      populateReportTemplate(lastCalculationData);
 
+      const pages = Array.from(document.querySelectorAll('.pdf-page'));
       if (!pages.length) {
-        alert('No PDF pages created.');
+        alert('No PDF pages found.');
         downloadButton.disabled = false;
         downloadButton.textContent = 'Download the Full Report';
         return;
@@ -1686,7 +1625,9 @@
             const imgWidth = pdfWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            if (index > 0) pdf.addPage();
+            if (index > 0) {
+              pdf.addPage();
+            }
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
           });
 
@@ -1704,8 +1645,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       showStep(1);
-      // Pre-create logo URL so it’s ready before html2canvas runs
-      ensureLogoUrl();
+      initPdfLogo();
     });
   </script>
 </body>
