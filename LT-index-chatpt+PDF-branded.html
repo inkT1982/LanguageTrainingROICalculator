@@ -108,8 +108,6 @@
       color: var(--text-muted);
     }
 
-    /* Progress bar */
-
     .progress-wrapper {
       margin-top: 12px;
       margin-bottom: 10px;
@@ -138,8 +136,6 @@
       display: flex;
       justify-content: space-between;
     }
-
-    /* Waiting / calculation status label */
 
     .calc-status {
       min-height: 1.2em;
@@ -300,7 +296,6 @@
 
     .btn-secondary:hover { background: rgba(15,23,42,0.9); }
 
-    /* Small reset pill: does not stretch */
     .btn-reset {
       flex: 0 0 auto;
       padding-inline: 14px;
@@ -308,7 +303,6 @@
       white-space: nowrap;
     }
 
-    /* Mobile: stack buttons full-width */
     @media (max-width: 720px) {
       .button-row {
         flex-direction: column;
@@ -449,7 +443,7 @@
       flex: none;
     }
 
-    /* ====== PDF TEMPLATE ROOT (HIDDEN) ====== */
+    /* ====== PDF TEMPLATE ROOT (HIDDEN OFF-SCREEN) ====== */
 
     .pdf-template {
       width: 794px;   /* A4 width at ~96dpi */
@@ -457,9 +451,8 @@
       color: #111827;
       font-family: 'Roboto', Arial, sans-serif;
       position: absolute;
-      left: 0;
+      left: -9999px;          /* keep it out of view but renderable */
       top: 0;
-      visibility: hidden;
       pointer-events: none;
     }
 
@@ -473,10 +466,10 @@
     }
 
     .pdf-page + .pdf-page {
-      margin-top: 20px; /* spacing in DOM, not in PDF (since we capture each page separately) */
+      margin-top: 20px; /* only affects DOM, pdf uses captured image */
     }
 
-    /* Absolute Speexx logo at requested position and size on each page */
+    /* Logo on each page */
     .pdf-logo {
       position: absolute;
       left: 57px;
@@ -491,7 +484,7 @@
       display: block;
     }
 
-    /* Content area with requested margins on each page */
+    /* Content margins on each page */
     .pdf-inner {
       position: absolute;
       top: 72px;
@@ -897,7 +890,6 @@
       </div>
 
       <div class="pdf-inner">
-        <!-- Page 1 dynamic + static -->
         <h1>Speexx Language Training ROI Report</h1>
         <p>Report generated on: <span id="reportDate"></span></p>
 
@@ -989,10 +981,9 @@
       </div>
     </div>
 
-    <!-- PAGE 2 (mostly static, same margins & logo placement) -->
+    <!-- PAGE 2 -->
     <div class="pdf-page" id="pdf-page-2">
       <div class="pdf-logo">
-        <!-- Same logo on page 2 -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 259">
           <defs>
             <style>.st0 { fill: #ff7900; }</style>
@@ -1007,7 +998,6 @@
       </div>
 
       <div class="pdf-inner">
-        <!-- Page 2: purely static explanatory content, same margins -->
         <h2>How to Use This ROI Report</h2>
         <p>
           Use this ROI report as a conversation starter between HR, L&amp;D, and
@@ -1105,7 +1095,6 @@
     // ---- CONFIG CONSTANTS ----
     const INTENSITY_COST = { light: 500, standard: 1500, intensive: 3000 };
 
-    // Size bands & scaling factors (economies of scale)
     const SIZE_FACTOR = {
       '1-500': 1.1,
       '501-1000': 1.0,
@@ -1122,7 +1111,6 @@
       '10001+': 15000
     };
 
-    // Region-specific cost multipliers
     const REGION_COST_MULT = {
       na: 1.1,
       emea: 0.8,
@@ -1130,7 +1118,6 @@
       latam: 0.6
     };
 
-    // Industry-specific cost multipliers
     const INDUSTRY_COST_MULT = {
       automotive: 1.0,
       banking_finance: 1.2,
@@ -1181,7 +1168,6 @@
       dutch: 0.4
     };
 
-    // DISPLAY MAPS
     const DISPLAY_MAP = {
       region: {
         na: 'North America',
@@ -1256,8 +1242,6 @@
     let currentStep = 1;
     const totalSteps = 3;
     let isCalculating = false;
-
-    // Global object to hold calculation results for the report
     let lastCalculationData = null;
 
     const getSelectedRadio = (name) =>
@@ -1328,12 +1312,10 @@
     }
 
     function resetForm() {
-      // Reset dropdowns (to first option)
       document.querySelectorAll('select').forEach(sel => {
         sel.selectedIndex = 0;
       });
 
-      // Step 2 defaults
       document.getElementById('learners').value = 50;
       document.querySelectorAll('input[name="intensity"]').forEach(r => {
         r.checked = (r.value === 'standard');
@@ -1343,7 +1325,6 @@
         cb.checked = (cb.value === 'english');
       });
 
-      // Step 3 defaults
       document.querySelectorAll('input[name="importance"]').forEach(r => {
         r.checked = (r.value === 'medium');
       });
@@ -1410,7 +1391,6 @@
         return;
       }
 
-      // Start animation + waiting label
       isCalculating = true;
       resultPanel.classList.add('calculating');
       resultPanel.setAttribute('aria-busy', 'true');
@@ -1426,7 +1406,6 @@
         'We are applying your inputs to typical industry benchmarks. This only takes a moment.';
 
       setTimeout(() => {
-        // ----- COST -----
         const sizeFactor = SIZE_FACTOR[companySize] ?? 1.0;
         const intensityCost = INTENSITY_COST[intensity] ?? 1500;
         const regionCostMult = REGION_COST_MULT[region] ?? 1.0;
@@ -1442,7 +1421,6 @@
 
         const totalCost = learners * costPerLearner;
 
-        // ----- READINESS -----
         const estHeadcount = SIZE_HEADCOUNT[companySize] ?? 750;
         const participationRate = estHeadcount > 0 ? (learners / estHeadcount) : 0;
 
@@ -1452,7 +1430,6 @@
         else if (participationRate < 0.4)  readinessFactor = 1.1;
         else                               readinessFactor = 1.15;
 
-        // ----- MULTIPLIERS & BONUSES -----
         const industryBonus = INDUSTRY_BONUS[industry] ?? 0.3;
         const importanceFactor = IMPORTANCE_FACTOR[importance] ?? 1.0;
         const timeFactor = TIME_FACTOR[horizon] ?? 1.0;
@@ -1468,7 +1445,6 @@
         normalizedLanguage = Math.min(normalizedLanguage, 2.0);
         const languageBonus = (normalizedLanguage - 1) * 0.2;
 
-        // Cost efficiency
         let costEfficiency = benchmarkCostPerLearner / costPerLearner;
         if (!isFinite(costEfficiency) || costEfficiency <= 0) costEfficiency = 1;
         costEfficiency = Math.max(0.7, Math.min(costEfficiency, 1.3));
@@ -1486,12 +1462,10 @@
           : 0;
         const returnPerEuro = totalCost > 0 ? totalBenefit / totalCost : 0;
 
-        // Confidence
         let confidence = 'Low';
         if (learners > 0 && impacts.length >= 2) confidence = 'Medium';
         if (learners > 0 && impacts.length >= 3 && horizon !== '6m') confidence = 'High';
 
-        // Tagline
         let roiTaglineText;
         if (totalCost === 0) {
           roiTaglineText = 'Enter at least one learner to see your scenario.';
@@ -1506,7 +1480,6 @@
             'High-impact scenario – strong potential upside if the program is well executed.';
         }
 
-        // Store all results for the report
         lastCalculationData = {
           region,
           companySize,
@@ -1527,7 +1500,6 @@
           roiTaglineText
         };
 
-        // Update UI
         roiValue.textContent = isFinite(roiPct) ? Math.round(roiPct) + '%' : '—';
         benefitValue.textContent = isFinite(totalBenefit) ? fmtMoney(totalBenefit) : '—';
         perEuroValue.textContent = isFinite(returnPerEuro)
@@ -1552,13 +1524,11 @@
       }, 2000);
     }
 
-    // Populate hidden PDF template with calculated data
     function populateReportTemplate(data) {
       const d = new Date().toLocaleDateString();
       document.getElementById('reportDate').textContent = d;
       document.getElementById('reportDateFooter').textContent = d;
 
-      // Summary
       document.getElementById('pdfRoiValue').textContent =
         Math.round(data.roiPct) + '%';
       document.getElementById('pdfTimeHorizon').textContent =
@@ -1573,7 +1543,6 @@
       document.getElementById('pdfLearnerCount').textContent =
         data.learners.toLocaleString('en-US');
 
-      // Inputs
       document.getElementById('pdfRegion').textContent =
         DISPLAY_MAP.region[data.region];
       document.getElementById('pdfCompanySize').textContent =
@@ -1610,8 +1579,7 @@
         impactNames || 'None selected';
     }
 
-    // Generate and download the PDF with multiple pages
-    async function downloadReport() {
+    function downloadReport() {
       if (!lastCalculationData || isCalculating) {
         alert('Please run the calculation and wait for it to finish first.');
         return;
@@ -1621,7 +1589,6 @@
       downloadButton.disabled = true;
       downloadButton.textContent = 'Generating PDF...';
 
-      // 1. Populate the hidden template with final data
       populateReportTemplate(lastCalculationData);
 
       const pages = Array.from(document.querySelectorAll('.pdf-page'));
@@ -1636,35 +1603,40 @@
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
 
-      try {
-        let isFirst = true;
-        for (const page of pages) {
-          const canvas = await html2canvas(page, {
-            scale: 2,
-            logging: false,
-            useCORS: true,
-            backgroundColor: '#ffffff'
+      const captureOptions = {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      };
+
+      const capturePromises = pages.map(page =>
+        html2canvas(page, captureOptions)
+      );
+
+      Promise.all(capturePromises)
+        .then(canvases => {
+          canvases.forEach((canvas, index) => {
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            const imgWidth = pdfWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            if (index > 0) {
+              pdf.addPage();
+            }
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
           });
 
-          const imgData = canvas.toDataURL('image/png', 1.0);
-          const imgWidth = pdfWidth;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-          if (!isFirst) {
-            pdf.addPage();
-          }
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-          isFirst = false;
-        }
-
-        pdf.save('Speexx_ROI_Report.pdf');
-      } catch (error) {
-        console.error('PDF Generation failed:', error);
-        alert('Failed to generate report. Check console for details.');
-      } finally {
-        downloadButton.disabled = false;
-        downloadButton.textContent = 'Download the Full Report';
-      }
+          pdf.save('Speexx_ROI_Report.pdf');
+        })
+        .catch(error => {
+          console.error('PDF Generation failed:', error);
+          alert('Failed to generate report. Check console for details.');
+        })
+        .finally(() => {
+          downloadButton.disabled = false;
+          downloadButton.textContent = 'Download the Full Report';
+        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
