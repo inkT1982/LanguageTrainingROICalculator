@@ -45,8 +45,66 @@
       height: 100%;
     }
 
+    /* *** FIX FOR CLIPPING: Tooltip is now fixed position and outside the map container. 
+    It will no longer be clipped by #map-section's overflow: hidden.
+    */
+    .tooltip {
+      /* FIX: Changed from absolute to fixed to position relative to viewport */
+      position: fixed; 
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.92);
+      color: #333333;
+      padding: 12px 18px;
+      font-size: 15px;
+      border-radius: 10px;
+      opacity: 0;
+      transform: translate(0, 0);
+      transition: opacity 0.12s ease-out;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 9999; /* Higher z-index to ensure it sits on top */
+      max-width: 360px;
+      white-space: normal;
+      backdrop-filter: blur(4px);
+      /* Default position outside the screen until first move */
+      top: 0;
+      left: 0;
+      display: none; /* Hidden by default and toggled by JS */
+    }
+
+    .tooltip-country {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #222222;
+    }
+
+    .tooltip-metric {
+      margin-top: 12px;
+      padding-left: 10px;
+      border-left: 4px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .tooltip-metric-title {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      color: #222222; /* overridden inline per metric color */
+    }
+
+    .tooltip-metric-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #555555;
+    }
+    
+    /* Remaining Styles (Unchanged) */
+
     .page {
-      /* 🌟 MOBILE IMPROVEMENT: Ensure the page container uses the full vertical height */
       min-height: 100vh;
       height: 100%;
       padding: 32px 2vw 40px;
@@ -58,11 +116,9 @@
       display: flex;
       flex-direction: column;
       gap: 32px;
-      /* 🌟 MOBILE IMPROVEMENT: Ensure main can stretch */
       height: 100%;
     }
 
-    /* HERO: header + subtitle + map */
     .hero {
       flex: 1;
       width: 100%;
@@ -72,17 +128,15 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 16px;
-      /* 🌟 MOBILE IMPROVEMENT: Set a robust minimum height for the hero on all devices */
       min-height: min(100vh, 900px);
     }
 
-    /* HEADER */
     .page-header {
       width: 100%;
       max-width: 1200px;
       margin: 0 0 8px;
       padding-bottom: 0;
-      text-align: left; /* left-align eyebrow + title */
+      text-align: left;
     }
 
     .eyebrow {
@@ -102,12 +156,10 @@
       color: #222222;
     }
 
-    /* removed orange line under the title */
     .header-rule {
       display: none;
     }
 
-    /* SUBTITLE */
     .subtitle-block {
       max-width: 1200px;
       font-size: 1.25rem;
@@ -126,15 +178,13 @@
       color: #333333;
     }
 
-    /* MAP SECTION – full-width, tall, globe cropped at bottom */
     #map-section {
       width: 100%;
       max-width: none;
       margin: 16px 0 0;
       position: relative;
-      /* 🌟 MOBILE IMPROVEMENT: Use a larger min-height on desktop/large screens */
       height: min(80vh, 900px);
-      overflow: hidden;
+      overflow: hidden; /* This is what clips the globe, but should not clip the tooltip now */
 
       border-radius: 0;
       box-shadow: none;
@@ -184,57 +234,7 @@
       stroke: #f0f0f0;
       transform: translateY(-0.5px);
     }
-
-    /* TOOLTIP (slightly transparent) */
-    .tooltip {
-      position: absolute;
-      pointer-events: none;
-      background: rgba(255, 255, 255, 0.92);
-      color: #333333;
-      padding: 12px 18px;
-      font-size: 15px;
-      border-radius: 10px;
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: opacity 0.12s ease-out;
-      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: 10;
-      max-width: 360px;
-      white-space: normal;
-      backdrop-filter: blur(4px);
-    }
-
-    .tooltip-country {
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #222222;
-    }
-
-    .tooltip-metric {
-      margin-top: 12px;
-      padding-left: 10px;
-      border-left: 4px solid rgba(0, 0, 0, 0.15);
-    }
-
-    .tooltip-metric-title {
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      color: #222222; /* overridden inline per metric color */
-    }
-
-    .tooltip-metric-text {
-      font-size: 14px;
-      line-height: 1.55;
-      color: #555555;
-    }
-
+    
     .map-label {
       position: absolute;
       top: 16px;
@@ -315,107 +315,10 @@
       display: none;
     }
 
-    /* kept for potential future re-use */
-    .info-grid-header {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999999;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .info-grid-header::before {
-      content: "";
-      display: inline-block;
-      width: 30px;
-      height: 2px;
-      background: var(--accent);
-      border-radius: 999px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .info-card {
-      display: flex;
-      flex-direction: column;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #ffffff;
-      border-width: 2px;
-      border-style: solid;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
-    }
-
-    .info-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.09);
-    }
-
-    .info-card-title {
-      padding: 10px 14px 9px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #ffffff;
-    }
-
-    .info-card-body {
-      padding: 14px 14px 16px;
-      font-size: 15px;
-      line-height: 1.55;
-      color: var(--text-main);
-    }
-
-    /* Color themes */
-    .card-group-culture { border-color: #cd5b00; }
-    .card-group-culture .info-card-title { background: #cd5b00; }
-
-    .card-individual-culture { border-color: #ff7900; }
-    .card-individual-culture .info-card-title { background: #ff7900; }
-
-    .card-speaking-implicity { border-color: #03649f; }
-    .card-speaking-implicity .info-card-title { background: #03649f; }
-
-    .card-explicit-language { border-color: #038bc7; }
-    .card-explicit-language .info-card-title { background: #038bc7; }
-
-    .card-hierarchical-culture { border-color: #d79d00; }
-    .card-hierarchical-culture .info-card-title { background: #d79d00; }
-
-    .card-focus-time { border-color: #98bc36; }
-    .card-focus-time .info-card-title { background: #98bc36; }
-
-    .card-focus-task { border-color: #70940e; }
-    .card-focus-task .info-card-title { background: #70940e; }
-
-    .card-culture-uncertainty { border-color: #039a82; }
-    .card-culture-uncertainty .info-card-title { background: #039a82; }
-
-    .card-change-management { border-color: #036f64; }
-    .card-change-management .info-card-title { background: #036f64; }
-
-    .card-informal-culture { border-color: #f5c500; }
-    .card-informal-culture .info-card-title { background: #f5c500; }
-
     /* DESKTOP-ish */
     @media (max-width: 1100px) {
       #map-section {
         height: min(70vh, 800px);
-      }
-
-      .info-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
@@ -431,28 +334,21 @@
       #map-section {
         height: 65vh;
       }
-
-      .info-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
     }
 
     /* TABLET / LARGE PHONE – make hero fill the viewport more like history.valyu.ai */
     @media (max-width: 700px) {
       body {
         font-size: 15px;
-        /* 🌟 MOBILE IMPROVEMENT: Ensure min-height respects mobile browser UI changes (viewport units) */
         min-height: 100dvh;
       }
 
       .page {
         padding: 20px 4vw 24px;
-        /* 🌟 MOBILE IMPROVEMENT: Use 100dvh for a more predictable mobile viewport height */
         min-height: 100dvh;
       }
 
       .hero {
-        /* 🌟 MOBILE IMPROVEMENT: Use 100dvh minus vertical padding/margins to calculate max height */
         min-height: calc(100dvh - 44px);
         gap: 12px;
         justify-content: flex-start;
@@ -466,7 +362,6 @@
 
       #map-section {
         margin-top: auto;
-        /* 🌟 MOBILE IMPROVEMENT: Increase map height slightly to maximize visual impact */
         height: 65vh; /* Increased from 60vh */
       }
 
@@ -494,6 +389,7 @@
         font-size: 14px;
       }
 
+      /* Tooltip mobile sizing */
       .tooltip {
         padding: 10px 14px;
         font-size: 14px;
@@ -517,7 +413,6 @@
     @media (max-width: 480px) {
       .hero {
         gap: 10px;
-        /* 🌟 MOBILE IMPROVEMENT: Ensure the hero takes up almost all screen space */
         min-height: calc(100dvh - 40px);
       }
 
@@ -530,7 +425,6 @@
       }
 
       #map-section {
-        /* 🌟 MOBILE IMPROVEMENT: Maximize the map height */
         height: 68vh; /* Increased from 58vh */
       }
 
@@ -554,6 +448,8 @@
 </head>
 
 <body>
+  <div id="tooltip" class="tooltip"></div> 
+
   <div class="page">
     <main>
       <section class="hero">
@@ -565,14 +461,13 @@
 
         <section class="subtitle-block">
           <p>
-            Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of
-            <strong>Intercultural Communication.</strong>
+            Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of Intercultural Communication.
+            <strong>Click any country on the globe to reveal its behavioral pattern.</strong>
           </p>
         </section>
 
         <section id="map-section">
           <div id="map-container"></div>
-          <div id="tooltip" class="tooltip"></div>
 
           <div class="map-label">
             <span class="map-label-dot"></span>
@@ -984,7 +879,6 @@
     let rotation = projection.rotate().slice();
     let isDragging = false;
     let isHovering = false;
-    // 🌟 JAVASCRIPT IMPROVEMENT: Track if a tap/click is currently processing to avoid conflict
     let isClicking = false; 
 
     // Zoom state
@@ -1044,15 +938,13 @@
 
     const drag = d3.drag()
       .on("start", (event) => {
-        // Prevent drag from starting if a click/tap event is still being processed
         if (isClicking) return; 
 
         isDragging = true;
         const r = projection.rotate();
         rotationStart = [r[0], r[1], r[2] || 0];
         dragStart = [event.x, event.y];
-        // 🌟 JAVASCRIPT FIX: Hide tooltip immediately when drag starts
-        tooltip.style("opacity", 0);
+        tooltip.style("opacity", 0).style("display", "none"); // FIX: Hide tooltip on drag start
         isHovering = false;
       })
       .on("drag", (event) => {
@@ -1166,42 +1058,48 @@
       return html;
     }
 
+    /* *** FIX: moveTooltip now uses clientX/clientY for fixed positioning, 
+    and incorporates a simplified boundary check based on viewport dimensions.
+    */
     function moveTooltip(event) {
-      // 🌟 JAVASCRIPT FIX: Use d3.pointer for consistent coordinate handling
-      const [x, y] = d3.pointer(event, container.node());
-      const containerRect = container.node().getBoundingClientRect();
-
-      // Adjust for screen edge so tooltip doesn't get cut off
-      const tooltipNode = tooltip.node();
-      // Ensure the node is visible to get dimensions (will be small if opacity is 0 but placement will be correct)
-      const currentOpacity = tooltip.style('opacity');
-      tooltip.style('opacity', 1).style('display', 'block');
+      // Get viewport coordinates directly from the event (handles both mouse and touch)
+      const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
+      const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
       
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Ensure tooltip is visible to get dimensions (it will be visible by the end of this function)
+      const tooltipNode = tooltip.node();
+      const currentDisplay = tooltip.style('display');
+      const currentOpacity = tooltip.style('opacity');
+
+      tooltip.style('display', 'block').style('opacity', 0); // Temporarily ensure display for measurement
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
-      
-      // Reset opacity and display after getting dimensions
-      tooltip.style('opacity', currentOpacity);
-      if (currentOpacity === '0') tooltip.style('display', 'none');
+      tooltip.style('opacity', currentOpacity).style('display', currentDisplay); // Restore previous state
 
+      let finalX = x + 18; // Default offset right
+      let finalY = y + 18; // Default offset down
 
-      let finalX = x + 10;
-      let finalY = y + 10;
-
-      // Check right boundary
-      if (finalX + tooltipWidth > containerRect.width - 20) {
-        finalX = x - tooltipWidth - 20; // Move to the left of the pointer
+      // Check right boundary: if tooltip goes off-screen, flip it to the left of the cursor
+      if (finalX + tooltipWidth > viewportWidth - 10) {
+        finalX = x - tooltipWidth - 18; // Move to the left of the pointer
       }
       
-      // Check bottom boundary
-      if (finalY + tooltipHeight > containerRect.height - 20) {
-        // Only adjust Y if we also have room to adjust X (to prevent placement off-screen)
-        if (finalY < y) { 
-            finalY = y - tooltipHeight - 20; // Move up from the pointer
-        } else {
-            // Default: if no room, just place it slightly above the pointer
-            finalY = y - tooltipHeight - 10; 
-        }
+      // Check bottom boundary: if tooltip goes off-screen, flip it up
+      if (finalY + tooltipHeight > viewportHeight - 10) {
+        finalY = y - tooltipHeight - 18; // Move up from the pointer
+      }
+
+      // Check left boundary (if flipped to the left and still off screen, push it back right)
+      if (finalX < 10) {
+        finalX = 10;
+      }
+      
+      // Check top boundary (if flipped up and still off screen, push it down)
+      if (finalY < 10) {
+        finalY = 10;
       }
 
       tooltip
@@ -1226,7 +1124,7 @@
           .append("path")
           .attr("class", "country")
           .on("mouseover", (event, d) => {
-            if (isDragging) return; // Ignore hover while dragging
+            if (isDragging) return; 
             isHovering = true;
             tooltip.style("display", "block").style("opacity", 1);
             
@@ -1246,18 +1144,15 @@
           })
           .on("mouseout", () => {
             isHovering = false;
-            // Only hide the tooltip if no drag is in progress
             if (!isDragging) { 
               tooltip.style("opacity", 0).style("display", "none");
             }
           })
-          // 🌟 JAVASCRIPT FIX: Handle touch events to show tooltip on tap (mobile fix)
           .on("touchstart", function(event, d) {
-            // Prevent drag from starting if a tap/click is currently being processed
             if (isDragging || isClicking) return;
             
             isClicking = true;
-            event.preventDefault(); // Stop default browser action (like scrolling/zooming)
+            event.preventDefault(); 
 
             const countryName = d.properties.name || d.properties.admin || "Unknown country";
             
@@ -1274,16 +1169,9 @@
             tooltip.attr("data-country", countryName);
             tooltip.style("display", "block").style("opacity", 1).html(buildTooltipHTML(countryName));
             
-            // Create a pseudo-event for moveTooltip using touch coordinates
-            const touch = event.touches[0];
-            const fakeEvent = {
-                clientX: touch.clientX,
-                clientY: touch.clientY,
-                target: this // Pass the path element for d3.pointer to calculate offset correctly
-            };
-            moveTooltip(fakeEvent);
+            // Use the D3 event object directly for moveTooltip (it contains clientX/clientY)
+            moveTooltip(event);
 
-            // Set a brief timeout to allow the tap to register before allowing rotation/new tap
             setTimeout(() => {
                 isClicking = false;
             }, 300); 
