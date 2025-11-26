@@ -234,18 +234,16 @@
       transform: translateY(-0.5px);
     }
     
-    /* .map-label has been removed */
-
-    /* ZOOM + RESET CONTROLS – horizontal row */
+    /* ZOOM + RESET + PAUSE CONTROLS – horizontal row */
     .zoom-controls {
       position: absolute;
       left: 18px;
       top: 18px; /* Desktop position */
-      bottom: auto; /* Ensure no conflict with bottom on desktop */
+      bottom: auto; 
       display: inline-flex;
       flex-direction: row; /* HORIZONTAL */
-      gap: 6px;
-      padding: 6px;
+      gap: 8px; /* Increased spacing */
+      padding: 8px; /* Increased padding to match size */
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
@@ -256,13 +254,13 @@
 
     .zoom-btn {
       border: none;
-      width: 32px;
-      height: 32px;
+      width: 40px; /* 125% of 32px */
+      height: 40px; /* 125% of 32px */
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 22px; /* 125% of 18px is ~22px */
       font-weight: 600;
       cursor: pointer;
       background: #ffffff;
@@ -282,8 +280,8 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    .zoom-reset {
-      font-size: 16px;
+    .zoom-reset, .zoom-pause-toggle {
+      font-size: 20px; /* 125% of 16px is 20px */
     }
 
     /* INFO BOXES WRAPPER – hidden now */
@@ -341,22 +339,22 @@
         height: 65vh; 
       }
 
-      /* *** CHANGE 3: Control panel moved to top left on mobile *** */
       .zoom-controls {
         left: 12px;
         top: 12px;              
         bottom: auto;              
-        padding: 4px 6px;
+        gap: 8px; /* Consistent spacing */
+        padding: 5px 7px;
       }
 
       .zoom-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 16px;
+        width: 38px; /* 125% of 30px is 37.5px */
+        height: 38px; /* 125% of 30px is 37.5px */
+        font-size: 20px; /* 125% of 16px is 20px */
       }
 
-      .zoom-reset {
-        font-size: 14px;
+      .zoom-reset, .zoom-pause-toggle {
+        font-size: 18px; /* 125% of 14px is 17.5px */
       }
 
       /* Tooltip mobile sizing */
@@ -399,15 +397,9 @@
       }
 
       .zoom-controls {
-        gap: 4px;
+        gap: 6px; /* Slightly smaller gap on tiny screens */
         top: 10px;
         left: 10px;
-      }
-
-      .zoom-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 15px;
       }
     }
   </style>
@@ -436,6 +428,7 @@
           <div id="map-container"></div>
           
           <div class="zoom-controls">
+            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Pause spinning">&#x23F8;</button>
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
             <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
@@ -456,7 +449,6 @@
     const container = d3.select("#map-container");
     const tooltip = d3.select("#tooltip");
     const svg = container.append("svg");
-    // Get the raw SVG DOM element for reliable native touch event handling
     const svgNode = svg.node(); 
 
     // ----- METRIC DEFINITIONS (Unchanged) -----
@@ -705,62 +697,49 @@
       return { key: countryName, inList: false };
     }
 
-    // ----- DEFINITIONS: gradient, glow (Unchanged) -----
+    // ----- D3 Setup (Unchanged) -----
     const defs = svg.append("defs");
-
     const globeGradient = defs.append("radialGradient")
       .attr("id", "globeGradient")
       .attr("cx", "30%")
       .attr("cy", "30%")
       .attr("r", "70%");
-
     globeGradient.append("stop").attr("offset", "0%").attr("stop-color", "#fffdf9");
     globeGradient.append("stop").attr("offset", "60%").attr("stop-color", "#ffe8d0");
     globeGradient.append("stop").attr("offset", "100%").attr("stop-color", "#ffd2a1");
-
-    /* Bright white glow filter */
     const glowFilter = defs.append("filter")
       .attr("id", "globeGlow")
       .attr("x", "-50%")
       .attr("y", "-50%")
       .attr("width", "200%")
       .attr("height", "200%");
-
     glowFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
       .attr("stdDeviation", 25)
       .attr("result", "blur");
-
     glowFilter.append("feMerge")
       .selectAll("feMergeNode")
       .data(["blur"])
       .enter()
       .append("feMergeNode")
       .attr("in", d => d);
-
     const clipPath = defs.append("clipPath").attr("id", "globeClip");
     const clipCircle = clipPath.append("circle");
-
     const globeGroup = svg.append("g");
     const landGroup = svg.append("g").attr("clip-path", "url(#globeClip)");
-
-    /* Glow circle behind globe */
     const globeGlowCircle = globeGroup.append("circle")
       .attr("fill", "#ffffff")
       .attr("opacity", 0.9)
       .attr("filter", "url(#globeGlow)");
-
     const globeSphere = globeGroup.append("circle")
       .attr("class", "globe-sphere")
       .attr("fill", "url(#globeGradient)");
 
-    // Initial rotation (used for reset)
+    // Globe State
     const initialRotation = [0, -10, 0];
-
     const projection = d3.geoOrthographic()
       .rotate(initialRotation.slice())
       .precision(0.5);
-
     const path = d3.geoPath().projection(projection);
     const graticule = d3.geoGraticule();
 
@@ -780,6 +759,9 @@
     // Pinch-to-zoom state
     let pinchStartDistance = null;
     let initialZoomFactorForPinch = 1;
+
+    // NEW STATE: Spinning
+    let isSpinning = true; 
 
     function redrawGlobe() {
       landGroup.selectAll("path").attr("d", path);
@@ -868,7 +850,7 @@
     svg.call(drag);
 
 
-    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - Using Native Listeners for Reliability -----
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - Native Listeners for Reliability -----
     
     // Helper function to calculate distance between two touches
     function getDistance(touches) {
@@ -878,7 +860,7 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
     
-    // 1. TOUCHSTART: Initialize pinch (Priority handling)
+    // 1. TOUCHSTART: Initialize pinch
     svgNode.addEventListener('touchstart', (event) => {
         if (event.touches.length === 2) {
             // Crucial for pinch: Prevent default browser zoom/scroll
@@ -897,7 +879,7 @@
             isHovering = false;
             isClicking = false; 
         }
-    }, {passive: false}); // passive: false ensures preventDefault works
+    }, {passive: false}); 
     
     // 2. TOUCHMOVE: Perform zoom calculation
     svgNode.addEventListener('touchmove', (event) => {
@@ -912,12 +894,11 @@
             const newZoom = initialZoomFactorForPinch * ratio;
             setZoom(newZoom); 
         }
-    }, {passive: false}); // passive: false ensures preventDefault works
+    }, {passive: false}); 
 
     // 3. TOUCHEND: Reset pinch state
     svgNode.addEventListener('touchend', (event) => {
         // Only reset if no touches remain OR if the number of remaining touches is less than 2
-        // If event.touches.length is 0, we are done. If it's 1, it might transition to a single-touch drag, but we reset pinch state anyway.
         if (pinchStartDistance !== null && event.touches.length < 2) {
             pinchStartDistance = null;
             initialZoomFactorForPinch = 1;
@@ -937,7 +918,8 @@
       const dt = now - lastTime;
       lastTime = now;
 
-      if (!isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
+      // Only spin if isSpinning is true AND no interaction is happening
+      if (isSpinning && !isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
         idleTime = Math.min(idleTime + dt, 3000); // cap after 3s
         const factor = Math.min(idleTime / 1500, 1); // ease in over 1.5s
         rotation[0] += autoSpeed * dt * factor;
@@ -961,6 +943,21 @@
       projection.rotate(rotation);
       zoomFactor = 1;
       resizeGlobe();
+      
+      // Also reset spinning state if needed
+      isSpinning = true;
+      d3.select("#pause-toggle-btn").html("&#x23F8;").attr("title", "Pause spinning");
+    });
+    
+    // NEW: Pause/Start Spinning Button Logic
+    d3.select("#pause-toggle-btn").on("click", (event) => {
+        isSpinning = !isSpinning;
+        const button = d3.select(event.currentTarget);
+        if (isSpinning) {
+            button.html("&#x23F8;").attr("title", "Pause spinning"); // Pause icon
+        } else {
+            button.html("&#x25B6;").attr("title", "Start spinning"); // Play icon
+        }
     });
 
     // Mouse wheel zoom (Desktop only)
@@ -1017,56 +1014,44 @@
     function moveTooltip(event) {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const isMobile = viewportWidth <= 700; // Mobile breakpoint
+      const isMobile = viewportWidth <= 700; 
     
-      // Ensure tooltip is visible to get dimensions (it will be visible by the end of this function)
       const tooltipNode = tooltip.node();
       const currentDisplay = tooltip.style('display');
 
-      // Temporarily ensure display for measurement
       tooltip.style('display', 'block'); 
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
-      tooltip.style('display', currentDisplay); // Restore previous state
+      tooltip.style('display', currentDisplay); 
     
       let finalX, finalY;
     
       if (isMobile) {
-        // Mobile Logic: Center the box on the screen
         finalX = (viewportWidth / 2) - (tooltipWidth / 2);
-        // Center vertically, or slightly up from center for better thumb visibility
         finalY = (viewportHeight / 2) - (tooltipHeight / 2) - 30; 
         
-        // Boundary checks
         finalX = Math.max(10, Math.min(finalX, viewportWidth - tooltipWidth - 10));
         finalY = Math.max(10, finalY);
     
       } else {
-        // Desktop Logic: Follow cursor with boundary checks
-    
-        // Get viewport coordinates directly from the event 
         const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
         const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
     
-        finalX = x + 18; // Default offset right
-        finalY = y + 18; // Default offset down
+        finalX = x + 18; 
+        finalY = y + 18; 
     
-        // Check right boundary: if tooltip goes off-screen, flip it to the left of the cursor
         if (finalX + tooltipWidth > viewportWidth - 10) {
-          finalX = x - tooltipWidth - 18; // Move to the left of the pointer
+          finalX = x - tooltipWidth - 18; 
         }
         
-        // Check bottom boundary: if tooltip goes off-screen, flip it up
         if (finalY + tooltipHeight > viewportHeight - 10) {
-          finalY = y - tooltipHeight - 18; // Move up from the pointer
+          finalY = y - tooltipHeight - 18; 
         }
     
-        // Check left boundary (if flipped to the left and still off screen, push it back right)
         if (finalX < 10) {
           finalX = 10;
         }
         
-        // Check top boundary (if flipped up and still off screen, push it down)
         if (finalY < 10) {
           finalY = 10;
         }
@@ -1094,7 +1079,6 @@
           .append("path")
           .attr("class", "country")
           .on("mouseover", (event, d) => {
-            // Desktop logic: Mouseover/Mousemove (Cursor-following)
             if (isDragging || pinchStartDistance !== null) return; 
             isHovering = true;
             tooltip.style("display", "block").style("opacity", 1);
@@ -1110,20 +1094,16 @@
             moveTooltip(event);
           })
           .on("mousemove", (event) => {
-             // Desktop logic: Mouseover/Mousemove (Cursor-following)
             if (isDragging || pinchStartDistance !== null) return;
             moveTooltip(event);
           })
           .on("mouseout", () => {
-             // Desktop logic
             isHovering = false;
             if (!isDragging && pinchStartDistance === null) { 
               tooltip.style("opacity", 0).style("display", "none");
             }
           })
           .on("touchstart", function(event, d) {
-            // Mobile logic: Touchevent (Center-screen positioning)
-            // Only proceed if it is a single touch (not part of a pinch)
             if (event.touches.length > 1 || isDragging || isClicking || pinchStartDistance !== null) return;
             
             isClicking = true;
@@ -1131,7 +1111,6 @@
 
             const countryName = d.properties.name || d.properties.admin || "Unknown country";
             
-            // Toggle logic: If the same country is tapped, hide the tooltip.
             const currentCountry = tooltip.attr("data-country");
             if (currentCountry === countryName && tooltip.style("opacity") === "1") {
                 tooltip.style("opacity", 0).style("display", "none");
@@ -1140,11 +1119,9 @@
                 return;
             }
 
-            // Show new tooltip
             tooltip.attr("data-country", countryName);
             tooltip.style("display", "block").style("opacity", 1).html(buildTooltipHTML(countryName));
             
-            // Call moveTooltip which will detect the screen width and center the box
             moveTooltip(event);
 
             setTimeout(() => {
