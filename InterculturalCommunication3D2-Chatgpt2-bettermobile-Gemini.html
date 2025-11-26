@@ -203,7 +203,8 @@
       width: 100%;
       height: 100%;
       cursor: grab;
-      touch-action: none; /* better mobile drag/pinch */
+      /* Ensure pinch-to-zoom is NOT blocked by browser default or D3, allowing both rotation and pinch */
+      touch-action: none; 
     }
 
     svg:active {
@@ -565,8 +566,10 @@
     const container = d3.select("#map-container");
     const tooltip = d3.select("#tooltip");
     const svg = container.append("svg");
+    // Get the raw SVG DOM element for reliable native touch event handling
+    const svgNode = svg.node(); 
 
-    // ----- METRIC DEFINITIONS -----
+    // ----- METRIC DEFINITIONS (Unchanged) -----
     const metrics = {
       group_culture: {
         title: "Group Culture",
@@ -630,7 +633,7 @@
       }
     };
 
-    // ----- COUNTRY → METRICS MAPPING -----
+    // ----- COUNTRY → METRICS MAPPING (Unchanged) -----
     const countryMetrics = {
       "Afghanistan": ["speaking_implicity","focus_task"],
       "Algeria": ["speaking_implicity","focus_task"],
@@ -789,7 +792,7 @@
       "Zimbabwe": ["focus_task"]
     };
 
-    // ----- ALIASES: TopoJSON name -> matrix name -----
+    // ----- ALIASES: TopoJSON name -> matrix name (Unchanged) -----
     const countryNameAliases = {
       "United States of America": "United States",
       "Côte d'Ivoire": "Ivory Coast",
@@ -814,7 +817,7 @@
       return { key: countryName, inList: false };
     }
 
-    // ----- DEFINITIONS: gradient, glow -----
+    // ----- DEFINITIONS: gradient, glow (Unchanged) -----
     const defs = svg.append("defs");
 
     const globeGradient = defs.append("radialGradient")
@@ -934,14 +937,14 @@
       resizeGlobe();
     }
 
-    // Drag to rotate
+    // Drag to rotate (Single touch/mouse)
     let dragStart = null;
     let rotationStart = null;
 
     const drag = d3.drag()
       .on("start", (event) => {
         // Only start drag if it's a single touch/mouse click AND not currently pinching
-        if (event.touches && event.touches.length > 1 || isClicking) return; 
+        if (event.touches && event.touches.length > 1 || isClicking || pinchStartDistance !== null) return; 
 
         isDragging = true;
         const r = projection.rotate();
@@ -977,7 +980,7 @@
     svg.call(drag);
 
 
-    // ----- PINCH-TO-ZOOM LOGIC (Mobile) -----
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - REPLACED WITH NATIVE LISTENERS -----
     
     // Helper function to calculate distance between two touches
     function getDistance(touches) {
@@ -987,9 +990,10 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
     
-    svg.on("touchstart.pinch", (event) => {
+    // 1. TOUCHSTART: Initialize pinch
+    svgNode.addEventListener('touchstart', (event) => {
         if (event.touches.length === 2) {
-            // Prevent default browser zoom/scroll
+            // Crucial: Prevent default browser zoom/scroll
             event.preventDefault(); 
             
             // Stop D3 drag if it was active
@@ -1005,11 +1009,13 @@
             isHovering = false;
             isClicking = false; 
         }
-    });
-
-    svg.on("touchmove.pinch", (event) => {
+    }, {passive: false}); // passive: false ensures preventDefault works
+    
+    // 2. TOUCHMOVE: Perform zoom calculation
+    svgNode.addEventListener('touchmove', (event) => {
         if (event.touches.length === 2 && pinchStartDistance !== null) {
-            event.preventDefault(); // Prevent default browser zoom/scroll
+            // Crucial: Prevent default browser zoom/scroll
+            event.preventDefault(); 
 
             const currentDistance = getDistance(event.touches);
             const ratio = currentDistance / pinchStartDistance;
@@ -1018,9 +1024,10 @@
             const newZoom = initialZoomFactorForPinch * ratio;
             setZoom(newZoom); 
         }
-    });
+    }, {passive: false}); // passive: false ensures preventDefault works
 
-    svg.on("touchend.pinch", (event) => {
+    // 3. TOUCHEND: Reset pinch state
+    svgNode.addEventListener('touchend', (event) => {
         // Reset pinch state when fingers are lifted
         if (pinchStartDistance !== null) {
             pinchStartDistance = null;
@@ -1074,7 +1081,7 @@
       setZoom(zoomFactor + direction * zoomStep);
     });
 
-    // Tooltip helpers
+    // Tooltip helpers (Unchanged)
     function buildTooltipHTML(countryName) {
       const { key, inList } = resolveCountryKey(countryName);
       const metricIds = inList ? (countryMetrics[key] || []) : [];
@@ -1228,7 +1235,7 @@
           .on("touchstart", function(event, d) {
             // Mobile logic: Touchevent (Center-screen positioning)
             // Only proceed if it is a single touch (not part of a pinch)
-            if (event.touches.length > 1 || isDragging || isClicking) return;
+            if (event.touches.length > 1 || isDragging || isClicking || pinchStartDistance !== null) return;
             
             isClicking = true;
             event.preventDefault(); 
