@@ -153,11 +153,6 @@
 
     .globe-sphere { /* ocean styled via gradient */ }
 
-    .globe-shadow {
-      fill: rgba(0, 0, 0, 0.18);
-      filter: blur(4px);
-    }
-
     .graticule {
       fill: none;
       stroke: rgba(255, 255, 255, 0.25);
@@ -179,11 +174,11 @@
       transform: translateY(-0.5px);
     }
 
-    /* TOOLTIP */
+    /* TOOLTIP (slightly transparent) */
     .tooltip {
       position: absolute;
       pointer-events: none;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.92);
       color: #333333;
       padding: 12px 18px;
       font-size: 15px;
@@ -192,10 +187,11 @@
       transform: translate(0, 0);
       transition: opacity 0.12s ease-out;
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
       z-index: 10;
       max-width: 360px;
       white-space: normal;
+      backdrop-filter: blur(4px);
     }
 
     .tooltip-country {
@@ -895,7 +891,7 @@
       return { key: countryName, inList: false };
     }
 
-    // ----- DEFINITIONS: gradient, clip, shadow -----
+    // ----- DEFINITIONS: gradient, glow -----
     const defs = svg.append("defs");
 
     const globeGradient = defs.append("radialGradient")
@@ -908,19 +904,25 @@
     globeGradient.append("stop").attr("offset", "60%").attr("stop-color", "#ffe8d0");
     globeGradient.append("stop").attr("offset", "100%").attr("stop-color", "#ffd2a1");
 
-    const shadowFilter = defs.append("filter")
-      .attr("id", "globeShadow")
-      .attr("x", "-30%")
-      .attr("y", "-30%")
-      .attr("width", "160%")
-      .attr("height", "160%");
+    /* Bright white glow filter */
+    const glowFilter = defs.append("filter")
+      .attr("id", "globeGlow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
 
-    shadowFilter.append("feDropShadow")
-      .attr("dx", 0)
-      .attr("dy", 4)
-      .attr("stdDeviation", 6)
-      .attr("flood-color", "#000000")
-      .attr("flood-opacity", 0.3);
+    glowFilter.append("feGaussianBlur")
+      .attr("in", "SourceGraphic")
+      .attr("stdDeviation", 25)
+      .attr("result", "blur");
+
+    glowFilter.append("feMerge")
+      .selectAll("feMergeNode")
+      .data(["blur"])
+      .enter()
+      .append("feMergeNode")
+      .attr("in", d => d);
 
     const clipPath = defs.append("clipPath").attr("id", "globeClip");
     const clipCircle = clipPath.append("circle");
@@ -928,14 +930,15 @@
     const globeGroup = svg.append("g");
     const landGroup = svg.append("g").attr("clip-path", "url(#globeClip)");
 
+    /* Glow circle behind globe */
+    const globeGlowCircle = globeGroup.append("circle")
+      .attr("fill", "#ffffff")
+      .attr("opacity", 0.9)
+      .attr("filter", "url(#globeGlow)");
+
     const globeSphere = globeGroup.append("circle")
       .attr("class", "globe-sphere")
-      .attr("fill", "url(#globeGradient)")
-      .attr("filter", "url(#globeShadow)");
-
-    const globeShadow = globeGroup.append("ellipse")
-      .attr("class", "globe-shadow")
-      .attr("opacity", 0.5);
+      .attr("fill", "url(#globeGradient)");
 
     // Initial rotation (used for reset)
     const initialRotation = [0, -10, 0];
@@ -977,14 +980,21 @@
       const cx = width / 2;
       const cy = height / 2 + radius * 0.12;
 
-      globeSphere.attr("cx", cx).attr("cy", cy).attr("r", radius);
-      clipCircle.attr("cx", cx).attr("cy", cy).attr("r", radius);
-
-      globeShadow
+      // Glow circle slightly larger than globe
+      globeGlowCircle
         .attr("cx", cx)
-        .attr("cy", cy + radius * 0.75)
-        .attr("rx", radius * 0.9)
-        .attr("ry", radius * 0.35);
+        .attr("cy", cy)
+        .attr("r", radius * 1.15);
+
+      globeSphere
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", radius);
+
+      clipCircle
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", radius);
 
       projection.translate([cx, cy]).scale(radius).rotate(rotation);
 
