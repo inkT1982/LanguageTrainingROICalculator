@@ -234,37 +234,14 @@
       transform: translateY(-0.5px);
     }
     
-    .map-label {
-      position: absolute;
-      top: 16px;
-      right: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #444444;
-    }
-
-    .map-label-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
+    /* .map-label has been removed */
 
     /* ZOOM + RESET CONTROLS – horizontal row */
     .zoom-controls {
       position: absolute;
       left: 18px;
-      top: 18px;
+      top: 18px; /* Desktop position */
+      bottom: auto; /* Ensure no conflict with bottom on desktop */
       display: inline-flex;
       flex-direction: row; /* HORIZONTAL */
       gap: 6px;
@@ -335,7 +312,7 @@
       }
     }
 
-    /* TABLET / LARGE PHONE – make hero fill the viewport more like history.valyu.ai */
+    /* TABLET / LARGE PHONE – mobile specific changes */
     @media (max-width: 700px) {
       body {
         font-size: 15px;
@@ -361,20 +338,14 @@
 
       #map-section {
         margin-top: auto;
-        height: 65vh; /* Increased from 60vh */
+        height: 65vh; 
       }
 
-      .map-label {
-        top: 12px;
-        right: 12px;
-        font-size: 11px;
-        padding: 6px 10px;
-      }
-
+      /* *** CHANGE 3: Control panel moved to top left on mobile *** */
       .zoom-controls {
         left: 12px;
-        top: auto;
-        bottom: 16px;              /* controls lower for thumb reach */
+        top: 12px;              
+        bottom: auto;              
         padding: 4px 6px;
       }
 
@@ -424,17 +395,13 @@
       }
 
       #map-section {
-        height: 68vh; /* Increased from 58vh */
-      }
-
-      .map-label {
-        max-width: 65%;
-        line-height: 1.3;
+        height: 68vh; 
       }
 
       .zoom-controls {
         gap: 4px;
-        bottom: 14px;
+        top: 10px;
+        left: 10px;
       }
 
       .zoom-btn {
@@ -467,12 +434,7 @@
 
         <section id="map-section">
           <div id="map-container"></div>
-
-          <div class="map-label">
-            <span class="map-label-dot"></span>
-            <span>Global communication landscape</span>
-          </div>
-
+          
           <div class="zoom-controls">
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
@@ -483,79 +445,7 @@
 
       <section class="info-grid-wrapper">
         <div class="info-grid-header">Key intercultural dimensions</div>
-
-        <div class="info-grid">
-          <div class="info-card card-group-culture">
-            <div class="info-card-title">Group Culture</div>
-            <div class="info-card-body">
-              The group, or “we,” has priority. This leads to relationships that are based on greater loyalty and selectivity.
-            </div>
-          </div>
-
-          <div class="info-card card-individual-culture">
-            <div class="info-card-title">Individual Culture</div>
-            <div class="info-card-body">
-              The focus is on the individual, i.e. his/her wellbeing and individual will. The “I” and self-expression take priority.
-            </div>
-          </div>
-
-          <div class="info-card card-speaking-implicity">
-            <div class="info-card-title">Speaking Implicity</div>
-            <div class="info-card-body">
-              Here, the content of the messages is somewhat veiled. More is implied than understood. A “yes” might actually just be a polite acknowledgement.
-            </div>
-          </div>
-
-          <div class="info-card card-explicit-language">
-            <div class="info-card-title">Explicit Language</div>
-            <div class="info-card-body">
-              Explicit language is very direct: a yes is a yes, a no is a no.
-            </div>
-          </div>
-
-          <div class="info-card card-hierarchical-culture">
-            <div class="info-card-title">Hierarchical Culture</div>
-            <div class="info-card-body">
-              Hierarchy is still very important here: communication depends on who you are speaking to and/or who is speaking to you.
-            </div>
-          </div>
-
-          <div class="info-card card-focus-time">
-            <div class="info-card-title">Focus on Time</div>
-            <div class="info-card-body">
-              Culture is monochronic. We tend to prioritize a specific timeframe.
-            </div>
-          </div>
-
-          <div class="info-card card-focus-task">
-            <div class="info-card-title">Focus on Task</div>
-            <div class="info-card-body">
-              Polychronic cultures focus on completing the task; the timeframe is less important, even if it means delays.
-            </div>
-          </div>
-
-          <div class="info-card card-culture-uncertainty">
-            <div class="info-card-title">Culture of Uncertainty</div>
-            <div class="info-card-body">
-              People accept the unknown and changes more calmly. The rules are less strict.
-            </div>
-          </div>
-
-          <div class="info-card card-change-management">
-            <div class="info-card-title">Change Management</div>
-            <div class="info-card-body">
-              Changes can feel threatening. To counteract this, strict rules are established, increasing motivation.
-            </div>
-          </div>
-
-          <div class="info-card card-informal-culture">
-            <div class="info-card-title">Informal Culture</div>
-            <div class="info-card-body">
-              People accept uncertainty and change more calmly. Rules tend to be flexible and open.
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
     </main>
   </div>
 
@@ -635,160 +525,158 @@
 
     // ----- COUNTRY → METRICS MAPPING (Unchanged) -----
     const countryMetrics = {
-      "Afghanistan": ["speaking_implicity","focus_task"],
-      "Algeria": ["speaking_implicity","focus_task"],
-      "Angola": ["speaking_implicity","focus_task"],
-      "Argentina": ["speaking_implicity"],
-      "Australia": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"],
-      "Austria": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Azerbaijan": ["group_culture","speaking_implicity","focus_task"],
-      "Bangladesh": ["group_culture","speaking_implicity","focus_task"],
-      "Belarus": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Belgium": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Bolivia": ["group_culture","speaking_implicity","focus_task"],
-      "Bosnia and Herzegovina": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Botswana": ["group_culture","speaking_implicity","focus_task"],
-      "Brazil": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "Bulgaria": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Burkina Faso": ["group_culture","speaking_implicity","focus_task"],
-      "Burundi": ["group_culture","speaking_implicity","focus_task"],
-      "Cambodia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Cameroon": ["group_culture","speaking_implicity","focus_task"],
-      "Canada": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Central African Republic": ["group_culture","speaking_implicity","focus_task"],
-      "Chad": ["group_culture","speaking_implicity","focus_task"],
-      "Chile": ["group_culture","speaking_implicity"],
-      "China": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Colombia": ["group_culture","speaking_implicity","focus_task"],
-      "Congo": ["group_culture","speaking_implicity","focus_task"],
-      "Costa Rica": ["group_culture","speaking_implicity","focus_task"],
-      "Croatia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Cuba": ["group_culture","speaking_implicity","focus_task"],
-      "Czech Republic": ["individual_culture","explicit_language","focus_time"],
-      "Denmark": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Dominican Republic": ["group_culture","speaking_implicity","focus_task"],
-      "DR Congo": ["group_culture","speaking_implicity","focus_task"],
-      "Ecuador": ["group_culture","speaking_implicity"],
-      "Egypt": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "El Salvador": ["group_culture","speaking_implicity","focus_task"],
-      "Equatorial Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Eritrea": ["group_culture","speaking_implicity","focus_task"],
-      "Estonia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Ethiopia": ["group_culture","speaking_implicity","focus_task"],
-      "Finland": ["individual_culture","explicit_language","focus_time"],
-      "France": ["individual_culture","explicit_language","informal_culture","focus_time"],
-      "Gabon": ["group_culture","speaking_implicity","focus_task"],
-      "Gambia": ["group_culture","speaking_implicity","focus_task"],
-      "Georgia": ["group_culture","speaking_implicity","focus_task"],
-      "Germany": ["individual_culture","explicit_language","focus_time","culture_uncertainty","focus_task"],
-      "Ghana": ["group_culture","speaking_implicity","focus_task"],
-      "Greece": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Guatemala": ["group_culture","speaking_implicity","focus_task"],
-      "Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Guinea Bissau": ["group_culture","speaking_implicity","focus_task"],
-      "Guyana": ["group_culture","speaking_implicity","focus_task"],
-      "Haiti": ["group_culture","speaking_implicity","focus_task"],
-      "Honduras": ["group_culture","speaking_implicity","focus_task"],
-      "Hungary": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Iceland": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "India": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Indonesia": ["group_culture","speaking_implicity","focus_task"],
-      "Iran": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Iraq": ["group_culture","speaking_implicity","focus_task"],
-      "Ireland": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Israel": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Italy": ["group_culture","speaking_implicity","informal_culture","focus_time"],
-      "Ivory Coast": ["group_culture","speaking_implicity","focus_task"],
-      "Jamaica": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "Japan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Jordan": ["group_culture","speaking_implicity","focus_task"],
-      "Kazakhstan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Kenya": ["group_culture","speaking_implicity","focus_task"],
-      "Kuwait": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Kyrgyzstan": ["group_culture","speaking_implicity","focus_task"],
-      "Laos": ["group_culture","speaking_implicity","focus_task"],
-      "Latvia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Lebanon": ["group_culture","speaking_implicity","focus_task"],
-      "Lesotho": ["group_culture","speaking_implicity","focus_task"],
-      "Liberia": ["group_culture","speaking_implicity","focus_task"],
-      "Libya": ["group_culture","speaking_implicity","focus_task"],
-      "Lithuania": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Luxembourg": ["individual_culture","explicit_language","focus_time"],
-      "Macedonia": ["group_culture","speaking_implicity","focus_task"],
-      "Madagascar": ["group_culture","speaking_implicity","focus_task"],
-      "Malawi": ["group_culture","speaking_implicity","focus_task"],
-      "Malaysia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Mali": ["group_culture","speaking_implicity","focus_task"],
-      "Mauritania": ["group_culture","speaking_implicity","focus_task"],
-      "Mexico": ["group_culture","speaking_implicity","focus_task"],
-      "Moldova": ["group_culture","speaking_implicity","focus_task"],
-      "Mongolia": ["group_culture","speaking_implicity","focus_task"],
-      "Montenegro": ["group_culture","speaking_implicity","focus_task"],
-      "Morocco": ["group_culture","speaking_implicity","focus_task"],
-      "Mozambique": ["group_culture","speaking_implicity","focus_task"],
-      "Myanmar": ["group_culture","speaking_implicity","focus_task"],
-      "Namibia": ["group_culture","speaking_implicity","focus_task"],
-      "Nepal": ["group_culture","speaking_implicity","focus_task"],
-      "Netherlands": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "New Zealand": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Nicaragua": ["group_culture","speaking_implicity","focus_task"],
-      "Niger": ["group_culture","speaking_implicity","focus_task"],
-      "Nigeria": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "North Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Norway": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Oman": ["group_culture","speaking_implicity","focus_task"],
-      "Pakistan": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Panama": ["group_culture","speaking_implicity","focus_task"],
-      "Papua New Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Paraguay": ["group_culture","speaking_implicity"],
-      "Peru": ["group_culture","speaking_implicity","focus_task"],
-      "Philippines": ["group_culture","speaking_implicity","focus_task"],
-      "Poland": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Portugal": ["group_culture","speaking_implicity","focus_time","focus_task"],
-      "Puerto Rico": ["group_culture","speaking_implicity","focus_task"],
-      "Qatar": ["group_culture","speaking_implicity","focus_task"],
-      "Romania": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Russia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Rwanda": ["group_culture","speaking_implicity","focus_task"],
-      "Saudi Arabia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Senegal": ["group_culture","speaking_implicity","focus_task"],
-      "Serbia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Sierra Leone": ["group_culture","speaking_implicity","focus_task"],
-      "Slovakia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Slovenia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Somalia": ["group_culture","speaking_implicity","focus_task"],
-      "South Africa": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "South Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "South Sudan": ["group_culture","speaking_implicity","focus_task"],
-      "Spain": ["group_culture","speaking_implicity","informal_culture","focus_time","focus_task"],
-      "Sri Lanka": ["group_culture","speaking_implicity","focus_task"],
-      "Sudan": ["group_culture","speaking_implicity","focus_task"],
-      "Suriname": ["group_culture","speaking_implicity","focus_task"],
-      "Swaziland": ["group_culture","speaking_implicity","focus_task"],
-      "Sweden": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Switzerland": ["individual_culture","explicit_language","focus_time"],
-      "Syria": ["group_culture","speaking_implicity","focus_task"],
-      "Taiwan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Tajikistan": ["group_culture","speaking_implicity","focus_task"],
-      "Tanzania": ["group_culture","speaking_implicity","focus_task"],
-      "Thailand": ["group_culture","speaking_implicity","focus_task"],
-      "Togo": ["group_culture","speaking_implicity","focus_task"],
-      "Trinidad and Tobago": ["group_culture","speaking_implicity","focus_task"],
-      "Tunisia": ["group_culture","speaking_implicity","focus_task"],
-      "Turkey": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Turkmenistan": ["group_culture","speaking_implicity","focus_task"],
-      "Uganda": ["group_culture","speaking_implicity","focus_task"],
-      "Ukraine": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "United Arab Emirates": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "United Kingdom": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "United States": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"],
-      "Uruguay": ["group_culture","speaking_implicity","focus_task"],
-      "Uzbekistan": ["group_culture","speaking_implicity","focus_task"],
-      "Venezuela": ["group_culture","speaking_implicity","focus_task"],
-      "Vietnam": ["group_culture","speaking_implicity","focus_task"],
-      "Western Sahara": ["group_culture","speaking_implicity","focus_task"],
-      "Yemen": ["group_culture","speaking_implicity","focus_task"],
-      "Zambia": ["group_culture","speaking_implicity","focus_task"],
+      "Afghanistan": ["speaking_implicity","focus_task"], "Algeria": ["speaking_implicity","focus_task"], 
+      "Angola": ["speaking_implicity","focus_task"], "Argentina": ["speaking_implicity"], 
+      "Australia": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"], 
+      "Austria": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Azerbaijan": ["group_culture","speaking_implicity","focus_task"], 
+      "Bangladesh": ["group_culture","speaking_implicity","focus_task"], 
+      "Belarus": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Belgium": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Bolivia": ["group_culture","speaking_implicity","focus_task"], 
+      "Bosnia and Herzegovina": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Botswana": ["group_culture","speaking_implicity","focus_task"], 
+      "Brazil": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "Bulgaria": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Burkina Faso": ["group_culture","speaking_implicity","focus_task"], 
+      "Burundi": ["group_culture","speaking_implicity","focus_task"], 
+      "Cambodia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Cameroon": ["group_culture","speaking_implicity","focus_task"], 
+      "Canada": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Central African Republic": ["group_culture","speaking_implicity","focus_task"], 
+      "Chad": ["group_culture","speaking_implicity","focus_task"], 
+      "Chile": ["group_culture","speaking_implicity"], 
+      "China": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Colombia": ["group_culture","speaking_implicity","focus_task"], 
+      "Congo": ["group_culture","speaking_implicity","focus_task"], 
+      "Costa Rica": ["group_culture","speaking_implicity","focus_task"], 
+      "Croatia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Cuba": ["group_culture","speaking_implicity","focus_task"], 
+      "Czech Republic": ["individual_culture","explicit_language","focus_time"], 
+      "Denmark": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Dominican Republic": ["group_culture","speaking_implicity","focus_task"], 
+      "DR Congo": ["group_culture","speaking_implicity","focus_task"], 
+      "Ecuador": ["group_culture","speaking_implicity"], 
+      "Egypt": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "El Salvador": ["group_culture","speaking_implicity","focus_task"], 
+      "Equatorial Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Eritrea": ["group_culture","speaking_implicity","focus_task"], 
+      "Estonia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Ethiopia": ["group_culture","speaking_implicity","focus_task"], 
+      "Finland": ["individual_culture","explicit_language","focus_time"], 
+      "France": ["individual_culture","explicit_language","informal_culture","focus_time"], 
+      "Gabon": ["group_culture","speaking_implicity","focus_task"], 
+      "Gambia": ["group_culture","speaking_implicity","focus_task"], 
+      "Georgia": ["group_culture","speaking_implicity","focus_task"], 
+      "Germany": ["individual_culture","explicit_language","focus_time","culture_uncertainty","focus_task"], 
+      "Ghana": ["group_culture","speaking_implicity","focus_task"], 
+      "Greece": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Guatemala": ["group_culture","speaking_implicity","focus_task"], 
+      "Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Guinea Bissau": ["group_culture","speaking_implicity","focus_task"], 
+      "Guyana": ["group_culture","speaking_implicity","focus_task"], 
+      "Haiti": ["group_culture","speaking_implicity","focus_task"], 
+      "Honduras": ["group_culture","speaking_implicity","focus_task"], 
+      "Hungary": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Iceland": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "India": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Indonesia": ["group_culture","speaking_implicity","focus_task"], 
+      "Iran": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Iraq": ["group_culture","speaking_implicity","focus_task"], 
+      "Ireland": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Israel": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Italy": ["group_culture","speaking_implicity","informal_culture","focus_time"], 
+      "Ivory Coast": ["group_culture","speaking_implicity","focus_task"], 
+      "Jamaica": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "Japan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Jordan": ["group_culture","speaking_implicity","focus_task"], 
+      "Kazakhstan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Kenya": ["group_culture","speaking_implicity","focus_task"], 
+      "Kuwait": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Kyrgyzstan": ["group_culture","speaking_implicity","focus_task"], 
+      "Laos": ["group_culture","speaking_implicity","focus_task"], 
+      "Latvia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Lebanon": ["group_culture","speaking_implicity","focus_task"], 
+      "Lesotho": ["group_culture","speaking_implicity","focus_task"], 
+      "Liberia": ["group_culture","speaking_implicity","focus_task"], 
+      "Libya": ["group_culture","speaking_implicity","focus_task"], 
+      "Lithuania": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Luxembourg": ["individual_culture","explicit_language","focus_time"], 
+      "Macedonia": ["group_culture","speaking_implicity","focus_task"], 
+      "Madagascar": ["group_culture","speaking_implicity","focus_task"], 
+      "Malawi": ["group_culture","speaking_implicity","focus_task"], 
+      "Malaysia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Mali": ["group_culture","speaking_implicity","focus_task"], 
+      "Mauritania": ["group_culture","speaking_implicity","focus_task"], 
+      "Mexico": ["group_culture","speaking_implicity","focus_task"], 
+      "Moldova": ["group_culture","speaking_implicity","focus_task"], 
+      "Mongolia": ["group_culture","speaking_implicity","focus_task"], 
+      "Montenegro": ["group_culture","speaking_implicity","focus_task"], 
+      "Morocco": ["group_culture","speaking_implicity","focus_task"], 
+      "Mozambique": ["group_culture","speaking_implicity","focus_task"], 
+      "Myanmar": ["group_culture","speaking_implicity","focus_task"], 
+      "Namibia": ["group_culture","speaking_implicity","focus_task"], 
+      "Nepal": ["group_culture","speaking_implicity","focus_task"], 
+      "Netherlands": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "New Zealand": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Nicaragua": ["group_culture","speaking_implicity","focus_task"], 
+      "Niger": ["group_culture","speaking_implicity","focus_task"], 
+      "Nigeria": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "North Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Norway": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Oman": ["group_culture","speaking_implicity","focus_task"], 
+      "Pakistan": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Panama": ["group_culture","speaking_implicity","focus_task"], 
+      "Papua New Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Paraguay": ["group_culture","speaking_implicity"], 
+      "Peru": ["group_culture","speaking_implicity","focus_task"], 
+      "Philippines": ["group_culture","speaking_implicity","focus_task"], 
+      "Poland": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Portugal": ["group_culture","speaking_implicity","focus_time","focus_task"], 
+      "Puerto Rico": ["group_culture","speaking_implicity","focus_task"], 
+      "Qatar": ["group_culture","speaking_implicity","focus_task"], 
+      "Romania": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Russia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Rwanda": ["group_culture","speaking_implicity","focus_task"], 
+      "Saudi Arabia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Senegal": ["group_culture","speaking_implicity","focus_task"], 
+      "Serbia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Sierra Leone": ["group_culture","speaking_implicity","focus_task"], 
+      "Slovakia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Slovenia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Somalia": ["group_culture","speaking_implicity","focus_task"], 
+      "South Africa": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "South Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "South Sudan": ["group_culture","speaking_implicity","focus_task"], 
+      "Spain": ["group_culture","speaking_implicity","informal_culture","focus_time","focus_task"], 
+      "Sri Lanka": ["group_culture","speaking_implicity","focus_task"], 
+      "Sudan": ["group_culture","speaking_implicity","focus_task"], 
+      "Suriname": ["group_culture","speaking_implicity","focus_task"], 
+      "Swaziland": ["group_culture","speaking_implicity","focus_task"], 
+      "Sweden": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Switzerland": ["individual_culture","explicit_language","focus_time"], 
+      "Syria": ["group_culture","speaking_implicity","focus_task"], 
+      "Taiwan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Tajikistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Tanzania": ["group_culture","speaking_implicity","focus_task"], 
+      "Thailand": ["group_culture","speaking_implicity","focus_task"], 
+      "Togo": ["group_culture","speaking_implicity","focus_task"], 
+      "Trinidad and Tobago": ["group_culture","speaking_implicity","focus_task"], 
+      "Tunisia": ["group_culture","speaking_implicity","focus_task"], 
+      "Turkey": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Turkmenistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Uganda": ["group_culture","speaking_implicity","focus_task"], 
+      "Ukraine": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "United Arab Emirates": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "United Kingdom": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "United States": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"], 
+      "Uruguay": ["group_culture","speaking_implicity","focus_task"], 
+      "Uzbekistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Venezuela": ["group_culture","speaking_implicity","focus_task"], 
+      "Vietnam": ["group_culture","speaking_implicity","focus_task"], 
+      "Western Sahara": ["group_culture","speaking_implicity","focus_task"], 
+      "Yemen": ["group_culture","speaking_implicity","focus_task"], 
+      "Zambia": ["group_culture","speaking_implicity","focus_task"], 
       "Zimbabwe": ["focus_task"]
     };
 
@@ -943,7 +831,7 @@
 
     const drag = d3.drag()
       .on("start", (event) => {
-        // Only start drag if it's a single touch/mouse click AND not currently pinching
+        // ABORT if: Multi-touch (pinch) or we are already pinching or processing a click
         if (event.touches && event.touches.length > 1 || isClicking || pinchStartDistance !== null) return; 
 
         isDragging = true;
@@ -980,7 +868,7 @@
     svg.call(drag);
 
 
-    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - REPLACED WITH NATIVE LISTENERS -----
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - Using Native Listeners for Reliability -----
     
     // Helper function to calculate distance between two touches
     function getDistance(touches) {
@@ -990,13 +878,13 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
     
-    // 1. TOUCHSTART: Initialize pinch
+    // 1. TOUCHSTART: Initialize pinch (Priority handling)
     svgNode.addEventListener('touchstart', (event) => {
         if (event.touches.length === 2) {
-            // Crucial: Prevent default browser zoom/scroll
+            // Crucial for pinch: Prevent default browser zoom/scroll
             event.preventDefault(); 
             
-            // Stop D3 drag if it was active
+            // Immediately stop D3 drag/rotation states
             isDragging = false;
             dragStart = null;
             rotationStart = null;
@@ -1014,7 +902,7 @@
     // 2. TOUCHMOVE: Perform zoom calculation
     svgNode.addEventListener('touchmove', (event) => {
         if (event.touches.length === 2 && pinchStartDistance !== null) {
-            // Crucial: Prevent default browser zoom/scroll
+            // Crucial for pinch: Prevent default browser zoom/scroll
             event.preventDefault(); 
 
             const currentDistance = getDistance(event.touches);
@@ -1028,8 +916,9 @@
 
     // 3. TOUCHEND: Reset pinch state
     svgNode.addEventListener('touchend', (event) => {
-        // Reset pinch state when fingers are lifted
-        if (pinchStartDistance !== null) {
+        // Only reset if no touches remain OR if the number of remaining touches is less than 2
+        // If event.touches.length is 0, we are done. If it's 1, it might transition to a single-touch drag, but we reset pinch state anyway.
+        if (pinchStartDistance !== null && event.touches.length < 2) {
             pinchStartDistance = null;
             initialZoomFactorForPinch = 1;
         }
