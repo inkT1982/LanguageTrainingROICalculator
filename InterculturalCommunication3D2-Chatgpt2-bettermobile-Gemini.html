@@ -53,7 +53,6 @@
       display: flex;
       flex-direction: column; 
       gap: 4px;
-      /* Removed background/padding from the main container */
       background: none; 
       padding: 0;
       border-radius: 0;
@@ -87,7 +86,7 @@
       gap: 4px;
       margin-top: 4px;
       padding: 4px;
-      border-radius: 8px; /* Slightly larger border for the options container */
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.7);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       backdrop-filter: blur(4px);
@@ -128,7 +127,7 @@
       background: rgba(255, 121, 0, 0.1);
     }
 
-    /* *** TOOLTIP STYLES *** (Unchanged) */
+    /* *** TOOLTIP STYLES *** */
     .tooltip {
       position: fixed; 
       pointer-events: none;
@@ -143,7 +142,7 @@
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
       border: 1px solid rgba(0, 0, 0, 0.05);
       z-index: 9999;
-      max-width: 360px;
+      max-width: 360px; /* Standard max-width on desktop */
       white-space: normal;
       backdrop-filter: blur(4px);
       top: 0;
@@ -263,7 +262,8 @@
       max-width: none;
       margin: 16px 0 0;
       position: relative;
-      height: min(80vh, 900px);
+      /* Adjusted for better desktop/large screen experience */
+      height: min(80vh, 900px); 
       overflow: hidden; 
 
       border-radius: 0;
@@ -365,19 +365,53 @@
       font-weight: 600;
     }
 
-    /* Mobile adjustments */
+    /* ---------------------------------
+       UNIVERSAL RESPONSIVENESS REFINEMENTS
+       --------------------------------- */
     @media (max-width: 700px) {
       .page {
-        padding: 20px 4vw 24px;
+        padding: 16px 4vw 20px; /* Tighter padding on mobile */
       }
+      /* Title and Subtitle */
+      .page-header h1 {
+        font-size: clamp(1.6rem, 6.5vw, 2.2rem); 
+      }
+      .subtitle-block {
+        font-size: 1rem; /* Base 16px on mobile */
+        margin-bottom: 1rem;
+      }
+      
+      /* Map Section Flexibility */
+      #map-section {
+        height: 75vh; /* Use 75% of viewport height */
+        min-height: 300px; /* Prevent collapse on content-heavy screens */
+        margin-top: 8px;
+      }
+
+      /* Controls Tighter Positioning */
+      .zoom-controls {
+        left: 8px; 
+        top: 8px;              
+        gap: 6px; 
+        padding: 6px;
+      }
+      .zoom-btn {
+        width: 36px; 
+        height: 36px; 
+        font-size: 18px; 
+      }
+      .zoom-reset, .zoom-pause-toggle {
+        font-size: 16px;
+      }
+      
+      /* Language Switch Tighter Positioning */
       #language-switch {
-        top: 15px;
+        top: 10px;
         right: 4vw;
-        padding: 0;
       }
       #lang-toggle-btn {
-        width: 44px; 
-        height: 36px;
+        width: 40px; 
+        height: 32px;
         font-size: 16px;
       }
       #lang-options {
@@ -385,34 +419,16 @@
         margin-top: 3px;
       }
       .lang-btn {
-        font-size: 13px;
-        padding: 5px 8px;
-        width: 44px; /* Adjust width slightly for smaller screen */
+        font-size: 12px;
+        padding: 4px 6px;
+        width: 40px; 
       }
-      /* Ensure h1 and subtitle adjust on mobile too */
-      .page-header h1 {
-        font-size: clamp(1.7rem, 6vw, 2.2rem); 
-      }
-      .subtitle-block {
-        font-size: 0.95rem; 
-      }
-      .zoom-controls {
-        left: 12px;
-        top: 12px;              
-        gap: 8px; 
-      }
-      .zoom-btn {
-        width: 38px; 
-        height: 38px; 
-        font-size: 20px; 
-      }
-      .zoom-reset, .zoom-pause-toggle {
-        font-size: 18px;
-      }
+      
+      /* Tooltip full width usage */
       .tooltip {
         padding: 10px 14px;
         font-size: 14px;
-        max-width: 280px;
+        max-width: 90vw; 
       }
     }
   </style>
@@ -443,6 +459,10 @@
           <p id="text-subtitle"></p>
         </section>
 
+        <div id="globe-diagnostics" style="font-family: sans-serif; font-size: 14px; 
+             background: #111; color: #fff; padding: 12px; margin: 0 0 16px 0; border-radius: 6px; display:none;">
+        </div>
+        
         <section id="map-section">
           <div id="map-container"></div>
           
@@ -454,8 +474,7 @@
           </div>
         </section>
       </section>
-
-      </main>
+    </main>
   </div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -1153,6 +1172,7 @@
       let finalX, finalY;
     
       if (isMobile) {
+        // Centered position on mobile
         finalX = (viewportWidth / 2) - (tooltipWidth / 2);
         finalY = (viewportHeight / 2) - (tooltipHeight / 2) - 30; 
         
@@ -1160,12 +1180,14 @@
         finalY = Math.max(10, finalY);
     
       } else {
+        // Offset position on desktop
         const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
         const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
     
         finalX = x + 18; 
         finalY = y + 18; 
     
+        // Keep tooltip within viewport bounds
         if (finalX + tooltipWidth > viewportWidth - 10) {
           finalX = x - tooltipWidth - 18; 
         }
@@ -1263,6 +1285,82 @@
 
     // Initialize the page in English on load
     updateLanguage('en');
+  </script>
+
+  <script>
+    (function () {
+        const diag = document.getElementById("globe-diagnostics");
+
+        function show(msg) {
+            diag.style.display = "block";
+            diag.innerHTML = "<b>Globe Diagnostics:</b><br>" + msg;
+            console.warn("Globe Diagnostics:", msg);
+        }
+
+        function webglSupported() {
+            try {
+                const c = document.createElement("canvas");
+                return !!window.WebGLRenderingContext &&
+                       (c.getContext("webgl") || c.getContext("experimental-webgl"));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function webgl2Supported() {
+            try {
+                const c = document.createElement("canvas");
+                return !!c.getContext("webgl2");
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 1. Check WebGL support
+        if (!webglSupported()) {
+            show("❌ Your browser does not support WebGL. The 3D globe cannot be displayed.<br>" +
+                 "➡ Try updating your browser or enabling hardware acceleration.");
+            return;
+        }
+
+        // 2. Warn if WebGL2 is missing (Some libs rely on it)
+        if (!webgl2Supported()) {
+            show("⚠ WebGL works, but WebGL2 is not supported.<br>" +
+                 "The globe may appear but could be slow or incomplete.");
+        }
+
+        // 3. Detect disabled hardware acceleration
+        const gl = document.createElement("canvas").getContext("webgl");
+        const info = gl && gl.getExtension("WEBGL_debug_renderer_info");
+
+        if (info) {
+            const renderer = gl.getParameter(info.UNMASKED_RENDERER_WEBGL);
+            if (renderer.toLowerCase().includes("swiftshader") ||
+                renderer.toLowerCase().includes("software")) {
+                show("⚠ WebGL is running in SOFTWARE mode (not hardware).<br>" +
+                     "The 3D globe may fail to render or appear very slow.<br>" +
+                     "➡ Enable GPU acceleration in your browser settings.");
+            }
+        }
+
+        // 4. Catch global JS errors so missing assets get reported
+        window.addEventListener("error", function (e) {
+            // Check if the error is related to D3, TopoJSON, or the map logic
+            const related = e.message.includes("d3") || e.message.includes("topojson") || e.filename.includes("script");
+            if (related) {
+                show("❌ A script error occurred while loading the 3D globe:<br>" +
+                     "<span style='color:#f88'>" + e.message + "</span><br>" +
+                     "➡ Check your console for missing files, wrong paths, or CORS issues.");
+            }
+        });
+
+        // 5. Detect WebGL context loss
+        window.addEventListener("webglcontextlost", function () {
+            show("❌ The WebGL context was lost.<br>" +
+                 "This usually means the browser or GPU blocked the 3D view.");
+        });
+
+    })();
   </script>
 </body>
 </html>
