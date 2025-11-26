@@ -246,6 +246,7 @@
       padding: 8px; 
       border-radius: 999px;
       
+      /* Hiding the plate */
       background: none;
       box-shadow: none;
       border: none;
@@ -262,7 +263,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      /* The font size is larger for the '+' and '-' for better visual balance */
+      /* Standard font size for '+' and '−' */
       font-size: 22px; 
       font-weight: 600;
       cursor: pointer;
@@ -283,10 +284,10 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    /* Smaller font for the new single-letter text buttons */
+    /* Symbol specific font size for balance */
     .zoom-reset, .zoom-pause-toggle {
-      font-size: 16px; 
-      font-weight: 700;
+      font-size: 20px; 
+      font-weight: 600;
     }
 
     /* INFO BOXES WRAPPER – hidden now */
@@ -363,7 +364,7 @@
       }
 
       .zoom-reset, .zoom-pause-toggle {
-        font-size: 15px; 
+        font-size: 18px; /* Adjusted symbol size for mobile */
       }
 
       /* Tooltip mobile sizing */
@@ -437,10 +438,10 @@
           <div id="map-container"></div>
           
           <div class="zoom-controls">
-            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Pause spinning">P</button>
+            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Pause spinning">&#x23F8;</button>
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
-            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">R</button>
+            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
           </div>
         </section>
       </section>
@@ -956,7 +957,7 @@
       
       // Also reset spinning state
       isSpinning = true;
-      pauseToggleBtn.html("P").attr("title", "Pause spinning");
+      pauseToggleBtn.html("&#x23F8;").attr("title", "Pause spinning");
     });
     
     // Pause/Start Spinning Button Logic
@@ -964,16 +965,16 @@
         isSpinning = !isSpinning;
         const button = d3.select(event.currentTarget);
         if (isSpinning) {
-            button.html("P").attr("title", "Pause spinning"); // P for Pause
+            button.html("&#x23F8;").attr("title", "Pause spinning"); // Pause symbol
         } else {
-            button.html("S").attr("title", "Start spinning"); // S for Start/Spin
+            button.html("&#x25B6;").attr("title", "Start spinning"); // Play symbol
         }
     });
-    // Initialize button text
+    // Initialize button text (Ensure correct symbol is shown on load)
     if (isSpinning) {
-        pauseToggleBtn.html("P").attr("title", "Pause spinning");
+        pauseToggleBtn.html("&#x23F8;").attr("title", "Pause spinning");
     } else {
-        pauseToggleBtn.html("S").attr("title", "Start spinning");
+        pauseToggleBtn.html("&#x25B6;").attr("title", "Start spinning");
     }
 
 
