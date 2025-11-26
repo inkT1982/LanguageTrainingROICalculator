@@ -27,6 +27,8 @@
       color: var(--text-main);
       font-size: 16px;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
 
       /* subtle diagonal infographic-style pattern */
       background-color: var(--page-bg);
@@ -67,7 +69,7 @@
     /* HEADER */
     .page-header {
       width: 100%;
-      max-width: 760px;
+      max-width: 1200px;
       margin: 0 0 8px;
       padding-bottom: 0;
       text-align: left; /* left-align eyebrow + title */
@@ -97,10 +99,11 @@
 
     /* SUBTITLE */
     .subtitle-block {
-      max-width: 720px;
-      font-size: 1.05rem;
-      line-height: 1.7;
+      max-width: 1200px;
+      font-size: 1.25rem;
+      line-height: 1.3;
       text-align: left;
+      margin-bottom: 1.5rem;
     }
 
     .subtitle-block p {
@@ -141,6 +144,7 @@
       width: 100%;
       height: 100%;
       cursor: grab;
+      touch-action: none; /* better mobile drag */
     }
 
     svg:active {
@@ -427,32 +431,93 @@
       }
     }
 
-    @media (max-width: 600px) {
-      .hero {
-        gap: 12px;
+    @media (max-width: 700px) {
+      body {
+        font-size: 15px;
+      }
+
+      .page {
+        padding: 20px 4vw 28px;
+      }
+
+      .subtitle-block {
+        font-size: 1.05rem;
+        line-height: 1.45;
+        margin-bottom: 1.1rem;
       }
 
       #map-section {
-        width: 100%;
-        height: 55vh;
-      }
-
-      .info-grid-wrapper {
-        padding: 20px 18px 22px;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
+        height: 58vh;
       }
 
       .map-label {
+        top: 12px;
         right: 12px;
-        justify-content: center;
+        font-size: 11px;
+        padding: 6px 10px;
       }
 
       .zoom-controls {
         left: 12px;
         top: 12px;
+        padding: 4px;
+      }
+
+      .zoom-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+      }
+
+      .zoom-reset {
+        font-size: 14px;
+      }
+
+      .tooltip {
+        padding: 10px 14px;
+        font-size: 14px;
+        max-width: 280px;
+      }
+
+      .tooltip-country {
+        font-size: 15px;
+      }
+
+      .tooltip-metric-title {
+        font-size: 13px;
+      }
+
+      .tooltip-metric-text {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        gap: 12px;
+      }
+
+      .page-header h1 {
+        font-size: clamp(1.8rem, 7vw, 2.2rem);
+      }
+
+      #map-section {
+        height: 52vh;
+      }
+
+      .map-label {
+        max-width: 60%;
+        line-height: 1.3;
+      }
+
+      .zoom-controls {
+        gap: 4px;
+      }
+
+      .zoom-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 15px;
       }
     }
   </style>
