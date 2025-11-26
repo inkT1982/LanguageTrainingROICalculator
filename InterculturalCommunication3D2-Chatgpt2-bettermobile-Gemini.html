@@ -313,7 +313,7 @@
       transform: translateY(-0.5px);
     }
     
-    /* ZOOM + RESET + PAUSE CONTROLS (Unchanged) */
+    /* ZOOM + RESET + PAUSE CONTROLS (Updated font size for consistency) */
     .zoom-controls {
       position: absolute;
       left: 18px;
@@ -339,7 +339,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px; 
+      font-size: 22px; /* Unified size for all desktop symbols */
       font-weight: 600;
       cursor: pointer;
       background: #ffffff;
@@ -359,12 +359,11 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    /* Symbol specific font size for balance */
-    .zoom-reset, .zoom-pause-toggle {
-      font-size: 20px; 
-      font-weight: 600;
+    /* Keep specific symbol size if needed, but the main one should cover it */
+    .zoom-reset {
+        font-size: 20px; /* Slightly smaller for the loop symbol */
     }
-
+    
     /* ---------------------------------
        UNIVERSAL RESPONSIVENESS REFINEMENTS
        --------------------------------- */
@@ -398,9 +397,10 @@
       .zoom-btn {
         width: 36px; 
         height: 36px; 
-        font-size: 18px; 
+        font-size: 18px; /* Mobile font size */
       }
-      .zoom-reset, .zoom-pause-toggle {
+      /* Reduce size for reset symbol on mobile */
+      .zoom-reset {
         font-size: 16px;
       }
       
@@ -468,8 +468,8 @@
           
           <div class="zoom-controls">
             <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Stop spinning">&#x25A0;</button>
-            <button class="zoom-btn" data-zoom="in" type="button">+</button>
-            <button class="zoom-btn" data-zoom="out" type="button">−</button>
+            <button class="zoom-btn" data-zoom="in" type="button" title="Zoom In">&#x2295;</button>
+            <button class="zoom-btn" data-zoom="out" type="button" title="Zoom Out">&#x2296;</button>
             <button class="zoom-btn zoom-reset" id="reset-btn" type="button" title="Reset globe">⟲</button>
           </div>
         </section>
