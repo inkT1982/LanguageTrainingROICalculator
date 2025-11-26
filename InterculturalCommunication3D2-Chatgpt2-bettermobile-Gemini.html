@@ -45,9 +45,7 @@
       height: 100%;
     }
 
-    /* *** FIX FOR CLIPPING: Tooltip is now fixed position and outside the map container. 
-    It will no longer be clipped by #map-section's overflow: hidden.
-    */
+    /* *** FIX FOR CLIPPING: Tooltip is now fixed position and outside the map container. */
     .tooltip {
       /* FIX: Changed from absolute to fixed to position relative to viewport */
       position: fixed; 
@@ -184,7 +182,7 @@
       margin: 16px 0 0;
       position: relative;
       height: min(80vh, 900px);
-      overflow: hidden; /* This is what clips the globe, but should not clip the tooltip now */
+      overflow: hidden; 
 
       border-radius: 0;
       box-shadow: none;
@@ -944,7 +942,7 @@
         const r = projection.rotate();
         rotationStart = [r[0], r[1], r[2] || 0];
         dragStart = [event.x, event.y];
-        tooltip.style("opacity", 0).style("display", "none"); // FIX: Hide tooltip on drag start
+        tooltip.style("opacity", 0).style("display", "none"); 
         isHovering = false;
       })
       .on("drag", (event) => {
@@ -1058,50 +1056,68 @@
       return html;
     }
 
-    /* *** FIX: moveTooltip now uses clientX/clientY for fixed positioning, 
-    and incorporates a simplified boundary check based on viewport dimensions.
+    /* *** FIX: moveTooltip now uses conditional logic for mobile vs desktop positioning.
+    * On screens <= 700px, it centers the tooltip in the viewport.
+    * On screens > 700px, it follows the cursor and applies boundary checks.
     */
     function moveTooltip(event) {
-      // Get viewport coordinates directly from the event (handles both mouse and touch)
-      const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
-      const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
-      
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-
+      const isMobile = viewportWidth <= 700; // Mobile breakpoint
+    
       // Ensure tooltip is visible to get dimensions (it will be visible by the end of this function)
       const tooltipNode = tooltip.node();
       const currentDisplay = tooltip.style('display');
-      const currentOpacity = tooltip.style('opacity');
 
-      tooltip.style('display', 'block').style('opacity', 0); // Temporarily ensure display for measurement
+      // Temporarily ensure display for measurement
+      tooltip.style('display', 'block'); 
       const tooltipWidth = tooltipNode.offsetWidth;
       const tooltipHeight = tooltipNode.offsetHeight;
-      tooltip.style('opacity', currentOpacity).style('display', currentDisplay); // Restore previous state
-
-      let finalX = x + 18; // Default offset right
-      let finalY = y + 18; // Default offset down
-
-      // Check right boundary: if tooltip goes off-screen, flip it to the left of the cursor
-      if (finalX + tooltipWidth > viewportWidth - 10) {
-        finalX = x - tooltipWidth - 18; // Move to the left of the pointer
+      tooltip.style('display', currentDisplay); // Restore previous state
+    
+      let finalX, finalY;
+    
+      if (isMobile) {
+        // 1. Mobile Logic: Center the box on the screen
+        finalX = (viewportWidth / 2) - (tooltipWidth / 2);
+        // Center vertically, or slightly up from center for better thumb visibility
+        finalY = (viewportHeight / 2) - (tooltipHeight / 2) - 30; 
+        
+        // Ensure it doesn't go off the left/right/top edges
+        finalX = Math.max(10, Math.min(finalX, viewportWidth - tooltipWidth - 10));
+        finalY = Math.max(10, finalY);
+    
+      } else {
+        // 2. Desktop Logic: Follow cursor with boundary checks
+    
+        // Get viewport coordinates directly from the event 
+        const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
+        const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
+    
+        finalX = x + 18; // Default offset right
+        finalY = y + 18; // Default offset down
+    
+        // Check right boundary: if tooltip goes off-screen, flip it to the left of the cursor
+        if (finalX + tooltipWidth > viewportWidth - 10) {
+          finalX = x - tooltipWidth - 18; // Move to the left of the pointer
+        }
+        
+        // Check bottom boundary: if tooltip goes off-screen, flip it up
+        if (finalY + tooltipHeight > viewportHeight - 10) {
+          finalY = y - tooltipHeight - 18; // Move up from the pointer
+        }
+    
+        // Check left boundary (if flipped to the left and still off screen, push it back right)
+        if (finalX < 10) {
+          finalX = 10;
+        }
+        
+        // Check top boundary (if flipped up and still off screen, push it down)
+        if (finalY < 10) {
+          finalY = 10;
+        }
       }
-      
-      // Check bottom boundary: if tooltip goes off-screen, flip it up
-      if (finalY + tooltipHeight > viewportHeight - 10) {
-        finalY = y - tooltipHeight - 18; // Move up from the pointer
-      }
-
-      // Check left boundary (if flipped to the left and still off screen, push it back right)
-      if (finalX < 10) {
-        finalX = 10;
-      }
-      
-      // Check top boundary (if flipped up and still off screen, push it down)
-      if (finalY < 10) {
-        finalY = 10;
-      }
-
+    
       tooltip
         .style("left", finalX + "px")
         .style("top", finalY + "px");
@@ -1124,6 +1140,7 @@
           .append("path")
           .attr("class", "country")
           .on("mouseover", (event, d) => {
+            // Desktop logic: Mouseover/Mousemove (Cursor-following)
             if (isDragging) return; 
             isHovering = true;
             tooltip.style("display", "block").style("opacity", 1);
@@ -1139,16 +1156,19 @@
             moveTooltip(event);
           })
           .on("mousemove", (event) => {
+             // Desktop logic: Mouseover/Mousemove (Cursor-following)
             if (isDragging) return;
             moveTooltip(event);
           })
           .on("mouseout", () => {
+             // Desktop logic
             isHovering = false;
             if (!isDragging) { 
               tooltip.style("opacity", 0).style("display", "none");
             }
           })
           .on("touchstart", function(event, d) {
+            // Mobile logic: Touchevent (Center-screen positioning)
             if (isDragging || isClicking) return;
             
             isClicking = true;
@@ -1169,7 +1189,7 @@
             tooltip.attr("data-country", countryName);
             tooltip.style("display", "block").style("opacity", 1).html(buildTooltipHTML(countryName));
             
-            // Use the D3 event object directly for moveTooltip (it contains clientX/clientY)
+            // Call moveTooltip which will detect the screen width and center the box
             moveTooltip(event);
 
             setTimeout(() => {
