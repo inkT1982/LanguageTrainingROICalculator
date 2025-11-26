@@ -984,6 +984,8 @@
     let rotation = projection.rotate().slice();
     let isDragging = false;
     let isHovering = false;
+    // 🌟 JAVASCRIPT IMPROVEMENT: Track if a tap/click is currently processing to avoid conflict
+    let isClicking = false; 
 
     // Zoom state
     let zoomFactor = 1;
@@ -1042,15 +1044,19 @@
 
     const drag = d3.drag()
       .on("start", (event) => {
+        // Prevent drag from starting if a click/tap event is still being processed
+        if (isClicking) return; 
+
         isDragging = true;
         const r = projection.rotate();
         rotationStart = [r[0], r[1], r[2] || 0];
         dragStart = [event.x, event.y];
-        // 🌟 JAVASCRIPT IMPROVEMENT: Hide tooltip on drag start
+        // 🌟 JAVASCRIPT FIX: Hide tooltip immediately when drag starts
         tooltip.style("opacity", 0);
+        isHovering = false;
       })
       .on("drag", (event) => {
-        if (!dragStart || !rotationStart) return;
+        if (!dragStart || !rotationStart || isClicking) return;
         const sensitivity = 0.25;
         const dx = event.x - dragStart[0];
         const dy = event.y - dragStart[1];
@@ -1083,7 +1089,7 @@
       const dt = now - lastTime;
       lastTime = now;
 
-      if (!isDragging && !isHovering) {
+      if (!isDragging && !isHovering && !isClicking) {
         idleTime = Math.min(idleTime + dt, 3000); // cap after 3s
         const factor = Math.min(idleTime / 1500, 1); // ease in over 1.5s
         rotation[0] += autoSpeed * dt * factor;
@@ -1161,24 +1167,46 @@
     }
 
     function moveTooltip(event) {
-      // 🌟 JAVASCRIPT IMPROVEMENT: Account for map container position to handle touch event offset
+      // 🌟 JAVASCRIPT FIX: Use d3.pointer for consistent coordinate handling
+      const [x, y] = d3.pointer(event, container.node());
       const containerRect = container.node().getBoundingClientRect();
-      let [x, y] = d3.pointer(event, container.node());
 
       // Adjust for screen edge so tooltip doesn't get cut off
-      const tooltipWidth = tooltip.node().offsetWidth;
-      const tooltipHeight = tooltip.node().offsetHeight;
+      const tooltipNode = tooltip.node();
+      // Ensure the node is visible to get dimensions (will be small if opacity is 0 but placement will be correct)
+      const currentOpacity = tooltip.style('opacity');
+      tooltip.style('opacity', 1).style('display', 'block');
+      
+      const tooltipWidth = tooltipNode.offsetWidth;
+      const tooltipHeight = tooltipNode.offsetHeight;
+      
+      // Reset opacity and display after getting dimensions
+      tooltip.style('opacity', currentOpacity);
+      if (currentOpacity === '0') tooltip.style('display', 'none');
 
-      if (x + 10 + tooltipWidth > containerRect.width) {
-        x = x - tooltipWidth - 20; // Move to the left of the pointer
+
+      let finalX = x + 10;
+      let finalY = y + 10;
+
+      // Check right boundary
+      if (finalX + tooltipWidth > containerRect.width - 20) {
+        finalX = x - tooltipWidth - 20; // Move to the left of the pointer
       }
-      if (y + 10 + tooltipHeight > containerRect.height) {
-        y = y - tooltipHeight - 20; // Move up from the pointer
+      
+      // Check bottom boundary
+      if (finalY + tooltipHeight > containerRect.height - 20) {
+        // Only adjust Y if we also have room to adjust X (to prevent placement off-screen)
+        if (finalY < y) { 
+            finalY = y - tooltipHeight - 20; // Move up from the pointer
+        } else {
+            // Default: if no room, just place it slightly above the pointer
+            finalY = y - tooltipHeight - 10; 
+        }
       }
 
       tooltip
-        .style("left", x + 10 + "px")
-        .style("top", y + 10 + "px");
+        .style("left", finalX + "px")
+        .style("top", finalY + "px");
     }
 
     // Load data
@@ -1200,13 +1228,14 @@
           .on("mouseover", (event, d) => {
             if (isDragging) return; // Ignore hover while dragging
             isHovering = true;
+            tooltip.style("display", "block").style("opacity", 1);
+            
             const countryName =
               d.properties.name ||
               d.properties.admin ||
               "Unknown country";
 
             tooltip
-              .style("opacity", 1)
               .html(buildTooltipHTML(countryName));
 
             moveTooltip(event);
@@ -1217,33 +1246,47 @@
           })
           .on("mouseout", () => {
             isHovering = false;
-            if (!isDragging) { // Only hide if not currently dragging
-              tooltip.style("opacity", 0);
+            // Only hide the tooltip if no drag is in progress
+            if (!isDragging) { 
+              tooltip.style("opacity", 0).style("display", "none");
             }
           })
-          // 🌟 JAVASCRIPT IMPROVEMENT: Handle touch events to show tooltip on tap
+          // 🌟 JAVASCRIPT FIX: Handle touch events to show tooltip on tap (mobile fix)
           .on("touchstart", function(event, d) {
-            // Prevent drag from immediately starting if tapping for tooltip
-            if (event.touches.length === 1) {
-              const countryName = d.properties.name || d.properties.admin || "Unknown country";
-              tooltip
-                .style("opacity", 1)
-                .html(buildTooltipHTML(countryName));
-              
-              // Use the touch coordinates for the tooltip position
-              const x = event.touches[0].clientX - container.node().getBoundingClientRect().left;
-              const y = event.touches[0].clientY - container.node().getBoundingClientRect().top;
+            // Prevent drag from starting if a tap/click is currently being processed
+            if (isDragging || isClicking) return;
+            
+            isClicking = true;
+            event.preventDefault(); // Stop default browser action (like scrolling/zooming)
 
-              // Temporarily adjust event object for moveTooltip logic
-              const syntheticEvent = {
-                  pointer: () => [x, y]
-              };
-              moveTooltip(syntheticEvent);
-              
-              // Re-use isHovering logic to keep the tooltip visible until drag/new tap
-              isHovering = true;
-              event.preventDefault(); // Prevent default browser actions (like scrolling)
+            const countryName = d.properties.name || d.properties.admin || "Unknown country";
+            
+            // Toggle logic: If the same country is tapped, hide the tooltip.
+            const currentCountry = tooltip.attr("data-country");
+            if (currentCountry === countryName && tooltip.style("opacity") === "1") {
+                tooltip.style("opacity", 0).style("display", "none");
+                tooltip.attr("data-country", "");
+                isClicking = false;
+                return;
             }
+
+            // Show new tooltip
+            tooltip.attr("data-country", countryName);
+            tooltip.style("display", "block").style("opacity", 1).html(buildTooltipHTML(countryName));
+            
+            // Create a pseudo-event for moveTooltip using touch coordinates
+            const touch = event.touches[0];
+            const fakeEvent = {
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                target: this // Pass the path element for d3.pointer to calculate offset correctly
+            };
+            moveTooltip(fakeEvent);
+
+            // Set a brief timeout to allow the tap to register before allowing rotation/new tap
+            setTimeout(() => {
+                isClicking = false;
+            }, 300); 
           });
 
         resizeGlobe();
