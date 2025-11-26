@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interactive Globe – Intercultural Communication 3D</title>
+  <title id="page-title">Interactive Globe – Intercultural Communication 3D</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -40,14 +40,50 @@
         rgba(255, 255, 255, 0.03) 4px,
         rgba(255, 255, 255, 0.03) 8px
       );
-      /* 🌟 MOBILE IMPROVEMENT: Use 100vh for a true full-height background on mobile */
       min-height: 100vh;
       height: 100%;
     }
 
-    /* *** FIX FOR CLIPPING: Tooltip is now fixed position and outside the map container. */
+    /* LANGUAGE SWITCH STYLES */
+    #language-switch {
+      position: absolute;
+      top: 24px;
+      right: 2vw;
+      z-index: 10;
+      display: flex;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 4px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .lang-btn {
+      border: none;
+      background: none;
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .lang-btn:not(.active):hover {
+      background: rgba(255, 121, 0, 0.1);
+    }
+
+    /* *** TOOLTIP STYLES *** */
     .tooltip {
-      /* FIX: Changed from absolute to fixed to position relative to viewport */
       position: fixed; 
       pointer-events: none;
       background: rgba(255, 255, 255, 0.92);
@@ -60,14 +96,13 @@
       transition: opacity 0.12s ease-out;
       box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
       border: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: 9999; /* Higher z-index to ensure it sits on top */
+      z-index: 9999;
       max-width: 360px;
       white-space: normal;
       backdrop-filter: blur(4px);
-      /* Default position outside the screen until first move */
       top: 0;
       left: 0;
-      display: none; /* Hidden by default and toggled by JS */
+      display: none;
     }
 
     .tooltip-country {
@@ -91,7 +126,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       margin-bottom: 4px;
-      color: #222222; /* overridden inline per metric color */
+      color: #222222; 
     }
 
     .tooltip-metric-text {
@@ -100,7 +135,7 @@
       color: #555555;
     }
     
-    /* Remaining Styles (Unchanged) */
+    /* Remaining Styles */
 
     .page {
       min-height: 100vh;
@@ -203,15 +238,12 @@
       width: 100%;
       height: 100%;
       cursor: grab;
-      /* Ensure pinch-to-zoom is NOT blocked by browser default or D3, allowing both rotation and pinch */
       touch-action: none; 
     }
 
     svg:active {
       cursor: grabbing;
     }
-
-    .globe-sphere { /* ocean styled via gradient */ }
 
     .graticule {
       fill: none;
@@ -245,13 +277,10 @@
       gap: 8px; 
       padding: 8px; 
       border-radius: 999px;
-      
-      /* Hiding the plate */
       background: none;
       box-shadow: none;
       border: none;
       backdrop-filter: none;
-      
       z-index: 5;
     }
 
@@ -263,7 +292,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Standard font size for '+' and '−' */
       font-size: 22px; 
       font-weight: 600;
       cursor: pointer;
@@ -290,148 +318,61 @@
       font-weight: 600;
     }
 
-    /* INFO BOXES WRAPPER – hidden now */
-    .info-grid-wrapper {
-      display: none;
-    }
-
-    /* DESKTOP-ish */
-    @media (max-width: 1100px) {
-      #map-section {
-        height: min(70vh, 800px);
-      }
-    }
-
-    @media (max-width: 900px) {
-      .page {
-        padding: 24px 4vw 32px;
-      }
-
-      .page-header h1 {
-        font-size: clamp(2rem, 6vw, 2.4rem);
-      }
-
-      #map-section {
-        height: 65vh;
-      }
-    }
-
-    /* TABLET / LARGE PHONE – mobile specific changes */
+    /* Mobile adjustments */
     @media (max-width: 700px) {
-      body {
-        font-size: 15px;
-        min-height: 100dvh;
-      }
-
       .page {
         padding: 20px 4vw 24px;
-        min-height: 100dvh;
       }
-
-      .hero {
-        min-height: calc(100dvh - 44px);
-        gap: 12px;
-        justify-content: flex-start;
+      #language-switch {
+        top: 15px;
+        right: 4vw;
+        padding: 3px;
       }
-
-      .subtitle-block {
-        font-size: 1.05rem;
-        line-height: 1.45;
-        margin-bottom: 0.9rem;
+      .lang-btn {
+        font-size: 13px;
+        padding: 5px 8px;
       }
-
-      #map-section {
-        margin-top: auto;
-        height: 65vh; 
-      }
-
       .zoom-controls {
         left: 12px;
         top: 12px;              
-        bottom: auto;              
         gap: 8px; 
-        padding: 5px 7px;
-        background: none;
-        box-shadow: none;
-        border: none;
-        backdrop-filter: none;
       }
-
       .zoom-btn {
         width: 38px; 
         height: 38px; 
         font-size: 20px; 
       }
-
       .zoom-reset, .zoom-pause-toggle {
-        font-size: 18px; /* Adjusted symbol size for mobile */
+        font-size: 18px;
       }
-
-      /* Tooltip mobile sizing */
       .tooltip {
         padding: 10px 14px;
         font-size: 14px;
         max-width: 280px;
-      }
-
-      .tooltip-country {
-        font-size: 15px;
-      }
-
-      .tooltip-metric-title {
-        font-size: 13px;
-      }
-
-      .tooltip-metric-text {
-        font-size: 13px;
-      }
-    }
-
-    /* SMALL PHONES */
-    @media (max-width: 480px) {
-      .hero {
-        gap: 10px;
-        min-height: calc(100dvh - 40px);
-      }
-
-      .page-header h1 {
-        font-size: clamp(1.8rem, 7vw, 2.2rem);
-      }
-
-      .subtitle-block {
-        font-size: 1rem;
-      }
-
-      #map-section {
-        height: 68vh; 
-      }
-
-      .zoom-controls {
-        gap: 6px; 
-        top: 10px;
-        left: 10px;
       }
     }
   </style>
 </head>
 
 <body>
+  <div id="language-switch">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="de">DE</button>
+  </div>
+  
   <div id="tooltip" class="tooltip"></div> 
 
   <div class="page">
     <main>
       <section class="hero">
         <header class="page-header">
-          <div class="eyebrow">Infographic</div>
-          <h1>A Survival Guide for Intercultural Communication</h1>
+          <div class="eyebrow" id="text-eyebrow"></div>
+          <h1 id="text-header"></h1>
           <div class="header-rule"></div>
         </header>
 
         <section class="subtitle-block">
-          <p>
-            Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of Intercultural Communication.
-            <strong>Click any country on the globe to reveal its behavioral pattern.</strong>
-          </p>
+          <p id="text-subtitle"></p>
         </section>
 
         <section id="map-section">
@@ -441,14 +382,14 @@
             <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Stop spinning">&#x25A0;</button>
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
-            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
+            <button class="zoom-btn zoom-reset" id="reset-btn" type="button" title="Reset globe">⟲</button>
           </div>
         </section>
       </section>
 
       <section class="info-grid-wrapper">
         <div class="info-grid-header">Key intercultural dimensions</div>
-        </section>
+      </section>
     </main>
   </div>
 
@@ -460,70 +401,138 @@
     const tooltip = d3.select("#tooltip");
     const svg = container.append("svg");
     const svgNode = svg.node(); 
+    let currentLang = 'en';
 
-    // ----- METRIC DEFINITIONS (Unchanged) -----
-    const metrics = {
-      group_culture: {
-        title: "Group Culture",
-        color: "#cd5b00",
-        description:
-          "The group, or “we,” has priority. Relationships are based on loyalty and selectivity."
-      },
-      individual_culture: {
-        title: "Individual Culture",
-        color: "#ff7900",
-        description:
-          "The focus is on the individual and self-expression. Personal goals take priority."
-      },
-      speaking_implicity: {
-        title: "Speaking Implicity",
-        color: "#03649f",
-        description:
-          "Messages are veiled; more is implied than said. A “yes” might simply be polite."
-      },
-      explicit_language: {
-        title: "Explicit Language",
-        color: "#038bc7",
-        description:
-          "Communication is direct: a yes is a yes, a no is a no."
-      },
-      hierarchical_culture: {
-        title: "Hierarchical Culture",
-        color: "#d79d00",
-        description:
-          "Hierarchy matters greatly and shapes how people speak and who speaks first."
-      },
-      informal_culture: {
-        title: "Informal Culture",
-        color: "#f5c500",
-        description:
-          "An informal setting where uncertainty and change are handled calmly and casually."
-      },
-      focus_time: {
-        title: "Focus on Time",
-        color: "#98bc36",
-        description:
-          "Monochronic cultures prioritize sticking to a specific timeframe."
-      },
-      culture_uncertainty: {
-        title: "Culture of Uncertainty",
-        color: "#039a82",
-        description:
-          "People accept the unknown and change more calmly. Rules are more flexible."
-      },
-      change_management: {
-        title: "Change Management",
-        color: "#036f64",
-        description:
-          "Change can feel threatening; strict rules help people feel in control and motivated."
-      },
-      focus_task: {
-        title: "Focus on Task",
-        color: "#70940e",
-        description:
-          "Polychronic cultures prioritize completing the task, even if this means delays."
-      }
+    // *** LANGUAGE DATA STRUCTURE ***
+    const languageData = {
+        en: {
+            title: "Interactive Globe – Intercultural Communication 3D",
+            eyebrow: "Infographic",
+            header: "A Survival Guide for Intercultural Communication",
+            subtitle: "Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of Intercultural Communication. <strong>Click any country on the globe to reveal its behavioral pattern.</strong>",
+            stopTitle: "Stop spinning",
+            startTitle: "Start spinning",
+            resetTitle: "Reset globe",
+            tooltipNoData: "No data for this country in this analysis.",
+            tooltipNoMetrics: "This country is included in the matrix, but no metrics are ticked.",
+            metrics: {
+                group_culture: {
+                    title: "Group Culture",
+                    color: "#cd5b00",
+                    description: "The group, or “we,” has priority. Relationships are based on loyalty and selectivity."
+                },
+                individual_culture: {
+                    title: "Individual Culture",
+                    color: "#ff7900",
+                    description: "The focus is on the individual and self-expression. Personal goals take priority."
+                },
+                speaking_implicity: {
+                    title: "Speaking Implicity",
+                    color: "#03649f",
+                    description: "Messages are veiled; more is implied than said. A “yes” might simply be polite."
+                },
+                explicit_language: {
+                    title: "Explicit Language",
+                    color: "#038bc7",
+                    description: "Communication is direct: a yes is a yes, a no is a no."
+                },
+                hierarchical_culture: {
+                    title: "Hierarchical Culture",
+                    color: "#d79d00",
+                    description: "Hierarchy matters greatly and shapes how people speak and who speaks first."
+                },
+                informal_culture: {
+                    title: "Informal Culture",
+                    color: "#f5c500",
+                    description: "An informal setting where uncertainty and change are handled calmly and casually."
+                },
+                focus_time: {
+                    title: "Focus on Time",
+                    color: "#98bc36",
+                    description: "Monochronic cultures prioritize sticking to a specific timeframe."
+                },
+                culture_uncertainty: {
+                    title: "Culture of Uncertainty",
+                    color: "#039a82",
+                    description: "People accept the unknown and change more calmly. Rules are more flexible."
+                },
+                change_management: {
+                    title: "Change Management",
+                    color: "#036f64",
+                    description: "Change can feel threatening; strict rules help people feel in control and motivated."
+                },
+                focus_task: {
+                    title: "Focus on Task",
+                    color: "#70940e",
+                    description: "Polychronic cultures prioritize completing the task, even if this means delays."
+                }
+            }
+        },
+        de: {
+            title: "Interaktiver Globus – Interkulturelle Kommunikation 3D",
+            eyebrow: "Infografik",
+            header: "Ein Überlebensleitfaden für Interkulturelle Kommunikation",
+            subtitle: "Haben Sie sich jemals in einem Gespräch missverstanden gefühlt? Machen Sie sich keine Sorgen, das liegt nicht immer an schlechter Grammatik oder fehlendem Vokabular; es ist oft einfach eine Frage der Interkulturellen Kommunikation. <strong>Klicken Sie auf ein Land auf dem Globus, um dessen Verhaltensmuster anzuzeigen.</strong>",
+            stopTitle: "Drehen stoppen",
+            startTitle: "Drehen starten",
+            resetTitle: "Globus zurücksetzen",
+            tooltipNoData: "Keine Daten für dieses Land in dieser Analyse.",
+            tooltipNoMetrics: "Dieses Land ist in der Matrix enthalten, aber es sind keine Kennzahlen markiert.",
+            metrics: {
+                group_culture: {
+                    title: "Gruppenkultur",
+                    color: "#cd5b00",
+                    description: "Die Gruppe, oder „wir“, hat Priorität. Beziehungen basieren auf Loyalität und Selektivität."
+                },
+                individual_culture: {
+                    title: "Individualkultur",
+                    color: "#ff7900",
+                    description: "Der Fokus liegt auf dem Individuum und der Selbstentfaltung. Persönliche Ziele haben Vorrang."
+                },
+                speaking_implicity: {
+                    title: "Implizite Sprache",
+                    color: "#03649f",
+                    description: "Botschaften sind verschleiert; es wird mehr impliziert als gesagt. Ein „Ja“ kann einfach nur höflich sein."
+                },
+                explicit_language: {
+                    title: "Explizite Sprache",
+                    color: "#038bc7",
+                    description: "Die Kommunikation ist direkt: Ein Ja ist ein Ja, ein Nein ist ein Nein."
+                },
+                hierarchical_culture: {
+                    title: "Hierarchische Kultur",
+                    color: "#d79d00",
+                    description: "Hierarchie ist von großer Bedeutung und prägt, wie Menschen sprechen und wer zuerst spricht."
+                },
+                informal_culture: {
+                    title: "Informelle Kultur",
+                    color: "#f5c500",
+                    description: "Ein informelles Umfeld, in dem Unsicherheit und Wandel gelassen und zwanglos gehandhabt werden."
+                },
+                focus_time: {
+                    title: "Zeitfokus",
+                    color: "#98bc36",
+                    description: "Monochrone Kulturen legen Wert darauf, sich an einen bestimmten Zeitrahmen zu halten."
+                },
+                culture_uncertainty: {
+                    title: "Unsicherheitskultur",
+                    color: "#039a82",
+                    description: "Menschen akzeptieren das Unbekannte und Veränderungen gelassener. Regeln sind flexibler."
+                },
+                change_management: {
+                    title: "Umgang mit Veränderungen",
+                    color: "#036f64",
+                    description: "Veränderungen können bedrohlich wirken; strenge Regeln helfen den Menschen, sich kontrolliert und motiviert zu fühlen."
+                },
+                focus_task: {
+                    title: "Aufgabenfokus",
+                    color: "#70940e",
+                    description: "Polychrone Kulturen legen Wert darauf, die Aufgabe zu erledigen, auch wenn dies zu Verzögerungen führt."
+                }
+            }
+        }
     };
+
 
     // ----- COUNTRY → METRICS MAPPING (Unchanged) -----
     const countryMetrics = {
@@ -707,6 +716,42 @@
       return { key: countryName, inList: false };
     }
 
+    // *** LANGUAGE UPDATE FUNCTION ***
+    function updateLanguage(lang) {
+        currentLang = lang;
+        const data = languageData[lang];
+
+        // 1. Update static page text
+        d3.select("#page-title").text(data.title);
+        d3.select("#text-eyebrow").text(data.eyebrow);
+        d3.select("#text-header").text(data.header);
+        d3.select("#text-subtitle").html(data.subtitle);
+
+        // 2. Update button titles
+        const pauseBtn = d3.select("#pause-toggle-btn");
+        d3.select("#reset-btn").attr("title", data.resetTitle);
+        if (isSpinning) {
+             pauseBtn.attr("title", data.stopTitle);
+        } else {
+             pauseBtn.attr("title", data.startTitle);
+        }
+
+        // 3. Update language switch buttons
+        d3.selectAll(".lang-btn").classed("active", function() {
+            return d3.select(this).attr("data-lang") === lang;
+        });
+
+        // 4. Hide tooltip if visible, since its content language would change
+        tooltip.style("opacity", 0).style("display", "none");
+    }
+
+    // Event listener for language switch buttons
+    d3.selectAll(".lang-btn").on("click", (event) => {
+        const lang = event.currentTarget.dataset.lang;
+        updateLanguage(lang);
+    });
+
+
     // ----- D3 Setup (Unchanged) -----
     const defs = svg.append("defs");
     const globeGradient = defs.append("radialGradient")
@@ -824,7 +869,6 @@
 
     const drag = d3.drag()
       .on("start", (event) => {
-        // ABORT if: Multi-touch (pinch) or we are already pinching or processing a click
         if (event.touches && event.touches.length > 1 || isClicking || pinchStartDistance !== null) return; 
 
         isDragging = true;
@@ -835,7 +879,6 @@
         isHovering = false;
       })
       .on("drag", (event) => {
-        // Prevent rotation during pinch
         if (pinchStartDistance !== null) return;
         if (!dragStart || !rotationStart || isClicking) return;
 
@@ -861,7 +904,7 @@
     svg.call(drag);
 
 
-    // ----- PINCH-TO-ZOOM LOGIC (Mobile) - Native Listeners for Reliability -----
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) -----
     
     // Helper function to calculate distance between two touches
     function getDistance(touches) {
@@ -874,18 +917,13 @@
     // 1. TOUCHSTART: Initialize pinch
     svgNode.addEventListener('touchstart', (event) => {
         if (event.touches.length === 2) {
-            // Crucial for pinch: Prevent default browser zoom/scroll
             event.preventDefault(); 
-            
-            // Immediately stop D3 drag/rotation states
             isDragging = false;
             dragStart = null;
             rotationStart = null;
-            
             pinchStartDistance = getDistance(event.touches);
             initialZoomFactorForPinch = zoomFactor;
 
-            // Hide tooltip instantly when pinch starts
             tooltip.style("opacity", 0).style("display", "none");
             isHovering = false;
             isClicking = false; 
@@ -895,13 +933,11 @@
     // 2. TOUCHMOVE: Perform zoom calculation
     svgNode.addEventListener('touchmove', (event) => {
         if (event.touches.length === 2 && pinchStartDistance !== null) {
-            // Crucial for pinch: Prevent default browser zoom/scroll
             event.preventDefault(); 
 
             const currentDistance = getDistance(event.touches);
             const ratio = currentDistance / pinchStartDistance;
             
-            // Apply zoom
             const newZoom = initialZoomFactorForPinch * ratio;
             setZoom(newZoom); 
         }
@@ -909,7 +945,6 @@
 
     // 3. TOUCHEND: Reset pinch state
     svgNode.addEventListener('touchend', (event) => {
-        // Only reset if no touches remain OR if the number of remaining touches is less than 2
         if (pinchStartDistance !== null && event.touches.length < 2) {
             pinchStartDistance = null;
             initialZoomFactorForPinch = 1;
@@ -929,10 +964,9 @@
       const dt = now - lastTime;
       lastTime = now;
 
-      // Only spin if isSpinning is true AND no interaction is happening
       if (isSpinning && !isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
-        idleTime = Math.min(idleTime + dt, 3000); // cap after 3s
-        const factor = Math.min(idleTime / 1500, 1); // ease in over 1.5s
+        idleTime = Math.min(idleTime + dt, 3000); 
+        const factor = Math.min(idleTime / 1500, 1); 
         rotation[0] += autoSpeed * dt * factor;
         projection.rotate(rotation);
         redrawGlobe();
@@ -957,7 +991,7 @@
       
       // Also reset spinning state to active
       isSpinning = true;
-      pauseToggleBtn.html("&#x25A0;").attr("title", "Stop spinning");
+      pauseToggleBtn.html("&#x25A0;").attr("title", languageData[currentLang].stopTitle);
     });
     
     // Pause/Start Spinning Button Logic (Toggles between Stop &#x25A0; and Play &#x25B6;)
@@ -965,17 +999,11 @@
         isSpinning = !isSpinning;
         const button = d3.select(event.currentTarget);
         if (isSpinning) {
-            button.html("&#x25A0;").attr("title", "Stop spinning"); // Stop symbol (square)
+            button.html("&#x25A0;").attr("title", languageData[currentLang].stopTitle); // Stop symbol (square)
         } else {
-            button.html("&#x25B6;").attr("title", "Start spinning"); // Play symbol (triangle)
+            button.html("&#x25B6;").attr("title", languageData[currentLang].startTitle); // Play symbol (triangle)
         }
     });
-    // Initialize button text (Ensure correct symbol is shown on load)
-    if (isSpinning) {
-        pauseToggleBtn.html("&#x25A0;").attr("title", "Stop spinning");
-    } else {
-        pauseToggleBtn.html("&#x25B6;").attr("title", "Start spinning");
-    }
 
 
     // Mouse wheel zoom (Desktop only)
@@ -985,8 +1013,11 @@
       setZoom(zoomFactor + direction * zoomStep);
     });
 
-    // Tooltip helpers (Unchanged)
+    // Tooltip helpers (NOW USES currentLang)
     function buildTooltipHTML(countryName) {
+      const data = languageData[currentLang];
+      const metrics = data.metrics;
+
       const { key, inList } = resolveCountryKey(countryName);
       const metricIds = inList ? (countryMetrics[key] || []) : [];
 
@@ -996,7 +1027,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              No data for this country in this analysis.
+              ${data.tooltipNoData}
             </div>
           </div>`;
         return html;
@@ -1006,7 +1037,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              This country is included in the matrix, but no metrics are ticked.
+              ${data.tooltipNoMetrics}
             </div>
           </div>`;
         return html;
@@ -1152,6 +1183,9 @@
       .catch(err => console.error("Error loading world data:", err));
 
     window.addEventListener("resize", resizeGlobe);
+
+    // Initialize the page in English on load
+    updateLanguage('en');
   </script>
 </body>
 </html>
