@@ -203,7 +203,7 @@
       width: 100%;
       height: 100%;
       cursor: grab;
-      touch-action: none; /* better mobile drag */
+      touch-action: none; /* better mobile drag/pinch */
     }
 
     svg:active {
@@ -886,6 +886,10 @@
     const zoomStep = 0.15;
     let baseRadius = 1;
 
+    // Pinch-to-zoom state
+    let pinchStartDistance = null;
+    let initialZoomFactorForPinch = 1;
+
     function redrawGlobe() {
       landGroup.selectAll("path").attr("d", path);
     }
@@ -936,7 +940,8 @@
 
     const drag = d3.drag()
       .on("start", (event) => {
-        if (isClicking) return; 
+        // Only start drag if it's a single touch/mouse click AND not currently pinching
+        if (event.touches && event.touches.length > 1 || isClicking) return; 
 
         isDragging = true;
         const r = projection.rotate();
@@ -946,7 +951,10 @@
         isHovering = false;
       })
       .on("drag", (event) => {
+        // Prevent rotation during pinch
+        if (pinchStartDistance !== null) return;
         if (!dragStart || !rotationStart || isClicking) return;
+
         const sensitivity = 0.25;
         const dx = event.x - dragStart[0];
         const dy = event.y - dragStart[1];
@@ -968,10 +976,64 @@
 
     svg.call(drag);
 
+
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) -----
+    
+    // Helper function to calculate distance between two touches
+    function getDistance(touches) {
+      if (touches.length < 2) return 0;
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    svg.on("touchstart.pinch", (event) => {
+        if (event.touches.length === 2) {
+            // Prevent default browser zoom/scroll
+            event.preventDefault(); 
+            
+            // Stop D3 drag if it was active
+            isDragging = false;
+            dragStart = null;
+            rotationStart = null;
+            
+            pinchStartDistance = getDistance(event.touches);
+            initialZoomFactorForPinch = zoomFactor;
+
+            // Hide tooltip instantly when pinch starts
+            tooltip.style("opacity", 0).style("display", "none");
+            isHovering = false;
+            isClicking = false; 
+        }
+    });
+
+    svg.on("touchmove.pinch", (event) => {
+        if (event.touches.length === 2 && pinchStartDistance !== null) {
+            event.preventDefault(); // Prevent default browser zoom/scroll
+
+            const currentDistance = getDistance(event.touches);
+            const ratio = currentDistance / pinchStartDistance;
+            
+            // Apply zoom
+            const newZoom = initialZoomFactorForPinch * ratio;
+            setZoom(newZoom); 
+        }
+    });
+
+    svg.on("touchend.pinch", (event) => {
+        // Reset pinch state when fingers are lifted
+        if (pinchStartDistance !== null) {
+            pinchStartDistance = null;
+            initialZoomFactorForPinch = 1;
+        }
+    });
+    
+    // ------------------------------------------
+
     // Auto-rotation with smooth restart
     const autoSpeed = 0.01; // base deg/ms
     let lastTime = Date.now();
-    let idleTime = 0; // ms since last hover/drag
+    let idleTime = 0; // ms since last hover/drag/pinch
 
     d3.timer(() => {
       if (!worldFeature) return;
@@ -979,7 +1041,7 @@
       const dt = now - lastTime;
       lastTime = now;
 
-      if (!isDragging && !isHovering && !isClicking) {
+      if (!isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
         idleTime = Math.min(idleTime + dt, 3000); // cap after 3s
         const factor = Math.min(idleTime / 1500, 1); // ease in over 1.5s
         rotation[0] += autoSpeed * dt * factor;
@@ -1005,7 +1067,7 @@
       resizeGlobe();
     });
 
-    // Mouse wheel zoom
+    // Mouse wheel zoom (Desktop only)
     svg.on("wheel", (event) => {
       event.preventDefault();
       const direction = event.deltaY > 0 ? -1 : 1;
@@ -1056,10 +1118,6 @@
       return html;
     }
 
-    /* *** FIX: moveTooltip now uses conditional logic for mobile vs desktop positioning.
-    * On screens <= 700px, it centers the tooltip in the viewport.
-    * On screens > 700px, it follows the cursor and applies boundary checks.
-    */
     function moveTooltip(event) {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
@@ -1078,17 +1136,17 @@
       let finalX, finalY;
     
       if (isMobile) {
-        // 1. Mobile Logic: Center the box on the screen
+        // Mobile Logic: Center the box on the screen
         finalX = (viewportWidth / 2) - (tooltipWidth / 2);
         // Center vertically, or slightly up from center for better thumb visibility
         finalY = (viewportHeight / 2) - (tooltipHeight / 2) - 30; 
         
-        // Ensure it doesn't go off the left/right/top edges
+        // Boundary checks
         finalX = Math.max(10, Math.min(finalX, viewportWidth - tooltipWidth - 10));
         finalY = Math.max(10, finalY);
     
       } else {
-        // 2. Desktop Logic: Follow cursor with boundary checks
+        // Desktop Logic: Follow cursor with boundary checks
     
         // Get viewport coordinates directly from the event 
         const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
@@ -1141,7 +1199,7 @@
           .attr("class", "country")
           .on("mouseover", (event, d) => {
             // Desktop logic: Mouseover/Mousemove (Cursor-following)
-            if (isDragging) return; 
+            if (isDragging || pinchStartDistance !== null) return; 
             isHovering = true;
             tooltip.style("display", "block").style("opacity", 1);
             
@@ -1157,19 +1215,20 @@
           })
           .on("mousemove", (event) => {
              // Desktop logic: Mouseover/Mousemove (Cursor-following)
-            if (isDragging) return;
+            if (isDragging || pinchStartDistance !== null) return;
             moveTooltip(event);
           })
           .on("mouseout", () => {
              // Desktop logic
             isHovering = false;
-            if (!isDragging) { 
+            if (!isDragging && pinchStartDistance === null) { 
               tooltip.style("opacity", 0).style("display", "none");
             }
           })
           .on("touchstart", function(event, d) {
             // Mobile logic: Touchevent (Center-screen positioning)
-            if (isDragging || isClicking) return;
+            // Only proceed if it is a single touch (not part of a pinch)
+            if (event.touches.length > 1 || isDragging || isClicking) return;
             
             isClicking = true;
             event.preventDefault(); 
