@@ -234,33 +234,36 @@
       transform: translateY(-0.5px);
     }
     
-    /* ZOOM + RESET + PAUSE CONTROLS – horizontal row */
+    /* ZOOM + RESET + PAUSE CONTROLS */
     .zoom-controls {
       position: absolute;
       left: 18px;
-      top: 18px; /* Desktop position */
+      top: 18px; 
       bottom: auto; 
       display: inline-flex;
-      flex-direction: row; /* HORIZONTAL */
-      gap: 8px; /* Increased spacing */
-      padding: 8px; /* Increased padding to match size */
+      flex-direction: row; 
+      gap: 8px; 
+      padding: 8px; 
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
+      
+      background: none;
+      box-shadow: none;
+      border: none;
+      backdrop-filter: none;
+      
       z-index: 5;
     }
 
     .zoom-btn {
       border: none;
-      width: 40px; /* 125% of 32px */
-      height: 40px; /* 125% of 32px */
+      width: 40px; 
+      height: 40px; 
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px; /* 125% of 18px is ~22px */
+      /* The font size is larger for the '+' and '-' for better visual balance */
+      font-size: 22px; 
       font-weight: 600;
       cursor: pointer;
       background: #ffffff;
@@ -280,8 +283,10 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
+    /* Smaller font for the new single-letter text buttons */
     .zoom-reset, .zoom-pause-toggle {
-      font-size: 20px; /* 125% of 16px is 20px */
+      font-size: 16px; 
+      font-weight: 700;
     }
 
     /* INFO BOXES WRAPPER – hidden now */
@@ -343,18 +348,22 @@
         left: 12px;
         top: 12px;              
         bottom: auto;              
-        gap: 8px; /* Consistent spacing */
+        gap: 8px; 
         padding: 5px 7px;
+        background: none;
+        box-shadow: none;
+        border: none;
+        backdrop-filter: none;
       }
 
       .zoom-btn {
-        width: 38px; /* 125% of 30px is 37.5px */
-        height: 38px; /* 125% of 30px is 37.5px */
-        font-size: 20px; /* 125% of 16px is 20px */
+        width: 38px; 
+        height: 38px; 
+        font-size: 20px; 
       }
 
       .zoom-reset, .zoom-pause-toggle {
-        font-size: 18px; /* 125% of 14px is 17.5px */
+        font-size: 15px; 
       }
 
       /* Tooltip mobile sizing */
@@ -397,7 +406,7 @@
       }
 
       .zoom-controls {
-        gap: 6px; /* Slightly smaller gap on tiny screens */
+        gap: 6px; 
         top: 10px;
         left: 10px;
       }
@@ -428,10 +437,10 @@
           <div id="map-container"></div>
           
           <div class="zoom-controls">
-            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Pause spinning">&#x23F8;</button>
+            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Pause spinning">P</button>
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
-            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
+            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">R</button>
           </div>
         </section>
       </section>
@@ -760,8 +769,9 @@
     let pinchStartDistance = null;
     let initialZoomFactorForPinch = 1;
 
-    // NEW STATE: Spinning
+    // Spinning State
     let isSpinning = true; 
+    const pauseToggleBtn = d3.select("#pause-toggle-btn");
 
     function redrawGlobe() {
       landGroup.selectAll("path").attr("d", path);
@@ -944,21 +954,28 @@
       zoomFactor = 1;
       resizeGlobe();
       
-      // Also reset spinning state if needed
+      // Also reset spinning state
       isSpinning = true;
-      d3.select("#pause-toggle-btn").html("&#x23F8;").attr("title", "Pause spinning");
+      pauseToggleBtn.html("P").attr("title", "Pause spinning");
     });
     
-    // NEW: Pause/Start Spinning Button Logic
-    d3.select("#pause-toggle-btn").on("click", (event) => {
+    // Pause/Start Spinning Button Logic
+    pauseToggleBtn.on("click", (event) => {
         isSpinning = !isSpinning;
         const button = d3.select(event.currentTarget);
         if (isSpinning) {
-            button.html("&#x23F8;").attr("title", "Pause spinning"); // Pause icon
+            button.html("P").attr("title", "Pause spinning"); // P for Pause
         } else {
-            button.html("&#x25B6;").attr("title", "Start spinning"); // Play icon
+            button.html("S").attr("title", "Start spinning"); // S for Start/Spin
         }
     });
+    // Initialize button text
+    if (isSpinning) {
+        pauseToggleBtn.html("P").attr("title", "Pause spinning");
+    } else {
+        pauseToggleBtn.html("S").attr("title", "Start spinning");
+    }
+
 
     // Mouse wheel zoom (Desktop only)
     svg.on("wheel", (event) => {
