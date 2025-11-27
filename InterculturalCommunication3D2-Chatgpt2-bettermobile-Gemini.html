@@ -897,7 +897,7 @@
     let worldFeature = null;
     let rotation = projection.rotate().slice();
     let isDragging = false;
-    let isHovering = false;
+    let isHovering = false; // Flag to stop spinning when mouse is over a country/tooltip
     let isClicking = false; 
 
     // Zoom state
@@ -1060,6 +1060,7 @@
       const dt = now - lastTime;
       lastTime = now;
 
+      // The globe only spins if it's set to spin AND there are no active interactions
       if (isSpinning && !isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
         idleTime = Math.min(idleTime + dt, 3000); 
         const factor = Math.min(idleTime / 1500, 1); 
@@ -1067,6 +1068,7 @@
         projection.rotate(rotation);
         redrawGlobe();
       } else {
+        // If an interaction is active (including isHovering), reset the idle timer
         idleTime = 0;
       }
     });
@@ -1228,7 +1230,7 @@
           .attr("class", "country")
           .on("mouseover", (event, d) => {
             if (isDragging || pinchStartDistance !== null) return; 
-            isHovering = true;
+            isHovering = true; // <-- Pause spinning on hover
             tooltip.style("display", "block").style("opacity", 1);
             
             const countryName =
@@ -1246,7 +1248,7 @@
             moveTooltip(event);
           })
           .on("mouseout", () => {
-            isHovering = false;
+            isHovering = false; // <-- Resume spinning on mouse out
             if (!isDragging && pinchStartDistance === null) { 
               tooltip.style("opacity", 0).style("display", "none");
             }
@@ -1256,6 +1258,7 @@
             
             isClicking = true;
             event.preventDefault(); 
+            isHovering = true; // <-- Pause spinning on touch/click
 
             const countryName = d.properties.name || d.properties.admin || "Unknown country";
             
@@ -1263,6 +1266,7 @@
             if (currentCountry === countryName && tooltip.style("opacity") === "1") {
                 tooltip.style("opacity", 0).style("display", "none");
                 tooltip.attr("data-country", "");
+                isHovering = false; // Resume spinning on second tap to close
                 isClicking = false;
                 return;
             }
