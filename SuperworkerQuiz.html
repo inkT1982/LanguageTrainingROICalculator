@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>What kind of AI superworker are you?</title>
+
+  <!-- Roboto font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-color: #555555;
+      --accent-color: #FF7900;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #ffffff;
+      color: var(--text-color);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .viz-wrapper {
+      width: 100%;
+      padding: 56px 24px 72px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .viz-container {
+      width: 100%;
+      max-width: 880px;
+      animation: fadeInUp 500ms ease-out;
+    }
+
+    .viz-header {
+      margin-bottom: 36px;
+    }
+
+    .viz-kicker {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 500;
+      color: #999999;
+      margin-bottom: 6px;
+    }
+
+    .viz-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--text-color);
+    }
+
+    .viz-subtitle {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      max-width: 580px;
+      color: #777777;
+    }
+
+    /* Step counter */
+    .step-counter {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #999999;
+      margin-bottom: 12px;
+    }
+
+    .step-counter strong {
+      color: var(--accent-color);
+    }
+
+    .step {
+      transition: opacity 200ms ease-out, transform 200ms ease-out;
+    }
+
+    .step--hidden {
+      display: none;
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .step-card {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      padding: 28px 24px 24px;
+      background-color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .step-card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .step-card-subtitle {
+      font-size: 1.1rem;
+      color: #777777;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    /* Quiz question */
+    .quiz-question-wrapper {
+      margin-top: 6px;
+      padding: 18px 16px 14px;
+      border-radius: 10px;
+      background-color: #fafafa;
+      border: 1px solid #eeeeee;
+    }
+
+    .quiz-question-title {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 14px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 1.1rem;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      line-height: 1.5;
+      padding: 4px 2px;
+    }
+
+    .quiz-option input[type="radio"] {
+      margin-top: 3px;
+      accent-color: var(--accent-color);
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .quiz-option span {
+      display: inline-block;
+    }
+
+    .error-text {
+      margin-top: 16px;
+      font-size: 1rem;
+      color: #cc3b3b;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity 160ms ease-out, transform 160ms ease-out;
+    }
+
+    .error-text.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Buttons */
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .primary-button {
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-color);
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.09);
+      transition: transform 120ms ease-out, box-shadow 120ms ease-out, filter 120ms ease-out;
+      white-space: nowrap;
+    }
+
+    .primary-button:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .primary-button:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .secondary-button {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid #dddddd;
+      background-color: #ffffff;
+      color: #777777;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .secondary-button:hover {
+      background-color: #fafafa;
+    }
+
+    /* Result section */
+    .result-type-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background-color: rgba(255, 121, 0, 0.08);
+      color: var(--accent-color);
+      margin-bottom: 14px;
+    }
+
+    .result-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+    }
+
+    .result-tagline {
+      font-size: 1.15rem;
+      color: #777777;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .result-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    .result-list {
+      padding-left: 20px;
+      margin: 8px 0 0;
+      font-size: 1.1rem;
+      color: #555555;
+    }
+
+    .result-list li {
+      margin-bottom: 6px;
+    }
+
+    .result-example {
+      margin-top: 12px;
+      font-size: 1rem;
+      color: #777777;
+    }
+
+    .result-secondary {
+      font-size: 1rem;
+      color: #999999;
+      margin-top: 14px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      font-size: 1rem;
+      margin-top: 8px;
+    }
+
+    .result-card-mini {
+      border-radius: 10px;
+      border: 1px dashed #e4e4e4;
+      padding: 9px 10px;
+      background-color: #fcfcfc;
+    }
+
+    .result-card-mini-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .result-card-mini p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 768px) {
+      .viz-wrapper {
+        padding: 40px 16px 56px;
+      }
+
+      .viz-title {
+        font-size: 1.9rem;
+      }
+
+      .viz-subtitle {
+        font-size: 1.05rem;
+        max-width: none;
+      }
+
+      .step-card {
+        padding: 22px 16px 20px;
+      }
+
+      .quiz-question-wrapper {
+        padding: 16px 12px 14px;
+      }
+
+      .quiz-options {
+        gap: 10px;
+      }
+
+      .button-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+
+      .primary-button,
+      .secondary-button {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .result-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="viz-wrapper">
+    <div class="viz-container">
+      <header class="viz-header">
+        <div class="viz-kicker">The four dimensions of AI automation</div>
+        <h1 class="viz-title">What kind of superworker are you?</h1>
+        <p class="viz-subtitle">
+          Answer three quick questions – one at a time – to see which AI-powered “superworker” profile best matches how you work today.
+        </p>
+      </header>
+
+      <!-- QUIZ STEPS -->
+      <section class="step" id="quizStep">
+        <div class="step-counter" id="stepCounter">
+          Question <strong>1</strong> of 3
+        </div>
+
+        <div class="step-card">
+          <h2 class="step-card-title" id="stepTitle">Step 1 – Tell us about your work with AI</h2>
+          <p class="step-card-subtitle" id="stepSubtitle">
+            Choose the option that feels closest to your current situation.
+          </p>
+
+          <div class="quiz-question-wrapper">
+            <div class="quiz-question-title" id="questionText">
+              <!-- Question text injected here -->
+            </div>
+            <div class="quiz-options" id="optionsContainer">
+              <!-- Options injected here -->
+            </div>
+          </div>
+
+          <div id="quizError" class="error-text">
+            Please choose one option to continue.
+          </div>
+
+          <div class="button-row">
+            <button class="secondary-button" id="backBtn" type="button">
+              ← Back
+            </button>
+
+            <button class="primary-button" id="nextBtn" type="button">
+              Next question
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULT STEP -->
+      <section class="step step--hidden" id="resultStep">
+        <div class="step-counter">
+          Step <strong>4</strong> of 4 · Your result
+        </div>
+
+        <div class="step-card" id="resultCard">
+          <!-- Filled dynamically -->
+        </div>
+
+        <div class="button-row" style="margin-top:20px;">
+          <button class="secondary-button" id="restartBtn" type="button">
+            ← Take the quiz again
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        id: "q1",
+        question: "How do you mainly use AI in your day-to-day work?",
+        options: [
+          {
+            id: "q1a",
+            label: "I collaborate with AI to create or improve complex work (code, analysis, content, designs).",
+            type: "empowered"
+          },
+          {
+            id: "q1b",
+            label: "I coordinate or manage AI tools and agents that other people or teams rely on.",
+            type: "manager"
+          },
+          {
+            id: "q1c",
+            label: "I use AI to speed up existing tasks like emails, documents, and reports.",
+            type: "efficient"
+          },
+          {
+            id: "q1d",
+            label: "AI takes over a big share of repetitive tasks so I can handle more volume or customers.",
+            type: "productive"
+          }
+        ]
+      },
+      {
+        id: "q2",
+        question: "Which statement best describes your role today?",
+        options: [
+          {
+            id: "q2a",
+            label: "I’m a specialist / knowledge worker focused on solving complex problems.",
+            type: "empowered"
+          },
+          {
+            id: "q2b",
+            label: "I’m a manager or lead responsible for workflows, teams, or processes.",
+            type: "manager"
+          },
+          {
+            id: "q2c",
+            label: "I’m an office or back-office professional keeping operations running smoothly.",
+            type: "efficient"
+          },
+          {
+            id: "q2d",
+            label: "I’m in a frontline or operations role where volume and speed really matter.",
+            type: "productive"
+          }
+        ]
+      },
+      {
+        id: "q3",
+        question: "Looking ahead, how do you want AI to change your job?",
+        options: [
+          {
+            id: "q3a",
+            label: "I want to retrain and build higher-level skills while AI handles routine parts of my work.",
+            type: "empowered"
+          },
+          {
+            id: "q3b",
+            label: "I want to design, monitor, and improve AI systems and how people work with them.",
+            type: "manager"
+          },
+          {
+            id: "q3c",
+            label: "I want to keep my role but become much faster and more productive at the same tasks.",
+            type: "efficient"
+          },
+          {
+            id: "q3d",
+            label: "I’m happy for AI to automate a lot of my current scope if I can move into new, adjacent tasks.",
+            type: "productive"
+          }
+        ]
+      }
+    ];
+
+    const profiles = {
+      empowered: {
+        label: "The Empowered Superworker",
+        tagline: "A highly skilled specialist who collaborates with AI to do higher-quality work.",
+        bullets: [
+          "Collaborates with AI on complex tasks.",
+          "Improves work quality and innovation.",
+          "Retrains to meet new demands and seize new opportunities.",
+          "Often positioned for higher wages and career growth."
+        ],
+        example: "Example: Software development using an AI-powered code assistant."
+      },
+      manager: {
+        label: "The Superworker Manager",
+        tagline: "A leader who orchestrates people and AI agents to scale performance.",
+        bullets: [
+          "Manages AI agents and automation tools.",
+          "Scales work performance across teams and processes.",
+          "Focuses on improving the quality of outcomes.",
+          "Creates new roles, careers, and professions around AI."
+        ],
+        example: "Example: HR specialist using an AI-powered recruiting tool."
+      },
+      efficient: {
+        label: "The Efficient Superworker",
+        tagline: "A professional who uses AI to make existing work faster and smoother.",
+        bullets: [
+          "Performs the same work more efficiently with AI.",
+          "Job description stays mostly the same.",
+          "Enjoys a noticeable productivity boost.",
+          "Faces some risk of redundancy if skills don’t keep evolving."
+        ],
+        example: "Example: Office work using tools like Microsoft Copilot."
+      },
+      productive: {
+        label: "The Productive Superworker",
+        tagline: "An operations-focused worker whose scope is leaner but output is much higher.",
+        bullets: [
+          "Job scope is significantly reduced or reshaped by automation.",
+          "Handles more tasks or customers thanks to AI.",
+          "Boosts operational efficiency at scale.",
+          "Also experiences some risk of redundancies as automation grows."
+        ],
+        example: "Example: Retail with automated ordering and checkout systems."
+      }
+    };
+
+    const stepCounter = document.getElementById("stepCounter");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepSubtitle = document.getElementById("stepSubtitle");
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const quizErrorEl = document.getElementById("quizError");
+
+    const quizStep = document.getElementById("quizStep");
+    const resultStep = document.getElementById("resultStep");
+    const resultCard = document.getElementById("resultCard");
+
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let currentIndex = 0;
+    const answers = new Array(quizData.length).fill(null);
+
+    function updateStepHeader() {
+      stepCounter.innerHTML = `Question <strong>${currentIndex + 1}</strong> of ${quizData.length}`;
+      stepTitle.textContent = `Step ${currentIndex + 1} – Tell us about your work with AI`;
+      stepSubtitle.textContent =
+        currentIndex === 0
+          ? "Choose the option that feels closest to how you use AI today."
+          : currentIndex === 1
+          ? "Now think about the kind of role you have in your organisation."
+          : "Finally, look ahead and pick the direction you’d like AI to take your job.";
+    }
+
+    function renderCurrentQuestion() {
+      const q = quizData[currentIndex];
+      updateStepHeader();
+
+      questionText.textContent = q.question;
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach((opt) => {
+        const labelEl = document.createElement("label");
+        labelEl.className = "quiz-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = q.id;
+        input.value = opt.type;
+        input.id = opt.id;
+
+        if (answers[currentIndex] === opt.type) {
+          input.checked = true;
+        }
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = opt.label;
+
+        labelEl.appendChild(input);
+        labelEl.appendChild(textSpan);
+        optionsContainer.appendChild(labelEl);
+      });
+
+      backBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+
+      if (currentIndex === quizData.length - 1) {
+        nextBtn.innerHTML = `Show my superworker type <span aria-hidden="true">→</span>`;
+      } else {
+        nextBtn.innerHTML = `Next question <span aria-hidden="true">→</span>`;
+      }
+
+      quizErrorEl.classList.remove("is-visible");
+    }
+
+    function getSelectedValue() {
+      const q = quizData[currentIndex];
+      const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+      return selected ? selected.value : null;
+    }
+
+    function calculateResult() {
+      const scores = {
+        empowered: 0,
+        manager: 0,
+        efficient: 0,
+        productive: 0
+      };
+
+      answers.forEach((type) => {
+        if (type && scores.hasOwnProperty(type)) {
+          scores[type] += 1;
+        }
+      });
+
+      let bestType = null;
+      let bestScore = -1;
+
+      Object.entries(scores).forEach(([type, score]) => {
+        if (score > bestScore) {
+          bestScore = score;
+          bestType = type;
+        }
+      });
+
+      if (!bestType) bestType = "efficient";
+
+      const sortedTypes = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const runnerUp = sortedTypes[1]?.[0];
+
+      return { bestType, scores, runnerUp };
+    }
+
+    function renderResult(result) {
+      const profile = profiles[result.bestType];
+      const runnerUpLabel = result.runnerUp ? profiles[result.runnerUp].label : null;
+
+      const bulletsHtml = profile.bullets
+        .map((b) => `<li>${b}</li>`)
+        .join("");
+
+      resultCard.innerHTML = `
+        <div class="result-type-label">Your likely profile</div>
+        <h2 class="result-title">${profile.label}</h2>
+        <p class="result-tagline">${profile.tagline}</p>
+
+        <div class="result-columns">
+          <div>
+            <ul class="result-list">
+              ${bulletsHtml}
+            </ul>
+            <p class="result-example">${profile.example}</p>
+          </div>
+
+          <div>
+            <p style="font-size:1rem; color:#777777; margin:0 0 10px; line-height:1.6;">
+              This quiz is a simple indicator based on how you use AI today and how you’d like your role to evolve.
+            </p>
+
+            <div class="result-grid">
+              <div class="result-card-mini">
+                <div class="result-card-mini-title">Skill level</div>
+                <p>${
+                  result.bestType === "empowered" || result.bestType === "manager"
+                    ? "You sit on the more highly skilled side of the AI automation chart."
+                    : "You’re closer to the operational side today, where AI boosts throughput and efficiency."
+                }</p>
+              </div>
+              <div class="result-card-mini">
+                <div class="result-card-mini-title">Type of change</div>
+                <p>${
+                  result.bestType === "empowered" || result.bestType === "efficient"
+                    ? "AI mainly makes your existing work more productive."
+                    : "AI is actively redesigning or reducing your job scope while increasing output."
+                }</p>
+              </div>
+            </div>
+
+            ${
+              runnerUpLabel
+                ? `<p class="result-secondary">
+                     Your secondary profile is <strong>${runnerUpLabel}</strong> – you may recognise elements of both in your role.
+                   </p>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function showResultStep() {
+      quizStep.classList.add("step--hidden");
+      resultStep.classList.remove("step--hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showQuizStep() {
+      resultStep.classList.add("step--hidden");
+      quizStep.classList.remove("step--hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      const selectedValue = getSelectedValue();
+
+      if (!selectedValue) {
+        quizErrorEl.classList.add("is-visible");
+        return;
+      }
+
+      quizErrorEl.classList.remove("is-visible");
+      answers[currentIndex] = selectedValue;
+
+      if (currentIndex < quizData.length - 1) {
+        currentIndex += 1;
+        renderCurrentQuestion();
+      } else {
+        const result = calculateResult();
+        renderResult(result);
+        showResultStep();
+      }
+    });
+
+    backBtn.addEventListener("click", () => {
+      if (currentIndex === 0) return;
+      currentIndex -= 1;
+      renderCurrentQuestion();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      for (let i = 0; i < answers.length; i++) {
+        answers[i] = null;
+      }
+      currentIndex = 0;
+      renderCurrentQuestion();
+      showQuizStep();
+    });
+
+    // Initialise
+    renderCurrentQuestion();
+  </script>
+</body>
+</html>

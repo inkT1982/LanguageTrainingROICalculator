@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Global Unemployment and Inflation 2015–2026</title>
+
+  <!-- Roboto font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #f3f4f7;
+      --card-bg: #ffffff;
+      --text-main: #555555;
+      --accent-orange: #ff7900;
+      --unemp-grey: #cbcbcb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Roboto", sans-serif;
+      background: radial-gradient(circle at top left, #ffffff 0, #f0f2f7 45%, #e4e7f0 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 28px;
+    }
+
+    .page-wrapper {
+      max-width: 1500px;
+      width: 100%;
+      margin: auto;
+    }
+
+    .viz-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow:
+        0 24px 40px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+      padding: 32px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      body {
+        padding: 16px;
+      }
+      .viz-card {
+        padding: 24px 20px 32px;
+      }
+    }
+
+    .viz-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+    }
+
+    .title-block h1 {
+      font-size: 35pt;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin: 0 0 4px;
+      color: var(--text-main);
+    }
+
+    .title-block .subtitle {
+      margin: 0;
+      font-size: 15pt;
+      color: #777777;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f5f5f7;
+      cursor: default;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+    }
+
+    .legend-swatch.grey {
+      background: var(--unemp-grey);
+    }
+
+    .legend-swatch.orange {
+      background: var(--accent-orange);
+    }
+
+    .legend-label {
+      white-space: nowrap;
+    }
+
+    /* Visualization area */
+    .viz-main {
+      position: relative;
+      min-height: 520px;
+    }
+
+    .viz-bg-band {
+      position: absolute;
+      inset: 4% 0 10% 0; /* inner “second frame” */
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #ffffff 0, #f7f7fb 45%, #eceef7 100%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .axis-line {
+      stroke: #555555;
+      stroke-width: 1;
+      stroke-dasharray: 4 6;
+      opacity: 0.6;
+    }
+
+    .year-guide {
+      stroke: #555555;
+      stroke-width: 1;
+      stroke-dasharray: 2 5;
+      opacity: 0.4;
+    }
+
+    .year-label {
+      fill: #555555;
+      font-size: 12px;
+      text-anchor: middle;
+    }
+
+    .rate-label {
+      font-size: 13px;
+      text-anchor: middle;
+      pointer-events: none;
+      transition: font-size 0.2s ease-out, transform 0.2s ease-out;
+    }
+
+    .rate-label.unemployment {
+      fill: #555555;
+    }
+
+    .rate-label.inflation {
+      fill: var(--accent-orange);
+    }
+
+    .circle-base {
+      stroke: none;
+      transition: r 0.25s ease-out, filter 0.25s ease-out;
+      opacity: 0;
+      animation: pop-in 0.7s ease-out forwards;
+    }
+
+    .circle-hovered {
+      filter: brightness(1.2); /* 20% brighter */
+    }
+
+    .label-hovered {
+      font-size: 14px;
+      transform: translateY(-3px);
+      font-weight: 500;
+    }
+
+    /* Horizontal-only entry animation */
+    @keyframes pop-in {
+      0% {
+        opacity: 0;
+        transform: translateX(-24px); /* slide in from left */
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* International affairs tooltip (HTML overlay following cursor) */
+    .affair-tooltip {
+      position: absolute;
+      display: none;
+      pointer-events: none;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #555555;
+      max-width: 240px;
+      line-height: 1.4;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      z-index: 10;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+
+    .affair-tooltip-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999999;
+      margin-bottom: 4px;
+    }
+
+    .affair-tooltip-body > div + div {
+      margin-top: 2px;
+    }
+
+    /* Rate explanation tooltip (for legend labels) */
+    .rate-tooltip {
+      position: fixed; /* CHANGED: so it follows cursor anywhere */
+      display: none;
+      pointer-events: none;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #555555;
+      max-width: 260px;
+      line-height: 1.45;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      z-index: 11;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+
+    .rate-tooltip-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999999;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="viz-card">
+      <header class="viz-header">
+        <div class="title-block">
+          <h1>Global Unemployment & Inflation, 2015–2026</h1>
+          <p class="subtitle">
+            Circle size encodes annual rates. Grey shows unemployment, orange shows inflation.
+            Hover circles to focus individual years and reveal key international affairs.
+          </p>
+        </div>
+        <div class="legend">
+          <div class="legend-chip">
+            <span class="legend-swatch grey"></span>
+            <span id="legendUnemployment" class="legend-label">Unemployment rate</span>
+          </div>
+          <div class="legend-chip">
+            <span class="legend-swatch orange"></span>
+            <span id="legendInflation" class="legend-label">Inflation rate</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main visualisation -->
+      <div class="viz-main">
+        <div class="viz-bg-band"></div>
+        <svg
+          id="unemploymentInflationViz"
+          viewBox="0 0 1200 460"
+          role="img"
+          aria-labelledby="title desc"
+        >
+          <title id="title">Global Unemployment and Inflation Rates 2015 to 2026</title>
+          <desc id="desc">
+            Horizontal bubble chart showing unemployment and inflation rates from 2015 to 2026.
+            Grey circles represent unemployment and orange circles represent inflation. Circle
+            size corresponds to the magnitude of the rate. On hover, a tooltip near the cursor
+            reveals key international affairs for that year. Additional tooltips on the legend
+            explain what each rate represents and typical data sources.
+          </desc>
+
+          <defs>
+            <!-- Grey gradient: transparent center, more opaque edge -->
+            <radialGradient id="unemploymentGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#cbcbcb" stop-opacity="0" />
+              <stop offset="60%" stop-color="#cbcbcb" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#cbcbcb" stop-opacity="1" />
+            </radialGradient>
+
+            <!-- Orange gradient: transparent center, more opaque edge -->
+            <radialGradient id="inflationGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ff7900" stop-opacity="0" />
+              <stop offset="60%" stop-color="#ff7900" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#ff7900" stop-opacity="1" />
+            </radialGradient>
+          </defs>
+
+          <!-- Horizontal baseline (center of circles) -->
+          <line class="axis-line" x1="60" y1="210" x2="1140" y2="210" />
+
+          <!-- Layer order: guides (dotted lines) -> circles -> labels (rates + years) -->
+          <g id="guidesLayer"></g>
+          <g id="circlesLayer"></g>
+          <g id="labelsLayer"></g>
+        </svg>
+
+        <!-- HTML tooltip following the cursor: critical events -->
+        <div id="affairTooltip" class="affair-tooltip">
+          <div class="affair-tooltip-title">Critical Event</div>
+          <div class="affair-tooltip-body"></div>
+        </div>
+
+        <!-- HTML tooltip for explaining rate legend labels -->
+        <div id="rateTooltip" class="rate-tooltip">
+          <div class="rate-tooltip-title"></div>
+          <div class="rate-tooltip-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Numeric dataset
+    const data = [
+      { year: 2015, unemployment: 6.0,  inflation: 2.70 },
+      { year: 2016, unemployment: 5.98, inflation: 2.68 },
+      { year: 2017, unemployment: 5.9,  inflation: 3.24 },
+      { year: 2018, unemployment: 5.76, inflation: 3.63 },
+      { year: 2019, unemployment: 5.6,  inflation: 3.50 },
+      { year: 2020, unemployment: 6.61, inflation: 3.26 },
+      { year: 2021, unemployment: 6.06, inflation: 4.66 },
+      { year: 2022, unemployment: 5.28, inflation: 8.63 },
+      { year: 2023, unemployment: 4.97, inflation: 6.66 },
+      { year: 2024, unemployment: 4.96, inflation: 5.76 },
+      { year: 2025, unemployment: 4.96, inflation: 4.32 },
+      { year: 2026, unemployment: 4.9,  inflation: 3.63 }
+    ];
+
+    // 1–2 key international affairs per year
+    const affairsByYear = {
+      2015: ["Global climate talks intensify"],
+      2016: ["Brexit referendum reshapes Europe"],
+      2017: ["Tensions on Korean Peninsula rise"],
+      2018: ["US–China trade disputes escalate"],
+      2019: ["Worldwide climate protests surge"],
+      2020: ["COVID-19 pandemic", "Global lockdowns & border closures"],
+      2021: ["Vaccine rollout, uneven recovery"],
+      2022: ["War in Ukraine", "Energy & food price shock"],
+      2023: ["Banking jitters", "Supply chains reorganise"],
+      2024: ["High-stakes election cycles"],
+      2025: ["Green transition accelerates"],
+      2026: ["Debates on AI & tech governance"]
+    };
+
+    (function renderChart() {
+      const svg = document.getElementById("unemploymentInflationViz");
+      const guidesLayer = document.getElementById("guidesLayer");
+      const circlesLayer = document.getElementById("circlesLayer");
+      const labelsLayer = document.getElementById("labelsLayer");
+      const vizMain = document.querySelector(".viz-main");
+
+      const affairTooltip = document.getElementById("affairTooltip");
+      const affairTooltipBody = affairTooltip.querySelector(".affair-tooltip-body");
+
+      const rateTooltip = document.getElementById("rateTooltip");
+      const rateTooltipTitle = rateTooltip.querySelector(".rate-tooltip-title");
+      const rateTooltipBody = rateTooltip.querySelector(".rate-tooltip-body");
+
+      const legendUnemp = document.getElementById("legendUnemployment");
+      const legendInfl = document.getElementById("legendInflation");
+
+      const paddingLeft = 80;
+      const paddingRight = 80;
+
+      const baselineY = 210; // center of circles
+      const yearLabelY = 430; // years: inside SVG but below the inner band
+
+      // Base radii scaled 125%
+      const minRadius = 25 * 1.25;
+      const maxRadius = 55 * 1.25;
+
+      // Shared scaling range across both datasets
+      const allRates = data.flatMap(d => [d.unemployment, d.inflation]);
+      const minRate = Math.min(...allRates);
+      const maxRate = Math.max(...allRates);
+
+      const totalWidth = 1200;
+      const usableWidth = totalWidth - paddingLeft - paddingRight;
+      const step = usableWidth / (data.length - 1);
+
+      const svgNS = "http://www.w3.org/2000/svg";
+
+      // Helper for *affair* tooltip: position relative to viz-main
+      function positionAffairTooltip(tooltipEl, evt) {
+        const rect = vizMain.getBoundingClientRect();
+        const offsetX = evt.clientX - rect.left;
+        const offsetY = evt.clientY - rect.top;
+        const padding = 12;
+
+        let finalLeft = offsetX + 16;
+        let finalTop = offsetY + 16;
+
+        tooltipEl.style.display = "block";
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+        const containerWidth = rect.width;
+        const containerHeight = rect.height;
+
+        if (finalLeft + tooltipRect.width > containerWidth) {
+          finalLeft = containerWidth - tooltipRect.width - padding;
+        }
+        if (finalTop + tooltipRect.height > containerHeight) {
+          finalTop = containerHeight - tooltipRect.height - padding;
+        }
+
+        if (finalLeft < padding) finalLeft = padding;
+        if (finalTop < padding) finalTop = padding;
+
+        tooltipEl.style.left = finalLeft + "px";
+        tooltipEl.style.top = finalTop + "px";
+      }
+
+      data.forEach((d, index) => {
+        const x = paddingLeft + step * index;
+
+        const unempRadius =
+          minRadius +
+          ((d.unemployment - minRate) / (maxRate - minRate)) *
+          (maxRadius - minRadius);
+
+        const inflRadius =
+          minRadius +
+          ((d.inflation - minRate) / (maxRate - minRate)) *
+          (maxRadius - minRadius);
+
+        const unempHoverRadius = unempRadius * 1.2;
+        const inflHoverRadius = inflRadius * 1.2;
+
+        // Gaps between circles and percentage text
+        const unempLabelY = baselineY - unempRadius - 26; // above circle
+        const inflLabelY  = baselineY + inflRadius + 34;  // below circle
+
+        // ----- DOTTED VERTICAL LINE (year guide) -----
+        const guideLine = document.createElementNS(svgNS, "line");
+        guideLine.setAttribute("class", "year-guide");
+        guideLine.setAttribute("x1", x);
+        guideLine.setAttribute("x2", x);
+        guideLine.setAttribute("y1", unempLabelY + 4);
+        guideLine.setAttribute("y2", inflLabelY - 4);
+        guidesLayer.appendChild(guideLine);
+
+        // ----- UNEMPLOYMENT CIRCLE (grey) -----
+        const circleUnemp = document.createElementNS(svgNS, "circle");
+        circleUnemp.setAttribute("cx", x);
+        circleUnemp.setAttribute("cy", baselineY);
+        circleUnemp.setAttribute("r", unempRadius);
+        circleUnemp.setAttribute("fill", "url(#unemploymentGradient)");
+        circleUnemp.setAttribute("class", "circle-base unemployment-circle");
+        circleUnemp.style.animationDelay = `${index * 40}ms`;
+        circlesLayer.appendChild(circleUnemp);
+
+        // ----- INFLATION CIRCLE (orange) -----
+        const circleInfl = document.createElementNS(svgNS, "circle");
+        circleInfl.setAttribute("cx", x);
+        circleInfl.setAttribute("cy", baselineY);
+        circleInfl.setAttribute("r", inflRadius);
+        circleInfl.setAttribute("fill", "url(#inflationGradient)");
+        circleInfl.setAttribute("class", "circle-base inflation-circle");
+        circleInfl.style.animationDelay = `${80 + index * 40}ms`;
+        circlesLayer.appendChild(circleInfl);
+
+        // ----- LABELS (rates) -----
+        const rateTextUnemp = document.createElementNS(svgNS, "text");
+        rateTextUnemp.setAttribute("class", "rate-label unemployment");
+        rateTextUnemp.setAttribute("x", x);
+        rateTextUnemp.setAttribute("y", unempLabelY);
+        rateTextUnemp.textContent = d.unemployment.toFixed(2) + "%";
+        labelsLayer.appendChild(rateTextUnemp);
+
+        const rateTextInfl = document.createElementNS(svgNS, "text");
+        rateTextInfl.setAttribute("class", "rate-label inflation");
+        rateTextInfl.setAttribute("x", x);
+        rateTextInfl.setAttribute("y", inflLabelY);
+        rateTextInfl.textContent = d.inflation.toFixed(2) + "%";
+        labelsLayer.appendChild(rateTextInfl);
+
+        // ----- YEAR LABELS (inside first box, below inner band) -----
+        const yearText = document.createElementNS(svgNS, "text");
+        yearText.setAttribute("class", "year-label");
+        yearText.setAttribute("x", x);
+        yearText.setAttribute("y", yearLabelY);
+        yearText.textContent = d.year;
+        labelsLayer.appendChild(yearText);
+
+        // ----- CRITICAL EVENTS TOOLTIP (circles) -----
+        const affairs = affairsByYear[d.year] || [];
+        let hoverCount = 0;
+
+        function showAffairTooltip(evt) {
+          if (!affairs.length) return;
+          affairTooltipBody.innerHTML = affairs.map(line => `<div>${line}</div>`).join("");
+          positionAffairTooltip(affairTooltip, evt);
+        }
+
+        function hideAffairTooltip() {
+          affairTooltip.style.display = "none";
+        }
+
+        function handleEnterCircle(circleElement, labelElement, hoverRadius, evt) {
+          hoverCount++;
+          circleElement.classList.add("circle-hovered");
+          circleElement.setAttribute("r", hoverRadius);
+          labelElement.classList.add("label-hovered");
+          showAffairTooltip(evt);
+        }
+
+        function handleLeaveCircle(circleElement, labelElement, baseRadius) {
+          hoverCount = Math.max(0, hoverCount - 1);
+          circleElement.classList.remove("circle-hovered");
+          circleElement.setAttribute("r", baseRadius);
+          labelElement.classList.remove("label-hovered");
+          if (hoverCount === 0) {
+            hideAffairTooltip();
+          }
+        }
+
+        function attachCircleEvents(circleElement, labelElement, baseRadius, hoverRadius) {
+          circleElement.addEventListener("mouseenter", (evt) =>
+            handleEnterCircle(circleElement, labelElement, hoverRadius, evt)
+          );
+          circleElement.addEventListener("mouseleave", () =>
+            handleLeaveCircle(circleElement, labelElement, baseRadius)
+          );
+          circleElement.addEventListener("mousemove", (evt) => {
+            if (hoverCount > 0 && affairs.length) {
+              positionAffairTooltip(affairTooltip, evt);
+            }
+          });
+        }
+
+        attachCircleEvents(circleUnemp, rateTextUnemp, unempRadius, unempHoverRadius);
+        attachCircleEvents(circleInfl, rateTextInfl, inflRadius, inflHoverRadius);
+      });
+
+      // ----- RATE EXPLANATION TOOLTIP (legend labels only, near cursor) -----
+      function positionRateTooltipNearCursor(evt) {
+        const padding = 12;
+        let left = evt.clientX + 16;
+        let top = evt.clientY + 16;
+
+        rateTooltip.style.display = "block";
+
+        const tooltipRect = rateTooltip.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        if (left + tooltipRect.width > vw - padding) {
+          left = vw - tooltipRect.width - padding;
+        }
+        if (top + tooltipRect.height > vh - padding) {
+          top = vh - tooltipRect.height - padding;
+        }
+
+        if (left < padding) left = padding;
+        if (top < padding) top = padding;
+
+        rateTooltip.style.left = left + "px";
+        rateTooltip.style.top = top + "px";
+      }
+
+      function attachRateTooltipToLegend(element, type) {
+        element.style.cursor = "help";
+        element.addEventListener("mouseenter", (evt) => {
+          if (type === "unemployment") {
+            rateTooltipTitle.textContent = "Unemployment rate";
+            rateTooltipBody.textContent =
+              "Share of the global labour force without work but available for and seeking employment in this year. Based on typical estimates from sources such as the International Labour Organization (ILO) and the World Bank.";
+          } else if (type === "inflation") {
+            rateTooltipTitle.textContent = "Inflation rate";
+            rateTooltipBody.textContent =
+              "Average annual increase in consumer prices worldwide for this year. Based on typical estimates from sources such as the IMF, World Bank, and national statistical offices.";
+          }
+          positionRateTooltipNearCursor(evt);
+        });
+
+        element.addEventListener("mousemove", (evt) => {
+          positionRateTooltipNearCursor(evt);
+        });
+
+        element.addEventListener("mouseleave", () => {
+          rateTooltip.style.display = "none";
+        });
+      }
+
+      if (legendUnemp) attachRateTooltipToLegend(legendUnemp, "unemployment");
+      if (legendInfl) attachRateTooltipToLegend(legendInfl, "inflation");
+    })();
+  </script>
+</body>
+</html>

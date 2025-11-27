@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Core skills in 2025 – Interactive</title>
+
+  <!-- Roboto font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-color: #555555;
+      --accent-color: #FF7900;
+      --bg-track: #f3f3f3;
+      --row-alt: #f9f9f9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #ffffff;
+      color: var(--text-color);
+    }
+
+    .viz-wrapper {
+      width: 100%;
+      padding: 40px 24px 56px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .viz-container {
+      width: 100%;
+      max-width: 1200px;
+      animation: fadeInUp 600ms ease-out;
+    }
+
+    .viz-header {
+      margin-bottom: 24px;
+    }
+
+    .viz-kicker {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 500;
+      color: #999999;
+      margin-bottom: 6px;
+    }
+
+    .viz-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: var(--text-color);
+    }
+
+    .viz-subtitle {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-width: 540px;
+      color: #777777;
+    }
+
+    /* Step indicator */
+    .steps-indicator {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #dedede;
+      color: #999999;
+      background-color: #ffffff;
+      cursor: pointer;
+      transition:
+        background-color 160ms ease-out,
+        border-color 160ms ease-out,
+        color 160ms ease-out,
+        box-shadow 160ms ease-out;
+    }
+
+    .step-pill span {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .step-pill strong {
+      font-weight: 500;
+    }
+
+    .step-pill.is-active {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background-color: rgba(255, 121, 0, 0.06);
+    }
+
+    /* When Step 2 timer finishes or Step 3 is active */
+    .step-pill.is-ready {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #ffffff;
+    }
+
+    .step-pill.is-ready span,
+    .step-pill.is-ready strong {
+      color: #ffffff;
+    }
+
+    /* Shining / breathing glow */
+    .step-pill.is-glow {
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    .step-divider {
+      flex: 1;
+      height: 1px;
+      background: #e4e4e4;
+    }
+
+    /* Generic step sections */
+    .step {
+      transition: opacity 200ms ease-out, transform 200ms ease-out;
+    }
+
+    .step--hidden {
+      display: none;
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    /* Step card container */
+    .step-card {
+      border-radius: 12px;
+      border: 1px solid #e4e4e4;
+      padding: 20px 18px 18px;
+      background-color: #ffffff;
+    }
+
+    .step-card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-card-subtitle {
+      font-size: 0.9rem;
+      color: #777777;
+      margin-bottom: 12px;
+    }
+
+    /* Step 1 – form (2 columns) */
+    .skills-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 24px;
+      row-gap: 10px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .skill-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .skill-option input[type="checkbox"] {
+      margin-top: 2px;
+      accent-color: var(--accent-color);
+    }
+
+    .skill-option-label {
+      line-height: 1.3;
+    }
+
+    .selection-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #888888;
+    }
+
+    .selection-count {
+      font-weight: 500;
+    }
+
+    .selection-count.is-full {
+      color: var(--accent-color);
+    }
+
+    .selection-error {
+      color: #cc3b3b;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity 160ms ease-out, transform 160ms ease-out;
+    }
+
+    .selection-error.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .primary-button {
+      margin-top: 16px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-color);
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      transition:
+        transform 120ms ease-out,
+        box-shadow 120ms ease-out,
+        filter 120ms ease-out;
+    }
+
+    .primary-button:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .primary-button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .primary-button span[aria-hidden="true"] {
+      transform: translateY(-1px);
+    }
+
+    /* Step 2 – chart */
+    .viz-chart {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px; /* same gap between all lines */
+    }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: minmax(0, 320px) 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 10px;
+      opacity: 0;
+      transform: translateY(4px);
+      animation: rowFadeIn 400ms ease-out forwards;
+      border-radius: 6px;
+      transition: background-color 200ms ease-out, box-shadow 200ms ease-out;
+    }
+
+    .skill-row:nth-child(odd) {
+      background-color: var(--row-alt); /* very light grey background for odd rows */
+    }
+
+    .skill-row:hover .skill-bar-fill {
+      filter: brightness(1.2); /* ~20% brightening effect on hover */
+    }
+
+    .skill-row.is-highlighted {
+      background-color: rgba(255, 121, 0, 0.06);
+      box-shadow: 0 0 0 1px rgba(255, 121, 0, 0.4);
+    }
+
+    .skill-label {
+      font-size: 0.9rem;
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .user-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background-color: rgba(255, 121, 0, 0.14);
+      color: var(--accent-color);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .skill-bar-wrapper {
+      position: relative;
+      background-color: var(--bg-track);
+      border-radius: 999px;
+      overflow: hidden;
+      height: 20px;
+    }
+
+    .skill-bar-fill {
+      position: relative;
+      height: 100%;
+      width: 0;
+      background: var(--accent-color);
+      border-radius: inherit;
+      transition: width 900ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .skill-bar-fill.is-highlighted {
+      filter: brightness(1.15);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.04),
+        0 0 14px rgba(255, 121, 0, 0.7);
+    }
+
+    .skill-value {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #ffffff; /* white percentage text */
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .viz-footer-note {
+      margin-top: 18px;
+      font-size: 0.75rem;
+      color: #999999;
+    }
+
+    .selected-summary {
+      font-size: 0.85rem;
+      color: #777777;
+      margin-bottom: 6px;
+    }
+
+    /* STEP 3 – eBook panel */
+    .step-card ul {
+      font-size: 0.85rem;
+      color: #777777;
+      margin: 8px 0 14px 18px;
+    }
+
+    .step-card ul li {
+      margin-bottom: 2px;
+    }
+
+    .step-card .secondary-note {
+      font-size: 0.75rem;
+      color: #999999;
+      margin-top: 10px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes rowFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 121, 0, 0.35);
+      }
+      50% {
+        box-shadow: 0 0 12px 4px rgba(255, 121, 0, 0.9);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 121, 0, 0.35);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .viz-wrapper {
+        padding: 24px 16px 40px;
+      }
+      .viz-title {
+        font-size: 1.4rem;
+      }
+      .skill-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .skill-label {
+        font-size: 0.88rem;
+      }
+      .step-card {
+        padding: 16px 14px 14px;
+      }
+      .skills-form {
+        grid-template-columns: 1fr; /* 1 column on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="viz-wrapper">
+    <div class="viz-container">
+      <header class="viz-header">
+        <div class="viz-kicker">Future workforce skills</div>
+        <h1 class="viz-title">Core skills in 2025</h1>
+        <p class="viz-subtitle">
+          Share of employers who consider the stated skills to be core skills for their workforce.
+        </p>
+      </header>
+
+      <!-- Step indicator with 3 labels -->
+      <div class="steps-indicator">
+        <div class="step-pill" id="stepPill1">
+          <span>Step 1</span><strong>Select your core skills</strong>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-pill" id="stepPill2">
+          <span>Step 2</span><strong>See industry insights</strong>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-pill" id="stepPill3">
+          <span>Step 3</span><strong>Download the eBook</strong>
+        </div>
+      </div>
+
+      <!-- STEP 1: Multi-select form -->
+      <section class="step" id="step1">
+        <div class="step-card">
+          <h2 class="step-card-title">Which core skills are critical to you in 2025?</h2>
+          <p class="step-card-subtitle">
+            Choose up to five skills that are most important for your organization. We’ll highlight them on the industry benchmark.
+          </p>
+
+          <div class="skills-form" id="skillsList">
+            <!-- Options injected by JavaScript -->
+          </div>
+
+          <div class="selection-meta">
+            <div id="selectionCount" class="selection-count">
+              0 of 5 selected
+            </div>
+            <div id="selectionError" class="selection-error">
+              You can select a maximum of 5 skills.
+            </div>
+          </div>
+
+          <button class="primary-button" id="showInsightsBtn" type="button">
+            Show me industry insights
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2: Chart -->
+      <section class="step step--hidden" id="step2">
+        <p class="selected-summary" id="selectedSummary">
+          <!-- Filled by JS -->
+        </p>
+        <section class="viz-chart" id="skillsChart"></section>
+
+        <div class="viz-footer-note">
+          Bars animate in sequence to emphasize the relative importance of each skill.
+          Skills you selected are highlighted.
+        </div>
+
+        <!-- Button to go to Step 3 -->
+        <button class="primary-button" id="goToStep3" type="button" style="margin-top: 16px;">
+          Continue to the eBook
+          <span aria-hidden="true">→</span>
+        </button>
+      </section>
+
+      <!-- STEP 3: eBook download -->
+      <section class="step step--hidden" id="step3">
+        <div class="step-card">
+          <h2 class="step-card-title">Download the full industry overview</h2>
+          <p class="step-card-subtitle">
+            Get a concise eBook that summarises the key trends behind these core skills in 2025,
+            including which ones are rising fastest and where organisations are investing.
+          </p>
+
+          <ul>
+            <li>Short overview of each core skill cluster</li>
+            <li>Practical implications for L&amp;D and talent strategy</li>
+            <li>Ideas for how to prioritise your next initiatives</li>
+          </ul>
+
+          <!-- Replace href with your real file path/URL -->
+          <a
+            href="ebook-core-skills-2025.pdf"
+            download
+            class="primary-button"
+            style="text-decoration: none;"
+          >
+            Download the eBook
+            <span aria-hidden="true">⬇</span>
+          </a>
+
+          <p class="secondary-note">
+            The eBook will be downloaded as a PDF file to your device.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    const skillsData = [
+      { label: "Resilience, flexibility and agility", value: 79 },
+      { label: "Analytical thinking", value: 69 },
+      { label: "Leadership and social influence", value: 61 },
+      { label: "Creative thinking", value: 57 },
+      { label: "Motivation and self-awareness", value: 52 },
+      { label: "Technological literacy", value: 51 },
+      { label: "Empathy and active listening", value: 50 },
+      { label: "Curiosity and lifelong learning", value: 50 },
+      { label: "Talent management", value: 47 },
+      { label: "Service orientation and customer service", value: 47 },
+      { label: "AI and big data", value: 45 },
+      { label: "Systems thinking", value: 42 },
+      { label: "Resource management and operations", value: 41 },
+      { label: "Dependability and attention to detail", value: 37 },
+      { label: "Quality control", value: 35 },
+      { label: "Teaching and mentoring", value: 26 },
+      { label: "Networks and cybersecurity", value: 25 },
+      { label: "Design and user experience", value: 25 },
+      { label: "Multi-lingualism", value: 23 },
+      { label: "Marketing and media", value: 21 },
+      { label: "Reading, writing and mathematics", value: 21 },
+      { label: "Environmental stewardship", value: 20 },
+      { label: "Programming", value: 17 },
+      { label: "Manual dexterity, endurance and precision", value: 14 },
+      { label: "Global citizenship", value: 13 },
+      { label: "Sensory-processing abilities", value: 6 }
+    ];
+
+    const maxSelections = 5;
+    const selectedSkillsSet = new Set();
+
+    const skillsListEl = document.getElementById("skillsList");
+    const selectionCountEl = document.getElementById("selectionCount");
+    const selectionErrorEl = document.getElementById("selectionError");
+    const showInsightsBtn = document.getElementById("showInsightsBtn");
+
+    const step1El = document.getElementById("step1");
+    const step2El = document.getElementById("step2");
+    const step3El = document.getElementById("step3");
+
+    const stepPill1 = document.getElementById("stepPill1");
+    const stepPill2 = document.getElementById("stepPill2");
+    const stepPill3 = document.getElementById("stepPill3");
+
+    const chartEl = document.getElementById("skillsChart");
+    const selectedSummaryEl = document.getElementById("selectedSummary");
+    const goToStep3Btn = document.getElementById("goToStep3");
+
+    // Timer state for Step 3 highlight
+    let step3TimerStarted = false;
+    let step3TimerId = null;
+
+    // STEP 1 options: display in alphabetical order
+    const skillsSortedByLabel = skillsData
+      .slice()
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    skillsSortedByLabel.forEach((skill, index) => {
+      const option = document.createElement("label");
+      option.className = "skill-option";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = skill.label;
+      checkbox.id = `skill-${index}`;
+
+      const textSpan = document.createElement("span");
+      textSpan.className = "skill-option-label";
+      textSpan.textContent = skill.label;
+
+      option.appendChild(checkbox);
+      option.appendChild(textSpan);
+
+      skillsListEl.appendChild(option);
+    });
+
+    function updateSelectionUI(showError = false) {
+      const count = selectedSkillsSet.size;
+      selectionCountEl.textContent = `${count} of ${maxSelections} selected`;
+      selectionCountEl.classList.toggle("is-full", count === maxSelections);
+
+      if (showError) {
+        selectionErrorEl.classList.add("is-visible");
+        setTimeout(() => {
+          selectionErrorEl.classList.remove("is-visible");
+        }, 1800);
+      }
+    }
+
+    // Handle checkbox changes with max 5 constraint
+    skillsListEl.addEventListener("change", (event) => {
+      const target = event.target;
+      if (target && target.type === "checkbox") {
+        const label = target.value;
+        if (target.checked) {
+          if (selectedSkillsSet.size >= maxSelections) {
+            target.checked = false;
+            updateSelectionUI(true);
+            return;
+          }
+          selectedSkillsSet.add(label);
+        } else {
+          selectedSkillsSet.delete(label);
+        }
+        updateSelectionUI(false);
+      }
+    });
+
+    function buildChart(selectedSkills) {
+      // Clear any existing chart (supports re-running)
+      chartEl.innerHTML = "";
+
+      skillsData.forEach((skill, index) => {
+        const isHighlighted = selectedSkills.includes(skill.label);
+
+        const row = document.createElement("div");
+        row.className = "skill-row";
+        if (isHighlighted) row.classList.add("is-highlighted");
+        row.style.animationDelay = `${index * 80}ms`; // staggered fade-in
+
+        const label = document.createElement("div");
+        label.className = "skill-label";
+        label.textContent = skill.label;
+
+        if (isHighlighted) {
+          const tag = document.createElement("span");
+          tag.className = "user-tag";
+          tag.textContent = "Your priority";
+          label.appendChild(tag);
+        }
+
+        const barWrapper = document.createElement("div");
+        barWrapper.className = "skill-bar-wrapper";
+
+        const barFill = document.createElement("div");
+        barFill.className = "skill-bar-fill";
+        if (isHighlighted) barFill.classList.add("is-highlighted");
+        barFill.dataset.targetWidth = skill.value;
+
+        const value = document.createElement("span");
+        value.className = "skill-value";
+        value.textContent = `${skill.value}%`;
+
+        barFill.appendChild(value);
+        barWrapper.appendChild(barFill);
+
+        row.appendChild(label);
+        row.appendChild(barWrapper);
+
+        chartEl.appendChild(row);
+      });
+    }
+
+    function animateBars() {
+      const barFills = document.querySelectorAll(".skill-bar-fill");
+      barFills.forEach((bar, index) => {
+        const target = bar.dataset.targetWidth;
+        const delay = 250 + index * 120; // overall opening + sequential drawing
+
+        // Reset width before animating
+        bar.style.width = "0";
+
+        setTimeout(() => {
+          bar.style.width = `${target}%`;
+        }, delay);
+      });
+    }
+
+    function startStep3HighlightTimer() {
+      if (step3TimerStarted) return;
+      step3TimerStarted = true;
+
+      step3TimerId = setTimeout(() => {
+        stepPill3.classList.add("is-ready");
+        stepPill3.classList.add("is-glow");
+      }, 5000);
+    }
+
+    function showStep1() {
+      step1El.classList.remove("step--hidden");
+      step2El.classList.add("step--hidden");
+      step3El.classList.add("step--hidden");
+
+      stepPill1.classList.add("is-active");
+      stepPill2.classList.remove("is-active");
+      // Keep stepPill3's ready/glow state as-is if it was already triggered
+    }
+
+    function showStep2() {
+      const selectedSkills = Array.from(selectedSkillsSet);
+
+      // Build descriptive summary
+      if (selectedSkills.length === 0) {
+        selectedSummaryEl.textContent =
+          "You didn’t highlight any specific skills. The chart below shows the full industry view.";
+      } else {
+        const listText = selectedSkills.join(", ");
+        selectedSummaryEl.textContent =
+          `You highlighted: ${listText}. These skills are marked as “Your priority” in the chart below.`;
+      }
+
+      buildChart(selectedSkills);
+      animateBars();
+
+      // Swap steps
+      step1El.classList.add("step--hidden");
+      step2El.classList.remove("step--hidden");
+      step3El.classList.add("step--hidden");
+
+      // Update pills
+      stepPill1.classList.remove("is-active");
+      stepPill2.classList.add("is-active");
+      // Step 3 stays grey initially; timer will light it up
+
+      // Listen for cursor movement within Step 2 to start the 5s timer
+      // (listener only has an effect the first time because of the guard in startStep3HighlightTimer)
+    }
+
+    function showStep3() {
+      // Swap steps
+      step1El.classList.add("step--hidden");
+      step2El.classList.add("step--hidden");
+      step3El.classList.remove("step--hidden");
+
+      // Ensure timer is not pending anymore
+      if (step3TimerId) {
+        clearTimeout(step3TimerId);
+        step3TimerId = null;
+      }
+
+      // Make sure Step 3 pill is lit and glowing
+      stepPill3.classList.add("is-ready");
+      stepPill3.classList.add("is-glow");
+
+      // Update pills
+      stepPill1.classList.remove("is-active");
+      stepPill2.classList.remove("is-active");
+    }
+
+    // Initial active pill
+    stepPill1.classList.add("is-active");
+
+    // Button click -> show chart (Step 2)
+    showInsightsBtn.addEventListener("click", () => {
+      showStep2();
+    });
+
+    // Button click -> go to Step 3
+    goToStep3Btn.addEventListener("click", () => {
+      showStep3();
+    });
+
+    // Step 2 mouse move -> start 5s timer for Step 3 pill highlight
+    step2El.addEventListener("mousemove", () => {
+      // Only matters once Step 2 is visible
+      if (!step2El.classList.contains("step--hidden")) {
+        startStep3HighlightTimer();
+      }
+    });
+
+    // Step pill clicks for going back
+    stepPill1.addEventListener("click", () => {
+      showStep1();
+    });
+
+    // Only allow going back from Step 3 to Step 2 via Step 2 pill
+    stepPill2.addEventListener("click", () => {
+      if (!step3El.classList.contains("step--hidden")) {
+        showStep2();
+      }
+    });
+  </script>
+</body>
+</html>
