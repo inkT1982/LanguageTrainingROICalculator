@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interactive Globe – Intercultural Communication 3D</title>
+  <title id="page-title">Interactive Globe – Intercultural Communication 3D</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -40,12 +41,154 @@
         rgba(255, 255, 255, 0.03) 4px,
         rgba(255, 255, 255, 0.03) 8px
       );
+      min-height: 100vh;
+      height: 100%;
     }
+
+    /* LANGUAGE SWITCH STYLES (Vertical, hidden by default) */
+    #language-switch {
+      position: absolute;
+      top: 24px;
+      right: 2vw;
+      z-index: 10;
+      display: flex;
+      flex-direction: column; 
+      gap: 4px;
+      background: none; 
+      padding: 0;
+      border-radius: 0;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    /* Style for the Globe Toggle Button */
+    #lang-toggle-btn {
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease-out, box-shadow 0.15s ease-out;
+
+      width: 48px;
+      height: 40px;
+      font-size: 18px; /* Globe symbol size */
+      font-weight: 500;
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+    }
+
+    #lang-toggle-btn:hover {
+        background: #fff5ec;
+    }
+
+    #lang-options {
+      display: flex;
+      flex-direction: column; 
+      gap: 4px;
+      margin-top: 4px;
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(4px);
+      /* Transition for smooth display */
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+    }
+
+    #lang-options.hidden {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-5px);
+    }
+    
+    .lang-btn {
+      border: none;
+      background: none;
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease-out, color 0.15s ease-out;
+      width: 48px; 
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .lang-btn:not(.active):hover {
+      background: rgba(255, 121, 0, 0.1);
+    }
+
+    /* *** TOOLTIP STYLES *** */
+    .tooltip {
+      position: fixed; 
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.92);
+      color: #333333;
+      padding: 12px 18px;
+      font-size: 15px;
+      border-radius: 10px;
+      opacity: 0;
+      transform: translate(0, 0);
+      transition: opacity 0.12s ease-out;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 9999;
+      max-width: 360px; /* Standard max-width on desktop */
+      white-space: normal;
+      backdrop-filter: blur(4px);
+      top: 0;
+      left: 0;
+      display: none;
+    }
+
+    .tooltip-country {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 18px; /* INCREASED GAP */
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #222222;
+    }
+
+    .tooltip-metric {
+      margin-top: 14px; /* Slightly increased gap between metrics */
+      padding-left: 10px;
+      border-left: 4px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .tooltip-metric-title {
+      font-weight: 900; /* BOLDER */
+      font-size: 15px; /* Slightly increased */
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #111111; /* Darker color */
+      margin-bottom: 3px; /* Small gap below title */
+    }
+
+    .tooltip-metric-text {
+      font-size: 13.5px; /* Slightly smaller for better hierarchy */
+      line-height: 1.5;
+      color: #555555;
+    }
+    
+    /* Remaining Styles */
 
     .page {
       min-height: 100vh;
+      height: 100%;
       padding: 32px 2vw 40px;
       display: flex;
+      flex-direction: column; /* Added to accommodate the footer */
     }
 
     main {
@@ -53,9 +196,9 @@
       display: flex;
       flex-direction: column;
       gap: 32px;
+      height: 100%;
     }
 
-    /* HERO: header + subtitle + map */
     .hero {
       flex: 1;
       width: 100%;
@@ -65,15 +208,15 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 16px;
+      min-height: min(100vh, 900px);
     }
 
-    /* HEADER */
     .page-header {
       width: 100%;
       max-width: 1200px;
       margin: 0 0 8px;
       padding-bottom: 0;
-      text-align: left; /* left-align eyebrow + title */
+      text-align: left;
     }
 
     .eyebrow {
@@ -85,23 +228,23 @@
       margin-bottom: 8px;
     }
 
+    /* TITLE SIZE ADJUSTMENT (15% smaller) */
     .page-header h1 {
       margin: 0;
-      font-size: clamp(2.3rem, 3vw, 3rem);
+      font-size: clamp(1.95rem, 2.55vw, 2.55rem);
       font-weight: 900;
       line-height: 1.15;
       color: #222222;
     }
 
-    /* removed orange line under the title */
     .header-rule {
       display: none;
     }
 
-    /* SUBTITLE */
+    /* SUBTITLE SIZE ADJUSTMENT (15% smaller) */
     .subtitle-block {
       max-width: 1200px;
-      font-size: 1.25rem;
+      font-size: 1.0625rem; 
       line-height: 1.3;
       text-align: left;
       margin-bottom: 1.5rem;
@@ -117,14 +260,14 @@
       color: #333333;
     }
 
-    /* MAP SECTION – full-width, tall, globe cropped at bottom */
     #map-section {
       width: 100%;
       max-width: none;
       margin: 16px 0 0;
       position: relative;
-      height: min(80vh, 900px);
-      overflow: hidden;
+      /* Adjusted for better desktop/large screen experience */
+      height: min(80vh, 900px); 
+      overflow: hidden; 
 
       border-radius: 0;
       box-shadow: none;
@@ -133,14 +276,6 @@
 
       align-self: stretch;
       margin-top: auto;
-      
-      /* New: Add a gradient mask to fade the bottom crop line */
-      mask-image: linear-gradient(
-        to bottom,
-        black 0%,      /* Full opacity from the top */
-        black 85%,     /* Full opacity down to 85% of the height */
-        transparent 100% /* Fade to transparent from 85% to 100% of the height */
-      );
     }
 
     #map-container {
@@ -153,14 +288,12 @@
       width: 100%;
       height: 100%;
       cursor: grab;
-      touch-action: none; /* better mobile drag */
+      touch-action: none; 
     }
 
     svg:active {
       cursor: grabbing;
     }
-
-    .globe-sphere { /* ocean styled via gradient */ }
 
     .graticule {
       fill: none;
@@ -182,109 +315,34 @@
       stroke: #f0f0f0;
       transform: translateY(-0.5px);
     }
-
-    /* TOOLTIP (slightly transparent) */
-    .tooltip {
-      position: absolute;
-      pointer-events: none;
-      background: rgba(255, 255, 255, 0.92);
-      color: #333333;
-      padding: 12px 18px;
-      font-size: 15px;
-      border-radius: 10px;
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: opacity 0.12s ease-out;
-      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: 10;
-      max-width: 360px;
-      white-space: normal;
-      backdrop-filter: blur(4px);
-    }
-
-    .tooltip-country {
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #222222;
-    }
-
-    .tooltip-metric {
-      margin-top: 12px;
-      padding-left: 10px;
-      border-left: 4px solid rgba(0, 0, 0, 0.15);
-    }
-
-    .tooltip-metric-title {
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      color: #222222; /* overridden inline per metric color */
-    }
-
-    .tooltip-metric-text {
-      font-size: 14px;
-      line-height: 1.55;
-      color: #555555;
-    }
-
-    .map-label {
-      position: absolute;
-      top: 16px;
-      right: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #444444;
-    }
-
-    .map-label-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    /* ZOOM + RESET CONTROLS – horizontal row */
+    
+    /* ZOOM + RESET + PAUSE CONTROLS (Updated font size for consistency) */
     .zoom-controls {
       position: absolute;
       left: 18px;
-      top: 18px;
+      top: 18px; 
+      bottom: auto; 
       display: inline-flex;
-      flex-direction: row; /* HORIZONTAL */
-      gap: 6px;
-      padding: 6px;
+      flex-direction: row; 
+      gap: 8px; 
+      padding: 8px; 
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
+      background: none;
+      box-shadow: none;
+      border: none;
+      backdrop-filter: none;
       z-index: 5;
     }
 
     .zoom-btn {
       border: none;
-      width: 32px;
-      height: 32px;
+      width: 40px; 
+      height: 40px; 
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 22px; /* Unified size for all desktop symbols */
       font-weight: 600;
       cursor: pointer;
       background: #ffffff;
@@ -304,356 +362,160 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
+    /* Keep specific symbol size if needed, but the main one should cover it */
     .zoom-reset {
-      font-size: 16px;
+        font-size: 20px; /* Slightly smaller for the loop symbol */
     }
-
-    /* INFO BOXES WRAPPER – hidden now */
-    .info-grid-wrapper {
-      display: none;
+    
+    /* *** NEW STYLES FOR SOURCES FOOTER *** */
+    .page-footer {
+      width: 100%;
+      max-width: 1300px;
+      margin: 20px auto 0;
+      padding: 20px 0 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
-
-    /* kept for potential future re-use */
-    .info-grid-header {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999999;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    
+    .sources {
+      font-size: 11.5px; /* Small font */
+      line-height: 1.4;
+      color: #888888; /* Grey font */
+      margin: 0;
     }
-
-    .info-grid-header::before {
-      content: "";
-      display: inline-block;
-      width: 30px;
-      height: 2px;
-      background: var(--accent);
-      border-radius: 999px;
+    
+    .sources a {
+      color: #888888;
+      text-decoration: underline;
+      transition: color 0.15s;
     }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-      align-items: stretch;
+    
+    .sources a:hover {
+        color: var(--accent);
     }
-
-    .info-card {
-      display: flex;
-      flex-direction: column;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #ffffff;
-      border-width: 2px;
-      border-style: solid;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
-    }
-
-    .info-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.09);
-    }
-
-    .info-card-title {
-      padding: 10px 14px 9px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #ffffff;
-    }
-
-    .info-card-body {
-      padding: 14px 14px 16px;
-      font-size: 15px;
-      line-height: 1.55;
-      color: var(--text-main);
-    }
-
-    /* Color themes */
-    .card-group-culture { border-color: #cd5b00; }
-    .card-group-culture .info-card-title { background: #cd5b00; }
-
-    .card-individual-culture { border-color: #ff7900; }
-    .card-individual-culture .info-card-title { background: #ff7900; }
-
-    .card-speaking-implicity { border-color: #03649f; }
-    .card-speaking-implicity .info-card-title { background: #03649f; }
-
-    .card-explicit-language { border-color: #038bc7; }
-    .card-explicit-language .info-card-title { background: #038bc7; }
-
-    .card-hierarchical-culture { border-color: #d79d00; }
-    .card-hierarchical-culture .info-card-title { background: #d79d00; }
-
-    .card-focus-time { border-color: #98bc36; }
-    .card-focus-time .info-card-title { background: #98bc36; }
-
-    .card-focus-task { border-color: #70940e; }
-    .card-focus-task .info-card-title { background: #70940e; }
-
-    .card-culture-uncertainty { border-color: #039a82; }
-    .card-culture-uncertainty .info-card-title { background: #039a82; }
-
-    .card-change-management { border-color: #036f64; }
-    .card-change-management .info-card-title { background: #036f64; }
-
-    .card-informal-culture { border-color: #f5c500; }
-    .card-informal-culture .info-card-title { background: #f5c500; }
-
-    /* DESKTOP-ish */
-    @media (max-width: 1100px) {
-      #map-section {
-        height: min(70vh, 800px);
-      }
-
-      .info-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 900px) {
-      .page {
-        padding: 24px 4vw 32px;
-      }
-
-      .page-header h1 {
-        font-size: clamp(2rem, 6vw, 2.4rem);
-      }
-
-      #map-section {
-        width: 100%;
-        height: 65vh;
-      }
-
-      .info-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    /* TABLET / LARGE PHONE – make hero fill the viewport more like history.valyu.ai */
+    /* ---------------------------------
+       UNIVERSAL RESPONSIVENESS REFINEMENTS
+       --------------------------------- */
     @media (max-width: 700px) {
-      body {
-        font-size: 15px;
-      }
-
       .page {
-        padding: 20px 4vw 24px;
-        min-height: 100vh;
+        padding: 16px 4vw 20px; /* Tighter padding on mobile */
       }
-
-      .hero {
-        min-height: calc(100vh - 40px);
-        gap: 12px;
-        justify-content: flex-start;
+      /* Title and Subtitle */
+      .page-header h1 {
+        font-size: clamp(1.6rem, 6.5vw, 2.2rem); 
       }
-
       .subtitle-block {
-        font-size: 1.05rem;
-        line-height: 1.45;
-        margin-bottom: 0.9rem;
+        font-size: 1rem; /* Base 16px on mobile */
+        margin-bottom: 1rem;
       }
-
+      
+      /* Map Section Flexibility */
       #map-section {
-        margin-top: auto;
-        height: 60vh;
+        height: 75vh; /* Use 75% of viewport height */
+        min-height: 300px; /* Prevent collapse on content-heavy screens */
+        margin-top: 8px;
       }
 
-      .map-label {
-        top: 12px;
-        right: 12px;
-        font-size: 11px;
-        padding: 6px 10px;
-      }
-
+      /* Controls Tighter Positioning */
       .zoom-controls {
-        left: 12px;
-        top: auto;
-        bottom: 16px;              /* controls lower for thumb reach */
-        padding: 4px 6px;
+        left: 8px; 
+        top: 8px;              
+        gap: 6px; 
+        padding: 6px;
       }
-
       .zoom-btn {
-        width: 30px;
-        height: 30px;
+        width: 36px; 
+        height: 36px; 
+        font-size: 18px; /* Mobile font size */
+      }
+      /* Reduce size for reset symbol on mobile */
+      .zoom-reset {
         font-size: 16px;
       }
-
-      .zoom-reset {
-        font-size: 14px;
+      
+      /* Language Switch Tighter Positioning */
+      #language-switch {
+        top: 10px;
+        right: 4vw;
       }
-
+      #lang-toggle-btn {
+        width: 40px; 
+        height: 32px;
+        font-size: 16px;
+      }
+      #lang-options {
+        padding: 3px;
+        margin-top: 3px;
+      }
+      .lang-btn {
+        font-size: 12px;
+        padding: 4px 6px;
+        width: 40px; 
+      }
+      
+      /* Tooltip full width usage */
       .tooltip {
         padding: 10px 14px;
         font-size: 14px;
-        max-width: 280px;
+        max-width: 90vw; 
       }
-
-      .tooltip-country {
-        font-size: 15px;
+      
+      /* Mobile source text */
+      .page-footer {
+        padding-top: 15px;
       }
-
-      .tooltip-metric-title {
-        font-size: 13px;
-      }
-
-      .tooltip-metric-text {
-        font-size: 13px;
-      }
-    }
-
-    /* SMALL PHONES */
-    @media (max-width: 480px) {
-      .hero {
-        gap: 10px;
-      }
-
-      .page-header h1 {
-        font-size: clamp(1.8rem, 7vw, 2.2rem);
-      }
-
-      .subtitle-block {
-        font-size: 1rem;
-      }
-
-      #map-section {
-        height: 58vh;
-      }
-
-      .map-label {
-        max-width: 65%;
-        line-height: 1.3;
-      }
-
-      .zoom-controls {
-        gap: 4px;
-        bottom: 14px;
-      }
-
-      .zoom-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 15px;
+      .sources {
+        font-size: 10.5px;
       }
     }
   </style>
 </head>
 
 <body>
+  <div id="language-switch">
+    <button id="lang-toggle-btn" class="lang-btn toggle-btn" title="Select Language">🌐</button>
+    
+    <div id="lang-options" class="lang-options hidden">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="de">DE</button>
+    </div>
+  </div>
+  
+  <div id="tooltip" class="tooltip"></div> 
+
   <div class="page">
     <main>
       <section class="hero">
         <header class="page-header">
-          <div class="eyebrow">Infographic</div>
-          <h1>A Survival Guide for Intercultural Communication</h1>
+          <div class="eyebrow" id="text-eyebrow"></div>
+          <h1 id="text-header"></h1>
           <div class="header-rule"></div>
         </header>
 
         <section class="subtitle-block">
-          <p>
-            Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of
-            <strong>Intercultural Communication.</strong>
-          </p>
+          <p id="text-subtitle"></p>
         </section>
 
+        <div id="globe-diagnostics" style="font-family: sans-serif; font-size: 14px; 
+             background: #111; color: #fff; padding: 12px; margin: 0 0 16px 0; border-radius: 6px; display:none;">
+        </div>
+        
         <section id="map-section">
           <div id="map-container"></div>
-          <div id="tooltip" class="tooltip"></div>
-
-          <div class="map-label">
-            <span class="map-label-dot"></span>
-            <span>Global communication landscape</span>
-          </div>
-
+          
           <div class="zoom-controls">
-            <button class="zoom-btn" data-zoom="in" type="button">+</button>
-            <button class="zoom-btn" data-zoom="out" type="button">−</button>
-            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
+            <button class="zoom-btn zoom-pause-toggle" id="pause-toggle-btn" type="button" title="Stop spinning">&#x25A0;</button>
+            <button class="zoom-btn" data-zoom="in" type="button" title="Zoom In">&#x2295;</button>
+            <button class="zoom-btn" data-zoom="out" type="button" title="Zoom Out">&#x2296;</button>
+            <button class="zoom-btn zoom-reset" id="reset-btn" type="button" title="Reset globe">⟲</button>
           </div>
         </section>
       </section>
-
-      <section class="info-grid-wrapper">
-        <div class="info-grid-header">Key intercultural dimensions</div>
-
-        <div class="info-grid">
-          <div class="info-card card-group-culture">
-            <div class="info-card-title">Group Culture</div>
-            <div class="info-card-body">
-              The group, or “we,” has priority. This leads to relationships that are based on greater loyalty and selectivity.
-            </div>
-          </div>
-
-          <div class="info-card card-individual-culture">
-            <div class="info-card-title">Individual Culture</div>
-            <div class="info-card-body">
-              The focus is on the individual, i.e. his/her wellbeing and individual will. The “I” and self-expression take priority.
-            </div>
-          </div>
-
-          <div class="info-card card-speaking-implicity">
-            <div class="info-card-title">Speaking Implicity</div>
-            <div class="info-card-body">
-              Here, the content of the messages is somewhat veiled. More is implied than understood. A “yes” might actually just be a polite acknowledgement.
-            </div>
-          </div>
-
-          <div class="info-card card-explicit-language">
-            <div class="info-card-title">Explicit Language</div>
-            <div class="info-card-body">
-              Explicit language is very direct: a yes is a yes, a no is a no.
-            </div>
-          </div>
-
-          <div class="info-card card-hierarchical-culture">
-            <div class="info-card-title">Hierarchical Culture</div>
-            <div class="info-card-body">
-              Hierarchy is still very important here: communication depends on who you are speaking to and/or who is speaking to you.
-            </div>
-          </div>
-
-          <div class="info-card card-focus-time">
-            <div class="info-card-title">Focus on Time</div>
-            <div class="info-card-body">
-              Monochronic cultures prioritize sticking to a specific timeframe.
-            </div>
-          </div>
-
-          <div class="info-card card-focus-task">
-            <div class="info-card-title">Focus on Task</div>
-            <div class="info-card-body">
-              Polychronic cultures focus on completing the task; the timeframe is less important, even if it means delays.
-            </div>
-          </div>
-
-          <div class="info-card card-culture-uncertainty">
-            <div class="info-card-title">Culture of Uncertainty</div>
-            <div class="info-card-body">
-              People accept the unknown and changes more calmly. The rules are more flexible.
-            </div>
-          </div>
-
-          <div class="info-card card-change-management">
-            <div class="info-card-title">Change Management</div>
-            <div class="info-card-body">
-              Changes can feel threatening. To counteract this, strict rules are established, increasing motivation.
-            </div>
-          </div>
-
-          <div class="info-card card-informal-culture">
-            <div class="info-card-title">Informal Culture</div>
-            <div class="info-card-body">
-              People accept uncertainty and change more calmly. Rules tend to be flexible and open.
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
+    
+    <footer class="page-footer">
+        <p class="sources" id="text-sources"></p>
+    </footer>
+    
   </div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -663,231 +525,300 @@
     const container = d3.select("#map-container");
     const tooltip = d3.select("#tooltip");
     const svg = container.append("svg");
+    const svgNode = svg.node(); 
+    let currentLang = 'en';
 
-    // ----- METRIC DEFINITIONS -----
-    const metrics = {
-      group_culture: {
-        title: "Group Culture",
-        color: "#cd5b00",
-        description:
-          "The group, or “we,” has priority. Relationships are based on loyalty and selectivity."
-      },
-      individual_culture: {
-        title: "Individual Culture",
-        color: "#ff7900",
-        description:
-          "The focus is on the individual and self-expression. Personal goals take priority."
-      },
-      speaking_implicity: {
-        title: "Speaking Implicity",
-        color: "#03649f",
-        description:
-          "Messages are veiled; more is implied than said. A “yes” might simply be polite."
-      },
-      explicit_language: {
-        title: "Explicit Language",
-        color: "#038bc7",
-        description:
-          "Communication is direct: a yes is a yes, a no is a no."
-      },
-      hierarchical_culture: {
-        title: "Hierarchical Culture",
-        color: "#d79d00",
-        description:
-          "Hierarchy matters greatly and shapes how people speak and who speaks first."
-      },
-      informal_culture: {
-        title: "Informal Culture",
-        color: "#f5c500",
-        description:
-          "An informal setting where uncertainty and change are handled calmly and casually."
-      },
-      focus_time: {
-        title: "Focus on Time",
-        color: "#98bc36",
-        description:
-          "Monochronic cultures prioritize sticking to a specific timeframe."
-      },
-      culture_uncertainty: {
-        title: "Culture of Uncertainty",
-        color: "#039a82",
-        description:
-          "People accept the unknown and change more calmly. Rules are more flexible."
-      },
-      change_management: {
-        title: "Change Management",
-        color: "#036f64",
-        description:
-          "Change can feel threatening; strict rules help people feel in control and motivated."
-      },
-      focus_task: {
-        title: "Focus on Task",
-        color: "#70940e",
-        description:
-          "Polychronic cultures prioritize completing the task, even if this means delays."
-      }
+    // *** LANGUAGE DATA STRUCTURE ***
+    const languageData = {
+        en: {
+            title: "Interactive Globe – Intercultural Communication 3D",
+            eyebrow: "Infographic",
+            header: "A Survival Guide for Intercultural Communication",
+            subtitle: "Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of Intercultural Communication. <strong>Click any country on the globe to reveal its behavioral pattern.</strong>",
+            stopTitle: "Stop spinning",
+            startTitle: "Start spinning",
+            resetTitle: "Reset globe",
+            tooltipNoData: "No data for this country in this analysis.",
+            tooltipNoMetrics: "This country is included in the matrix, but no metrics are ticked.",
+            sources: 'Sources: “Interethnic communication” John Gumperz, “Cultures and organizations: Software of the Mind” Hofsted, Various works by Edward T. Hall, <a href="https://www.acc.com/sites/default/files/2021-08/Presentation%20The%20culture%20map-%20Breaking%20through%20the%20invisible%20boundaries%20of%20global%20business%20.pdf" target="_blank">The culture map - Breaking through the invisible boundaries of global business (PDF)</a>.',
+            metrics: {
+                group_culture: {
+                    title: "Group Culture",
+                    color: "#cd5b00",
+                    description: "The group, or “we,” has priority. Relationships are based on loyalty and selectivity."
+                },
+                individual_culture: {
+                    title: "Individual Culture",
+                    color: "#ff7900",
+                    description: "The focus is on the individual and self-expression. Personal goals take priority."
+                },
+                speaking_implicity: {
+                    title: "Speaking Implicity",
+                    color: "#03649f",
+                    description: "Messages are veiled; more is implied than said. A “yes” might simply be polite."
+                },
+                explicit_language: {
+                    title: "Explicit Language",
+                    color: "#038bc7",
+                    description: "Communication is direct: a yes is a yes, a no is a no."
+                },
+                hierarchical_culture: {
+                    title: "Hierarchical Culture",
+                    color: "#d79d00",
+                    description: "Hierarchy matters greatly and shapes how people speak and who speaks first."
+                },
+                informal_culture: {
+                    title: "Informal Culture",
+                    color: "#f5c500",
+                    description: "An informal setting where uncertainty and change are handled calmly and casually."
+                },
+                focus_time: {
+                    title: "Focus on Time",
+                    color: "#98bc36",
+                    description: "Monochronic cultures prioritize sticking to a specific timeframe."
+                },
+                culture_uncertainty: {
+                    title: "Culture of Uncertainty",
+                    color: "#039a82",
+                    description: "People accept the unknown and change more calmly. Rules are more flexible."
+                },
+                change_management: {
+                    title: "Change Management",
+                    color: "#036f64",
+                    description: "Change can feel threatening; strict rules help people feel in control and motivated."
+                },
+                focus_task: {
+                    title: "Focus on Task",
+                    color: "#70940e",
+                    description: "Polychronic cultures prioritize completing the task, even if this means delays."
+                }
+            }
+        },
+        de: {
+            title: "Interaktiver Globus – Interkulturelle Kommunikation 3D",
+            eyebrow: "Infografik",
+            header: "Ein Überlebensleitfaden für Interkulturelle Kommunikation",
+            subtitle: "Haben Sie sich jemals in einem Gespräch missverstanden gefühlt? Machen Sie sich keine Sorgen, das liegt nicht immer an schlechter Grammatik oder fehlendem Vokabular; es ist oft einfach eine Frage der Interkulturellen Kommunikation. <strong>Klicken Sie auf ein Land auf dem Globus, um dessen Verhaltensmuster anzuzeigen.</strong>",
+            stopTitle: "Drehen stoppen",
+            startTitle: "Drehen starten",
+            resetTitle: "Globus zurücksetzen",
+            tooltipNoData: "Keine Daten für dieses Land in dieser Analyse.",
+            tooltipNoMetrics: "Dieses Land ist in der Matrix enthalten, aber es sind keine Kennzahlen markiert.",
+            sources: 'Quellen: „Interethnic communication“ John Gumperz, „Cultures and organizations: Software of the Mind“ Hofsted, Verschiedene Werke von Edward T. Hall, <a href="https://www.acc.com/sites/default/files/2021-08/Presentation%20The%20culture%20map-%20Breaking%20through%20the%20invisible%20boundaries%20of%20global%20business%20.pdf" target="_blank">The culture map - Breaking through the invisible boundaries of global business (PDF)</a>.',
+            metrics: {
+                group_culture: {
+                    title: "Gruppenkultur",
+                    color: "#cd5b00",
+                    description: "Die Gruppe, oder „wir“, hat Priorität. Beziehungen basieren auf Loyalität und Selektivität."
+                },
+                individual_culture: {
+                    title: "Individualkultur",
+                    color: "#ff7900",
+                    description: "Der Fokus liegt auf dem Individuum und der Selbstentfaltung. Persönliche Ziele haben Vorrang."
+                },
+                speaking_implicity: {
+                    title: "Implizite Sprache",
+                    color: "#03649f",
+                    description: "Botschaften sind verschleiert; es wird mehr impliziert als gesagt. Ein „Ja“ kann einfach nur höflich sein."
+                },
+                explicit_language: {
+                    title: "Explizite Sprache",
+                    color: "#038bc7",
+                    description: "Die Kommunikation ist direkt: Ein Ja ist ein Ja, ein Nein ist ein Nein."
+                },
+                hierarchical_culture: {
+                    title: "Hierarchische Kultur",
+                    color: "#d79d00",
+                    description: "Hierarchie ist von großer Bedeutung und prägt, wie Menschen sprechen und wer zuerst spricht."
+                },
+                informal_culture: {
+                    title: "Informelle Kultur",
+                    color: "#f5c500",
+                    description: "Ein informelles Umfeld, in dem Unsicherheit und Wandel gelassen und zwanglos gehandhabt werden."
+                },
+                focus_time: {
+                    title: "Zeitfokus",
+                    color: "#98bc36",
+                    description: "Monochrone Kulturen legen Wert darauf, sich an einen bestimmten Zeitrahmen zu halten."
+                },
+                culture_uncertainty: {
+                    title: "Unsicherheitskultur",
+                    color: "#039a82",
+                    description: "Menschen akzeptieren das Unbekannte und Veränderungen gelassener. Regeln sind flexibler."
+                },
+                change_management: {
+                    title: "Umgang mit Veränderungen",
+                    color: "#036f64",
+                    description: "Veränderungen können bedrohlich wirken; strenge Regeln helfen den Menschen, sich kontrolliert und motiviert zu fühlen."
+                },
+                focus_task: {
+                    title: "Aufgabenfokus",
+                    color: "#70940e",
+                    description: "Polychrone Kulturen legen Wert darauf, die Aufgabe zu erledigen, auch wenn dies zu Verzögerungen führt."
+                }
+            }
+        }
     };
 
-    // ----- COUNTRY → METRICS MAPPING -----
+
+    // ----- COUNTRY → METRICS MAPPING (Unchanged) -----
     const countryMetrics = {
-      "Afghanistan": ["speaking_implicity","focus_task"],
-      "Algeria": ["speaking_implicity","focus_task"],
-      "Angola": ["speaking_implicity","focus_task"],
-      "Argentina": ["speaking_implicity"],
-      "Australia": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"],
-      "Austria": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Azerbaijan": ["group_culture","speaking_implicity","focus_task"],
-      "Bangladesh": ["group_culture","speaking_implicity","focus_task"],
-      "Belarus": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Belgium": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Bolivia": ["group_culture","speaking_implicity","focus_task"],
-      "Bosnia and Herzegovina": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Botswana": ["group_culture","speaking_implicity","focus_task"],
-      "Brazil": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "Bulgaria": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Burkina Faso": ["group_culture","speaking_implicity","focus_task"],
-      "Burundi": ["group_culture","speaking_implicity","focus_task"],
-      "Cambodia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Cameroon": ["group_culture","speaking_implicity","focus_task"],
-      "Canada": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Central African Republic": ["group_culture","speaking_implicity","focus_task"],
-      "Chad": ["group_culture","speaking_implicity","focus_task"],
-      "Chile": ["group_culture","speaking_implicity"],
-      "China": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Colombia": ["group_culture","speaking_implicity","focus_task"],
-      "Congo": ["group_culture","speaking_implicity","focus_task"],
-      "Costa Rica": ["group_culture","speaking_implicity","focus_task"],
-      "Croatia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Cuba": ["group_culture","speaking_implicity","focus_task"],
-      "Czech Republic": ["individual_culture","explicit_language","focus_time"],
-      "Denmark": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Dominican Republic": ["group_culture","speaking_implicity","focus_task"],
-      "DR Congo": ["group_culture","speaking_implicity","focus_task"],
-      "Ecuador": ["group_culture","speaking_implicity"],
-      "Egypt": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "El Salvador": ["group_culture","speaking_implicity","focus_task"],
-      "Equatorial Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Eritrea": ["group_culture","speaking_implicity","focus_task"],
-      "Estonia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Ethiopia": ["group_culture","speaking_implicity","focus_task"],
-      "Finland": ["individual_culture","explicit_language","focus_time"],
-      "France": ["individual_culture","explicit_language","informal_culture","focus_time"],
-      "Gabon": ["group_culture","speaking_implicity","focus_task"],
-      "Gambia": ["group_culture","speaking_implicity","focus_task"],
-      "Georgia": ["group_culture","speaking_implicity","focus_task"],
-      "Germany": ["individual_culture","explicit_language","focus_time","culture_uncertainty","focus_task"],
-      "Ghana": ["group_culture","speaking_implicity","focus_task"],
-      "Greece": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Guatemala": ["group_culture","speaking_implicity","focus_task"],
-      "Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Guinea Bissau": ["group_culture","speaking_implicity","focus_task"],
-      "Guyana": ["group_culture","speaking_implicity","focus_task"],
-      "Haiti": ["group_culture","speaking_implicity","focus_task"],
-      "Honduras": ["group_culture","speaking_implicity","focus_task"],
-      "Hungary": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Iceland": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "India": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Indonesia": ["group_culture","speaking_implicity","focus_task"],
-      "Iran": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Iraq": ["group_culture","speaking_implicity","focus_task"],
-      "Ireland": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Israel": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Italy": ["group_culture","speaking_implicity","informal_culture","focus_time"],
-      "Ivory Coast": ["group_culture","speaking_implicity","focus_task"],
-      "Jamaica": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "Japan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Jordan": ["group_culture","speaking_implicity","focus_task"],
-      "Kazakhstan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Kenya": ["group_culture","speaking_implicity","focus_task"],
-      "Kuwait": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Kyrgyzstan": ["group_culture","speaking_implicity","focus_task"],
-      "Laos": ["group_culture","speaking_implicity","focus_task"],
-      "Latvia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Lebanon": ["group_culture","speaking_implicity","focus_task"],
-      "Lesotho": ["group_culture","speaking_implicity","focus_task"],
-      "Liberia": ["group_culture","speaking_implicity","focus_task"],
-      "Libya": ["group_culture","speaking_implicity","focus_task"],
-      "Lithuania": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Luxembourg": ["individual_culture","explicit_language","focus_time"],
-      "Macedonia": ["group_culture","speaking_implicity","focus_task"],
-      "Madagascar": ["group_culture","speaking_implicity","focus_task"],
-      "Malawi": ["group_culture","speaking_implicity","focus_task"],
-      "Malaysia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Mali": ["group_culture","speaking_implicity","focus_task"],
-      "Mauritania": ["group_culture","speaking_implicity","focus_task"],
-      "Mexico": ["group_culture","speaking_implicity","focus_task"],
-      "Moldova": ["group_culture","speaking_implicity","focus_task"],
-      "Mongolia": ["group_culture","speaking_implicity","focus_task"],
-      "Montenegro": ["group_culture","speaking_implicity","focus_task"],
-      "Morocco": ["group_culture","speaking_implicity","focus_task"],
-      "Mozambique": ["group_culture","speaking_implicity","focus_task"],
-      "Myanmar": ["group_culture","speaking_implicity","focus_task"],
-      "Namibia": ["group_culture","speaking_implicity","focus_task"],
-      "Nepal": ["group_culture","speaking_implicity","focus_task"],
-      "Netherlands": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "New Zealand": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "Nicaragua": ["group_culture","speaking_implicity","focus_task"],
-      "Niger": ["group_culture","speaking_implicity","focus_task"],
-      "Nigeria": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "North Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Norway": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Oman": ["group_culture","speaking_implicity","focus_task"],
-      "Pakistan": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Panama": ["group_culture","speaking_implicity","focus_task"],
-      "Papua New Guinea": ["group_culture","speaking_implicity","focus_task"],
-      "Paraguay": ["group_culture","speaking_implicity"],
-      "Peru": ["group_culture","speaking_implicity","focus_task"],
-      "Philippines": ["group_culture","speaking_implicity","focus_task"],
-      "Poland": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Portugal": ["group_culture","speaking_implicity","focus_time","focus_task"],
-      "Puerto Rico": ["group_culture","speaking_implicity","focus_task"],
-      "Qatar": ["group_culture","speaking_implicity","focus_task"],
-      "Romania": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Russia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Rwanda": ["group_culture","speaking_implicity","focus_task"],
-      "Saudi Arabia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Senegal": ["group_culture","speaking_implicity","focus_task"],
-      "Serbia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "Sierra Leone": ["group_culture","speaking_implicity","focus_task"],
-      "Slovakia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Slovenia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"],
-      "Somalia": ["group_culture","speaking_implicity","focus_task"],
-      "South Africa": ["group_culture","speaking_implicity","informal_culture","focus_task"],
-      "South Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "South Sudan": ["group_culture","speaking_implicity","focus_task"],
-      "Spain": ["group_culture","speaking_implicity","informal_culture","focus_time","focus_task"],
-      "Sri Lanka": ["group_culture","speaking_implicity","focus_task"],
-      "Sudan": ["group_culture","speaking_implicity","focus_task"],
-      "Suriname": ["group_culture","speaking_implicity","focus_task"],
-      "Swaziland": ["group_culture","speaking_implicity","focus_task"],
-      "Sweden": ["individual_culture","explicit_language","culture_uncertainty","focus_task"],
-      "Switzerland": ["individual_culture","explicit_language","focus_time"],
-      "Syria": ["group_culture","speaking_implicity","focus_task"],
-      "Taiwan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"],
-      "Tajikistan": ["group_culture","speaking_implicity","focus_task"],
-      "Tanzania": ["group_culture","speaking_implicity","focus_task"],
-      "Thailand": ["group_culture","speaking_implicity","focus_task"],
-      "Togo": ["group_culture","speaking_implicity","focus_task"],
-      "Trinidad and Tobago": ["group_culture","speaking_implicity","focus_task"],
-      "Tunisia": ["group_culture","speaking_implicity","focus_task"],
-      "Turkey": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "Turkmenistan": ["group_culture","speaking_implicity","focus_task"],
-      "Uganda": ["group_culture","speaking_implicity","focus_task"],
-      "Ukraine": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"],
-      "United Arab Emirates": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"],
-      "United Kingdom": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"],
-      "United States": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"],
-      "Uruguay": ["group_culture","speaking_implicity","focus_task"],
-      "Uzbekistan": ["group_culture","speaking_implicity","focus_task"],
-      "Venezuela": ["group_culture","speaking_implicity","focus_task"],
-      "Vietnam": ["group_culture","speaking_implicity","focus_task"],
-      "Western Sahara": ["group_culture","speaking_implicity","focus_task"],
-      "Yemen": ["group_culture","speaking_implicity","focus_task"],
-      "Zambia": ["group_culture","speaking_implicity","focus_task"],
+      "Afghanistan": ["speaking_implicity","focus_task"], "Algeria": ["speaking_implicity","focus_task"], 
+      "Angola": ["speaking_implicity","focus_task"], "Argentina": ["speaking_implicity"], 
+      "Australia": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"], 
+      "Austria": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Azerbaijan": ["group_culture","speaking_implicity","focus_task"], 
+      "Bangladesh": ["group_culture","speaking_implicity","focus_task"], 
+      "Belarus": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Belgium": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Bolivia": ["group_culture","speaking_implicity","focus_task"], 
+      "Bosnia and Herzegovina": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Botswana": ["group_culture","speaking_implicity","focus_task"], 
+      "Brazil": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "Bulgaria": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Burkina Faso": ["group_culture","speaking_implicity","focus_task"], 
+      "Burundi": ["group_culture","speaking_implicity","focus_task"], 
+      "Cambodia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Cameroon": ["group_culture","speaking_implicity","focus_task"], 
+      "Canada": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Central African Republic": ["group_culture","speaking_implicity","focus_task"], 
+      "Chad": ["group_culture","speaking_implicity","focus_task"], 
+      "Chile": ["group_culture","speaking_implicity"], 
+      "China": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Colombia": ["group_culture","speaking_implicity","focus_task"], 
+      "Congo": ["group_culture","speaking_implicity","focus_task"], 
+      "Costa Rica": ["group_culture","speaking_implicity","focus_task"], 
+      "Croatia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Cuba": ["group_culture","speaking_implicity","focus_task"], 
+      "Czech Republic": ["individual_culture","explicit_language","focus_time"], 
+      "Denmark": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Dominican Republic": ["group_culture","speaking_implicity","focus_task"], 
+      "DR Congo": ["group_culture","speaking_implicity","focus_task"], 
+      "Ecuador": ["group_culture","speaking_implicity"], 
+      "Egypt": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "El Salvador": ["group_culture","speaking_implicity","focus_task"], 
+      "Equatorial Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Eritrea": ["group_culture","speaking_implicity","focus_task"], 
+      "Estonia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Ethiopia": ["group_culture","speaking_implicity","focus_task"], 
+      "Finland": ["individual_culture","explicit_language","focus_time"], 
+      "France": ["individual_culture","explicit_language","informal_culture","focus_time"], 
+      "Gabon": ["group_culture","speaking_implicity","focus_task"], 
+      "Gambia": ["group_culture","speaking_implicity","focus_task"], 
+      "Georgia": ["group_culture","speaking_implicity","focus_task"], 
+      "Germany": ["individual_culture","explicit_language","focus_time","culture_uncertainty","focus_task"], 
+      "Ghana": ["group_culture","speaking_implicity","focus_task"], 
+      "Greece": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Guatemala": ["group_culture","speaking_implicity","focus_task"], 
+      "Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Guinea Bissau": ["group_culture","speaking_implicity","focus_task"], 
+      "Guyana": ["group_culture","speaking_implicity","focus_task"], 
+      "Haiti": ["group_culture","speaking_implicity","focus_task"], 
+      "Honduras": ["group_culture","speaking_implicity","focus_task"], 
+      "Hungary": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Iceland": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "India": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Indonesia": ["group_culture","speaking_implicity","focus_task"], 
+      "Iran": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Iraq": ["group_culture","speaking_implicity","focus_task"], 
+      "Ireland": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Israel": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Italy": ["group_culture","speaking_implicity","informal_culture","focus_time"], 
+      "Ivory Coast": ["group_culture","speaking_implicity","focus_task"], 
+      "Jamaica": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "Japan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Jordan": ["group_culture","speaking_implicity","focus_task"], 
+      "Kazakhstan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Kenya": ["group_culture","speaking_implicity","focus_task"], 
+      "Kuwait": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Kyrgyzstan": ["group_culture","speaking_implicity","focus_task"], 
+      "Laos": ["group_culture","speaking_implicity","focus_task"], 
+      "Latvia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Lebanon": ["group_culture","speaking_implicity","focus_task"], 
+      "Lesotho": ["group_culture","speaking_implicity","focus_task"], 
+      "Liberia": ["group_culture","speaking_implicity","focus_task"], 
+      "Libya": ["group_culture","speaking_implicity","focus_task"], 
+      "Lithuania": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Luxembourg": ["individual_culture","explicit_language","focus_time"], 
+      "Macedonia": ["group_culture","speaking_implicity","focus_task"], 
+      "Madagascar": ["group_culture","speaking_implicity","focus_task"], 
+      "Malawi": ["group_culture","speaking_implicity","focus_task"], 
+      "Malaysia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Mali": ["group_culture","speaking_implicity","focus_task"], 
+      "Mauritania": ["group_culture","speaking_implicity","focus_task"], 
+      "Mexico": ["group_culture","speaking_implicity","focus_task"], 
+      "Moldova": ["group_culture","speaking_implicity","focus_task"], 
+      "Mongolia": ["group_culture","speaking_implicity","focus_task"], 
+      "Montenegro": ["group_culture","speaking_implicity","focus_task"], 
+      "Morocco": ["group_culture","speaking_implicity","focus_task"], 
+      "Mozambique": ["group_culture","speaking_implicity","focus_task"], 
+      "Myanmar": ["group_culture","speaking_implicity","focus_task"], 
+      "Namibia": ["group_culture","speaking_implicity","focus_task"], 
+      "Nepal": ["group_culture","speaking_implicity","focus_task"], 
+      "Netherlands": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "New Zealand": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "Nicaragua": ["group_culture","speaking_implicity","focus_task"], 
+      "Niger": ["group_culture","speaking_implicity","focus_task"], 
+      "Nigeria": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "North Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Norway": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Oman": ["group_culture","speaking_implicity","focus_task"], 
+      "Pakistan": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Panama": ["group_culture","speaking_implicity","focus_task"], 
+      "Papua New Guinea": ["group_culture","speaking_implicity","focus_task"], 
+      "Paraguay": ["group_culture","speaking_implicity"], 
+      "Peru": ["group_culture","speaking_implicity","focus_task"], 
+      "Philippines": ["group_culture","speaking_implicity","focus_task"], 
+      "Poland": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Portugal": ["group_culture","speaking_implicity","focus_time","focus_task"], 
+      "Puerto Rico": ["group_culture","speaking_implicity","focus_task"], 
+      "Qatar": ["group_culture","speaking_implicity","focus_task"], 
+      "Romania": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Russia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Rwanda": ["group_culture","speaking_implicity","focus_task"], 
+      "Saudi Arabia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Senegal": ["group_culture","speaking_implicity","focus_task"], 
+      "Serbia": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "Sierra Leone": ["group_culture","speaking_implicity","focus_task"], 
+      "Slovakia": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Slovenia": ["individual_culture","explicit_language","focus_time","culture_uncertainty"], 
+      "Somalia": ["group_culture","speaking_implicity","focus_task"], 
+      "South Africa": ["group_culture","speaking_implicity","informal_culture","focus_task"], 
+      "South Korea": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "South Sudan": ["group_culture","speaking_implicity","focus_task"], 
+      "Spain": ["group_culture","speaking_implicity","informal_culture","focus_time","focus_task"], 
+      "Sri Lanka": ["group_culture","speaking_implicity","focus_task"], 
+      "Sudan": ["group_culture","speaking_implicity","focus_task"], 
+      "Suriname": ["group_culture","speaking_implicity","focus_task"], 
+      "Swaziland": ["group_culture","speaking_implicity","focus_task"], 
+      "Sweden": ["individual_culture","explicit_language","culture_uncertainty","focus_task"], 
+      "Switzerland": ["individual_culture","explicit_language","focus_time"], 
+      "Syria": ["group_culture","speaking_implicity","focus_task"], 
+      "Taiwan": ["group_culture","speaking_implicity","hierarchical_culture","focus_time"], 
+      "Tajikistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Tanzania": ["group_culture","speaking_implicity","focus_task"], 
+      "Thailand": ["group_culture","speaking_implicity","focus_task"], 
+      "Togo": ["group_culture","speaking_implicity","focus_task"], 
+      "Trinidad and Tobago": ["group_culture","speaking_implicity","focus_task"], 
+      "Tunisia": ["group_culture","speaking_implicity","focus_task"], 
+      "Turkey": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "Turkmenistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Uganda": ["group_culture","speaking_implicity","focus_task"], 
+      "Ukraine": ["group_culture","speaking_implicity","hierarchical_culture","focus_time","focus_task"], 
+      "United Arab Emirates": ["group_culture","speaking_implicity","hierarchical_culture","focus_task"], 
+      "United Kingdom": ["individual_culture","explicit_language","informal_culture","focus_time","culture_uncertainty"], 
+      "United States": ["individual_culture","explicit_language","informal_culture","focus_time","change_management"], 
+      "Uruguay": ["group_culture","speaking_implicity","focus_task"], 
+      "Uzbekistan": ["group_culture","speaking_implicity","focus_task"], 
+      "Venezuela": ["group_culture","speaking_implicity","focus_task"], 
+      "Vietnam": ["group_culture","speaking_implicity","focus_task"], 
+      "Western Sahara": ["group_culture","speaking_implicity","focus_task"], 
+      "Yemen": ["group_culture","speaking_implicity","focus_task"], 
+      "Zambia": ["group_culture","speaking_implicity","focus_task"], 
       "Zimbabwe": ["focus_task"]
     };
 
-    // ----- ALIASES: TopoJSON name -> matrix name -----
+    // ----- ALIASES: TopoJSON name -> matrix name (Unchanged) -----
     const countryNameAliases = {
       "United States of America": "United States",
       "Côte d'Ivoire": "Ivory Coast",
@@ -912,69 +843,106 @@
       return { key: countryName, inList: false };
     }
 
-    // ----- DEFINITIONS: gradient, glow -----
-    const defs = svg.append("defs");
+    // *** LANGUAGE UPDATE FUNCTION ***
+    function updateLanguage(lang) {
+        currentLang = lang;
+        const data = languageData[lang];
 
+        // 1. Update static page text
+        d3.select("#page-title").text(data.title);
+        d3.select("#text-eyebrow").text(data.eyebrow);
+        d3.select("#text-header").text(data.header);
+        d3.select("#text-subtitle").html(data.subtitle);
+        d3.select("#text-sources").html(data.sources); // <-- New: Update sources text
+
+        // 2. Update button titles
+        const pauseBtn = d3.select("#pause-toggle-btn");
+        d3.select("#reset-btn").attr("title", data.resetTitle);
+        if (isSpinning) {
+             pauseBtn.attr("title", data.stopTitle);
+        } else {
+             pauseBtn.attr("title", data.startTitle);
+        }
+
+        // 3. Update language switch buttons
+        d3.selectAll(".lang-btn:not(.toggle-btn)").classed("active", function() {
+            return d3.select(this).attr("data-lang") === lang;
+        });
+
+        // 4. Hide tooltip if visible, since its content language would change
+        tooltip.style("opacity", 0).style("display", "none");
+    }
+
+    // JavaScript logic for language toggle
+    const langOptions = d3.select("#lang-options");
+    const langToggleBtn = d3.select("#lang-toggle-btn");
+
+    // 1. Toggle visibility of language options on globe click
+    langToggleBtn.on("click", () => {
+        const isHidden = langOptions.classed("hidden");
+        langOptions.classed("hidden", !isHidden);
+    });
+
+    // 2. Event listener for actual language buttons (excludes the globe toggle button)
+    d3.selectAll(".lang-btn:not(.toggle-btn)").on("click", (event) => {
+        const lang = event.currentTarget.dataset.lang;
+        updateLanguage(lang);
+        // Hide options after selection
+        langOptions.classed("hidden", true);
+    });
+
+
+    // ----- D3 Setup (Unchanged) -----
+    const defs = svg.append("defs");
     const globeGradient = defs.append("radialGradient")
       .attr("id", "globeGradient")
       .attr("cx", "30%")
       .attr("cy", "30%")
       .attr("r", "70%");
-
     globeGradient.append("stop").attr("offset", "0%").attr("stop-color", "#fffdf9");
     globeGradient.append("stop").attr("offset", "60%").attr("stop-color", "#ffe8d0");
     globeGradient.append("stop").attr("offset", "100%").attr("stop-color", "#ffd2a1");
-
-    /* Bright white glow filter */
     const glowFilter = defs.append("filter")
       .attr("id", "globeGlow")
       .attr("x", "-50%")
       .attr("y", "-50%")
       .attr("width", "200%")
       .attr("height", "200%");
-
     glowFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
       .attr("stdDeviation", 25)
       .attr("result", "blur");
-
     glowFilter.append("feMerge")
       .selectAll("feMergeNode")
       .data(["blur"])
       .enter()
       .append("feMergeNode")
       .attr("in", d => d);
-
     const clipPath = defs.append("clipPath").attr("id", "globeClip");
     const clipCircle = clipPath.append("circle");
-
     const globeGroup = svg.append("g");
     const landGroup = svg.append("g").attr("clip-path", "url(#globeClip)");
-
-    /* Glow circle behind globe */
     const globeGlowCircle = globeGroup.append("circle")
       .attr("fill", "#ffffff")
       .attr("opacity", 0.9)
       .attr("filter", "url(#globeGlow)");
-
     const globeSphere = globeGroup.append("circle")
       .attr("class", "globe-sphere")
       .attr("fill", "url(#globeGradient)");
 
-    // Initial rotation (used for reset)
+    // Globe State
     const initialRotation = [0, -10, 0];
-
     const projection = d3.geoOrthographic()
       .rotate(initialRotation.slice())
       .precision(0.5);
-
     const path = d3.geoPath().projection(projection);
     const graticule = d3.geoGraticule();
 
     let worldFeature = null;
     let rotation = projection.rotate().slice();
     let isDragging = false;
-    let isHovering = false;
+    let isHovering = false; // Flag to stop spinning when mouse is over a country/tooltip
+    let isClicking = false; 
 
     // Zoom state
     let zoomFactor = 1;
@@ -982,6 +950,14 @@
     const zoomMax = 2.5;
     const zoomStep = 0.15;
     let baseRadius = 1;
+
+    // Pinch-to-zoom state
+    let pinchStartDistance = null;
+    let initialZoomFactorForPinch = 1;
+
+    // Spinning State
+    let isSpinning = true; 
+    const pauseToggleBtn = d3.select("#pause-toggle-btn");
 
     function redrawGlobe() {
       landGroup.selectAll("path").attr("d", path);
@@ -1027,19 +1003,25 @@
       resizeGlobe();
     }
 
-    // Drag to rotate
+    // Drag to rotate (Single touch/mouse)
     let dragStart = null;
     let rotationStart = null;
 
     const drag = d3.drag()
       .on("start", (event) => {
+        if (event.touches && event.touches.length > 1 || isClicking || pinchStartDistance !== null) return; 
+
         isDragging = true;
         const r = projection.rotate();
         rotationStart = [r[0], r[1], r[2] || 0];
         dragStart = [event.x, event.y];
+        tooltip.style("opacity", 0).style("display", "none"); 
+        isHovering = false;
       })
       .on("drag", (event) => {
-        if (!dragStart || !rotationStart) return;
+        if (pinchStartDistance !== null) return;
+        if (!dragStart || !rotationStart || isClicking) return;
+
         const sensitivity = 0.25;
         const dx = event.x - dragStart[0];
         const dy = event.y - dragStart[1];
@@ -1061,10 +1043,60 @@
 
     svg.call(drag);
 
+
+    // ----- PINCH-TO-ZOOM LOGIC (Mobile) -----
+    
+    // Helper function to calculate distance between two touches
+    function getDistance(touches) {
+      if (touches.length < 2) return 0;
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    // 1. TOUCHSTART: Initialize pinch
+    svgNode.addEventListener('touchstart', (event) => {
+        if (event.touches.length === 2) {
+            event.preventDefault(); 
+            isDragging = false;
+            dragStart = null;
+            rotationStart = null;
+            pinchStartDistance = getDistance(event.touches);
+            initialZoomFactorForPinch = zoomFactor;
+
+            tooltip.style("opacity", 0).style("display", "none");
+            isHovering = false;
+            isClicking = false; 
+        }
+    }, {passive: false}); 
+    
+    // 2. TOUCHMOVE: Perform zoom calculation
+    svgNode.addEventListener('touchmove', (event) => {
+        if (event.touches.length === 2 && pinchStartDistance !== null) {
+            event.preventDefault(); 
+
+            const currentDistance = getDistance(event.touches);
+            const ratio = currentDistance / pinchStartDistance;
+            
+            const newZoom = initialZoomFactorForPinch * ratio;
+            setZoom(newZoom); 
+        }
+    }, {passive: false}); 
+
+    // 3. TOUCHEND: Reset pinch state
+    svgNode.addEventListener('touchend', (event) => {
+        if (pinchStartDistance !== null && event.touches.length < 2) {
+            pinchStartDistance = null;
+            initialZoomFactorForPinch = 1;
+        }
+    });
+    
+    // ------------------------------------------
+
     // Auto-rotation with smooth restart
     const autoSpeed = 0.01; // base deg/ms
     let lastTime = Date.now();
-    let idleTime = 0; // ms since last hover/drag
+    let idleTime = 0; // ms since last hover/drag/pinch
 
     d3.timer(() => {
       if (!worldFeature) return;
@@ -1072,13 +1104,15 @@
       const dt = now - lastTime;
       lastTime = now;
 
-      if (!isDragging && !isHovering) {
-        idleTime = Math.min(idleTime + dt, 3000); // cap after 3s
-        const factor = Math.min(idleTime / 1500, 1); // ease in over 1.5s
+      // The globe only spins if it's set to spin AND there are no active interactions
+      if (isSpinning && !isDragging && !isHovering && !isClicking && pinchStartDistance === null) {
+        idleTime = Math.min(idleTime + dt, 3000); 
+        const factor = Math.min(idleTime / 1500, 1); 
         rotation[0] += autoSpeed * dt * factor;
         projection.rotate(rotation);
         redrawGlobe();
       } else {
+        // If an interaction is active (including isHovering), reset the idle timer
         idleTime = 0;
       }
     });
@@ -1096,17 +1130,36 @@
       projection.rotate(rotation);
       zoomFactor = 1;
       resizeGlobe();
+      
+      // Also reset spinning state to active
+      isSpinning = true;
+      pauseToggleBtn.html("&#x25A0;").attr("title", languageData[currentLang].stopTitle);
+    });
+    
+    // Pause/Start Spinning Button Logic (Toggles between Stop &#x25A0; and Play &#x25B6;)
+    pauseToggleBtn.on("click", (event) => {
+        isSpinning = !isSpinning;
+        const button = d3.select(event.currentTarget);
+        if (isSpinning) {
+            button.html("&#x25A0;").attr("title", languageData[currentLang].stopTitle); // Stop symbol (square)
+        } else {
+            button.html("&#x25B6;").attr("title", languageData[currentLang].startTitle); // Play symbol (triangle)
+        }
     });
 
-    // Mouse wheel zoom
+
+    // Mouse wheel zoom (Desktop only)
     svg.on("wheel", (event) => {
       event.preventDefault();
       const direction = event.deltaY > 0 ? -1 : 1;
       setZoom(zoomFactor + direction * zoomStep);
     });
 
-    // Tooltip helpers
+    // Tooltip helpers (NOW USES currentLang)
     function buildTooltipHTML(countryName) {
+      const data = languageData[currentLang];
+      const metrics = data.metrics;
+
       const { key, inList } = resolveCountryKey(countryName);
       const metricIds = inList ? (countryMetrics[key] || []) : [];
 
@@ -1116,7 +1169,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              No data for this country in this analysis.
+              ${data.tooltipNoData}
             </div>
           </div>`;
         return html;
@@ -1126,7 +1179,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              This country is included in the matrix, but no metrics are ticked.
+              ${data.tooltipNoMetrics}
             </div>
           </div>`;
         return html;
@@ -1150,10 +1203,57 @@
     }
 
     function moveTooltip(event) {
-      const [x, y] = d3.pointer(event, container.node());
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const isMobile = viewportWidth <= 700; 
+    
+      const tooltipNode = tooltip.node();
+      const currentDisplay = tooltip.style('display');
+
+      tooltip.style('display', 'block'); 
+      const tooltipWidth = tooltipNode.offsetWidth;
+      const tooltipHeight = tooltipNode.offsetHeight;
+      tooltip.style('display', currentDisplay); 
+    
+      let finalX, finalY;
+    
+      if (isMobile) {
+        // Centered position on mobile
+        finalX = (viewportWidth / 2) - (tooltipWidth / 2);
+        finalY = (viewportHeight / 2) - (tooltipHeight / 2) - 30; 
+        
+        finalX = Math.max(10, Math.min(finalX, viewportWidth - tooltipWidth - 10));
+        finalY = Math.max(10, finalY);
+    
+      } else {
+        // Offset position on desktop
+        const x = event.clientX || (event.touches ? event.touches[0].clientX : d3.pointer(event)[0]);
+        const y = event.clientY || (event.touches ? event.touches[0].clientY : d3.pointer(event)[1]);
+    
+        finalX = x + 18; 
+        finalY = y + 18; 
+    
+        // Keep tooltip within viewport bounds
+        if (finalX + tooltipWidth > viewportWidth - 10) {
+          finalX = x - tooltipWidth - 18; 
+        }
+        
+        if (finalY + tooltipHeight > viewportHeight - 10) {
+          finalY = y - tooltipHeight - 18; 
+        }
+    
+        if (finalX < 10) {
+          finalX = 10;
+        }
+        
+        if (finalY < 10) {
+          finalY = 10;
+        }
+      }
+    
       tooltip
-        .style("left", x + 10 + "px")
-        .style("top", y + 10 + "px");
+        .style("left", finalX + "px")
+        .style("top", finalY + "px");
     }
 
     // Load data
@@ -1173,24 +1273,56 @@
           .append("path")
           .attr("class", "country")
           .on("mouseover", (event, d) => {
-            isHovering = true;
+            if (isDragging || pinchStartDistance !== null) return; 
+            isHovering = true; // <-- Pause spinning on hover
+            tooltip.style("display", "block").style("opacity", 1);
+            
             const countryName =
               d.properties.name ||
               d.properties.admin ||
               "Unknown country";
 
             tooltip
-              .style("opacity", 1)
               .html(buildTooltipHTML(countryName));
 
             moveTooltip(event);
           })
           .on("mousemove", (event) => {
+            if (isDragging || pinchStartDistance !== null) return;
             moveTooltip(event);
           })
           .on("mouseout", () => {
-            isHovering = false;
-            tooltip.style("opacity", 0);
+            isHovering = false; // <-- Resume spinning on mouse out
+            if (!isDragging && pinchStartDistance === null) { 
+              tooltip.style("opacity", 0).style("display", "none");
+            }
+          })
+          .on("touchstart", function(event, d) {
+            if (event.touches.length > 1 || isDragging || isClicking || pinchStartDistance !== null) return;
+            
+            isClicking = true;
+            event.preventDefault(); 
+            isHovering = true; // <-- Pause spinning on touch/click
+
+            const countryName = d.properties.name || d.properties.admin || "Unknown country";
+            
+            const currentCountry = tooltip.attr("data-country");
+            if (currentCountry === countryName && tooltip.style("opacity") === "1") {
+                tooltip.style("opacity", 0).style("display", "none");
+                tooltip.attr("data-country", "");
+                isHovering = false; // Resume spinning on second tap to close
+                isClicking = false;
+                return;
+            }
+
+            tooltip.attr("data-country", countryName);
+            tooltip.style("display", "block").style("opacity", 1).html(buildTooltipHTML(countryName));
+            
+            moveTooltip(event);
+
+            setTimeout(() => {
+                isClicking = false;
+            }, 300); 
           });
 
         resizeGlobe();
@@ -1198,6 +1330,85 @@
       .catch(err => console.error("Error loading world data:", err));
 
     window.addEventListener("resize", resizeGlobe);
+
+    // Initialize the page in English on load
+    updateLanguage('en');
+  </script>
+
+  <script>
+    (function () {
+        const diag = document.getElementById("globe-diagnostics");
+
+        function show(msg) {
+            diag.style.display = "block";
+            diag.innerHTML = "<b>Globe Diagnostics:</b><br>" + msg;
+            console.warn("Globe Diagnostics:", msg);
+        }
+
+        function webglSupported() {
+            try {
+                const c = document.createElement("canvas");
+                return !!window.WebGLRenderingContext &&
+                       (c.getContext("webgl") || c.getContext("experimental-webgl"));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function webgl2Supported() {
+            try {
+                const c = document.createElement("canvas");
+                return !!c.getContext("webgl2");
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 1. Check WebGL support
+        if (!webglSupported()) {
+            show("❌ Your browser does not support WebGL. The 3D globe cannot be displayed.<br>" +
+                 "➡ Try updating your browser or enabling hardware acceleration.");
+            return;
+        }
+
+        // 2. Warn if WebGL2 is missing (Some libs rely on it)
+        if (!webgl2Supported()) {
+            show("⚠ WebGL works, but WebGL2 is not supported.<br>" +
+                 "The globe may appear but could be slow or incomplete.");
+        }
+
+        // 3. Detect disabled hardware acceleration
+        const gl = document.createElement("canvas").getContext("webgl");
+        const info = gl && gl.getExtension("WEBGL_debug_renderer_info");
+
+        if (info) {
+            const renderer = gl.getParameter(info.UNMASKED_RENDERER_WEBGL);
+            if (renderer.toLowerCase().includes("swiftshader") ||
+                renderer.toLowerCase().includes("software")) {
+                show("⚠ WebGL is running in SOFTWARE mode (not hardware).<br>" +
+                     "The 3D globe may fail to render or appear very slow.<br>" +
+                     "➡ Enable GPU acceleration in your browser settings.");
+            }
+        }
+
+        // 4. Catch global JS errors so missing assets get reported
+        window.addEventListener("error", function (e) {
+            // Check if the error is related to D3, TopoJSON, or the map logic
+            const related = e.message.includes("d3") || e.message.includes("topojson") || e.filename.includes("script");
+            if (related) {
+                show("❌ A script error occurred while loading the 3D globe:<br>" +
+                     "<span style='color:#f88'>" + e.message + "</span><br>" +
+                     "➡ Check your console for missing files, wrong paths, or CORS issues.");
+            }
+        });
+
+        // 5. Detect WebGL context loss
+        window.addEventListener("webglcontextlost", function () {
+            show("❌ The WebGL context was lost.<br>" +
+                 "This usually means the browser or GPU blocked the 3D view.");
+        });
+
+    })();
   </script>
 </body>
 </html>
