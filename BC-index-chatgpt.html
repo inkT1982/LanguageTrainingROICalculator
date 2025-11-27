@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Speexx Business Coaching ROI Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #05070b;
+      --bg-card: #10131c;
+      --bg-card-soft: #171b26;
+      --border-subtle: #252b3a;
+      --accent: #038bc7;
+      --accent-soft: rgba(3, 139, 199, 0.2);
+      --accent-strong: rgba(3, 139, 199, 0.4);
+      --text-main: #f7f9ff;
+      --text-muted: #a4acc4;
+      --text-soft: #6c7390;
+      --error: #ff5c7a;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.7);
+      --shadow-light: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #111526 0, #05070b 45%, #03040a 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 52px 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      background: linear-gradient(145deg, rgba(8, 11, 20, 0.95), rgba(3, 7, 17, 0.98));
+      border-radius: 32px;
+      padding: 34px 30px 32px 30px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        padding: 26px 18px 24px;
+      }
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .app-header h1 {
+      font-size: 2.15rem;
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+
+    .app-header p {
+      margin: 0;
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-inline: auto;
+      line-height: 1.7;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
+      gap: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .steps-container {
+      background: radial-gradient(circle at top left, rgba(3, 139, 199, 0.28), rgba(3, 10, 24, 0.9));
+      border-radius: var(--radius-xl);
+      padding: 20px 18px 18px;
+      border: 1px solid rgba(3, 139, 199, 0.55);
+      box-shadow: var(--shadow-light);
+      position: relative;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .steps-container::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      background:
+        radial-gradient(circle at 10% 0, rgba(3, 139, 199, 0.2), transparent 60%),
+        radial-gradient(circle at 90% 10%, rgba(3, 139, 199, 0.14), transparent 55%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .steps-inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-panels {
+      border-radius: var(--radius-lg);
+      background: rgba(5, 8, 16, 0.92);
+      border: 1px solid rgba(3, 139, 199, 0.5);
+      padding: 20px 18px 18px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65);
+    }
+
+    .step-panel {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .step-panel.active {
+      display: flex;
+    }
+
+    .step-title {
+      font-size: 1.18rem;
+      margin: 0 0 6px;
+    }
+
+    .step-subtitle {
+      font-size: 0.86rem;
+      color: var(--text-soft);
+      margin: 0 0 14px;
+      line-height: 1.6;
+    }
+
+    .stepper-header {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin: 4px 0 16px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #06b6d4, #038bc7);
+      border-radius: inherit;
+      transition: width 0.35s ease-out;
+    }
+
+    .stepper-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+    }
+
+    .form-section {
+      border-radius: 16px;
+      background: rgba(10, 13, 24, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .form-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .form-section-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .form-section-caption {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.79rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(6, 10, 22, 0.95);
+      color: var(--text-main);
+      padding: 9px 13px;
+      font-size: 0.86rem;
+      outline: none;
+      transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(3, 139, 199, 0.4);
+      background: rgba(4, 10, 22, 0.98);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .inline-select-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .inline-select-row .field {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .pill-option {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(4, 7, 16, 0.95);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      user-select: none;
+    }
+
+    .pill-option:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(10, 13, 24, 0.98);
+    }
+
+    .pill-option.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(3, 139, 199, 0.9), rgba(5, 99, 145, 0.95));
+      color: #001019;
+      box-shadow: 0 0 0 1px rgba(3, 139, 199, 0.25);
+    }
+
+    .impact-area {
+      border-radius: 14px;
+      background: rgba(6, 9, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px 10px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 4px;
+    }
+
+    .impact-area.active {
+      border-color: rgba(3, 139, 199, 0.8);
+      background: radial-gradient(circle at top left, rgba(3, 139, 199, 0.25), rgba(6, 9, 18, 0.92));
+    }
+
+    .impact-area-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .impact-area-title {
+      font-weight: 600;
+    }
+
+    .impact-area-chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(3, 139, 199, 0.12);
+      color: var(--accent);
+      font-size: 0.7rem;
+    }
+
+    .helper-text {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .step-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .step-footer-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 9px 17px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease-out;
+      background: rgba(8, 11, 22, 0.9);
+      color: var(--text-main);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #038bc7);
+      border-color: rgba(0, 0, 0, 0.7);
+      color: #001019;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(3, 139, 199, 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 14px 35px rgba(3, 139, 199, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      border-color: rgba(255, 255, 255, 0.18);
+      color: var(--text-soft);
+      background: transparent;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(3, 139, 199, 0.09);
+    }
+
+    .btn-ghost {
+      border-color: transparent;
+      background: transparent;
+      color: var(--text-soft);
+      padding-inline: 6px;
+    }
+
+    .btn-ghost:hover {
+      color: var(--accent);
+    }
+
+    .step-hint {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 4px;
+    }
+
+    .result-card {
+      border-radius: 24px;
+      background: radial-gradient(circle at top, rgba(3, 139, 199, 0.3), rgba(7, 11, 22, 0.98));
+      border: 1px solid rgba(3, 139, 199, 0.8);
+      padding: 20px 20px 18px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0, rgba(3, 139, 199, 0.4), transparent 60%),
+        radial-gradient(circle at 90% 0, rgba(3, 139, 199, 0.25), transparent 55%),
+        radial-gradient(circle at 50% 120%, rgba(3, 139, 199, 0.35), transparent 50%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .result-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .result-title {
+      font-size: 1.06rem;
+      margin: 0 0 6px;
+    }
+
+    .result-subtitle {
+      font-size: 0.83rem;
+      color: #ced9ff;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .scenario-chip {
+      font-size: 0.7rem;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(3, 13, 22, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #dbeafe;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .scenario-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .result-metric {
+      border-radius: 16px;
+      background: rgba(7, 11, 23, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 11px 12px 10px;
+    }
+
+    .result-metric-label {
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #9ca3c9;
+      margin-bottom: 4px;
+    }
+
+    .result-metric-value {
+      font-size: 1.18rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .result-metric-sub {
+      font-size: 0.73rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .result-helper {
+      font-size: 0.76rem;
+      color: #cbd5ff;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .assumptions-card {
+      border-radius: 18px;
+      background: rgba(8, 11, 20, 0.9);
+      border: 1px dashed rgba(148, 163, 184, 0.45);
+      padding: 13px 14px;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .assumptions-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .assumption-bullet {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      line-height: 1.6;
+    }
+
+    .assumption-bullet span:first-child {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .error-text {
+      font-size: 0.75rem;
+      color: var(--error);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1>Speexx Business Coaching ROI Calculator</h1>
+      <p>
+        Estimate the potential return of investing in business coaching for your organisation.
+        Answer three short steps and explore different scenarios.
+      </p>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT: STEPS -->
+      <section class="left-panel">
+        <div class="steps-container">
+          <div class="steps-inner">
+            <div class="step-panels">
+              <!-- STEP 1 -->
+              <div class="step-panel active" data-step-panel="1">
+                <div>
+                  <h3 class="step-title">Context &amp; Cohort</h3>
+                  <p class="step-subtitle">
+                    We use this to estimate coaching investment, salary benchmarks and how widely impact can ripple.
+                  </p>
+
+                  <div class="stepper-header">
+                    <div class="progress-track">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="stepper-label"></div>
+                  </div>
+                </div>
+
+                <!-- Organisation context -->
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Organisation context</div>
+                      <div class="form-section-caption">
+                        These details only influence benchmarks for salary, coaching cost and a small spillover effect.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="region">Region</label>
+                      <select id="region">
+                        <option value="">Select…</option>
+                        <option value="na">North America (NA)</option>
+                        <option value="emea">Europe, Middle East and Africa (EMEA)</option>
+                        <option value="apac">Asia-Pacific (APAC)</option>
+                        <option value="latam">Latin America (LATAM)</option>
+                      </select>
+                    </div>
+
+                    <div class="inline-select-row">
+                      <div class="field">
+                        <label for="industry">Industry (optional)</label>
+                        <select id="industry">
+                          <option value="">Not specified</option>
+                          <option value="automotive">Automotive</option>
+                          <option value="banking_finance">Banking and Finance</option>
+                          <option value="education">Education</option>
+                          <option value="energy">Energy</option>
+                          <option value="entertainment">Entertainment</option>
+                          <option value="healthcare_pharma">Healthcare and Pharma</option>
+                          <option value="hospitality">Hospitality</option>
+                          <option value="it">Information Technology</option>
+                          <option value="manufacturing_hitech">Manufacturing and Hitech</option>
+                          <option value="oil_gas">Oil and Gas</option>
+                          <option value="public_sector">Public Sector</option>
+                          <option value="retail">Retail</option>
+                          <option value="telecom">Telecommunication</option>
+                          <option value="transport_logistics">Transport and Logistics</option>
+                        </select>
+                      </div>
+
+                      <div class="field">
+                        <label for="companySize">Company size</label>
+                        <select id="companySize">
+                          <option value="">Select…</option>
+                          <option value="size_1_500">1–500 Employees</option>
+                          <option value="size_501_1000">501–1,000 Employees</option>
+                          <option value="size_1001_5000">1,001–5,000 Employees</option>
+                          <option value="size_5001_10000">5,001–10,000 Employees</option>
+                          <option value="size_10001_plus">10,001+ Employees</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Cohort -->
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Who will be coached?</div>
+                      <div class="form-section-caption">
+                        Basic information – you can either provide an average salary or let us estimate it.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="numCoachees">Number of coachees</label>
+                      <input id="numCoachees" type="number" min="1" placeholder="e.g. 25" />
+                    </div>
+
+                    <div class="inline-select-row">
+                      <div class="field">
+                        <label for="seniority">Seniority of coachees</label>
+                        <select id="seniority">
+                          <option value="">Select…</option>
+                          <option value="ic">Individual contributors</option>
+                          <option value="leaders">Team leaders / supervisors</option>
+                          <option value="middle">Middle management</option>
+                          <option value="exec">Senior leaders / executives</option>
+                        </select>
+                      </div>
+
+                      <div class="field">
+                        <label for="avgSalary">Average annual salary per coachee</label>
+                        <input
+                          id="avgSalary"
+                          type="number"
+                          min="0"
+                          placeholder="Optional – enter if you know it"
+                        />
+                        <div class="helper-text">
+                          If you leave this blank, we’ll estimate a typical salary for your region, industry and seniority.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Coaching format -->
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Coaching format</div>
+                      <div class="form-section-caption">
+                        Program type and typical duration. We use this to estimate a benchmark coaching cost.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="inline-select-row">
+                      <div class="field">
+                        <label for="format">Format</label>
+                        <select id="format">
+                          <option value="">Select…</option>
+                          <option value="1to1">1:1 coaching</option>
+                          <option value="group">Group / team coaching</option>
+                          <option value="blended">Blended (mix of 1:1, group, digital)</option>
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label for="duration">Program length</label>
+                        <select id="duration">
+                          <option value="">Select…</option>
+                          <option value="3">3 months</option>
+                          <option value="6" selected>6 months</option>
+                          <option value="12">12 months</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="field">
+                      <label for="costPerPerson">
+                        Estimated coaching cost per coachee (for the full program)
+                      </label>
+                      <input
+                        id="costPerPerson"
+                        type="number"
+                        min="0"
+                        placeholder="Leave empty to use benchmarks"
+                      />
+                      <div class="helper-text">
+                        If you’re not sure, just leave it blank – we’ll estimate typical costs for your region and format.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="step-footer">
+                  <div class="step-footer-left">
+                    <button class="btn-ghost btn" type="button" id="resetBtnLeft1">Reset</button>
+                  </div>
+                  <div>
+                    <button class="btn btn-primary" type="button" id="nextFromStep1">
+                      Next: Impact Areas →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 2 (simplified impact areas) -->
+              <div class="step-panel" data-step-panel="2">
+                <div>
+                  <h3 class="step-title">Impact Areas</h3>
+                  <p class="step-subtitle">
+                    For each area, choose how important it is for this coaching program. You can leave areas as “Not a focus”.
+                  </p>
+
+                  <div class="stepper-header">
+                    <div class="progress-track">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="stepper-label"></div>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Focus of your coaching</div>
+                      <div class="form-section-caption">
+                        A simple overview – no extra sliders or toggles.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-grid" id="impactAreasContainer">
+                    <!-- Impact areas rendered by JS -->
+                  </div>
+                </div>
+
+                <div class="step-footer">
+                  <div class="step-footer-left">
+                    <button class="btn btn-outline" type="button" id="backToStep1">
+                      ← Back
+                    </button>
+                    <button class="btn-ghost btn" type="button" id="resetBtnLeft2">Reset</button>
+                  </div>
+                  <div>
+                    <button class="btn btn-primary" type="button" id="nextFromStep2">
+                      Next: Time &amp; Scenario →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 3 -->
+              <div class="step-panel" data-step-panel="3">
+                <div>
+                  <h3 class="step-title">Time Horizon &amp; Scenario</h3>
+                  <p class="step-subtitle">
+                    Choose how long you want to look ahead and how conservative you prefer the estimate to be.
+                  </p>
+
+                  <div class="stepper-header">
+                    <div class="progress-track">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="stepper-label"></div>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Time horizon</div>
+                      <div class="form-section-caption">
+                        Coaching effects grow over time – longer horizons capture more benefit.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="inline-select-row">
+                    <div class="field">
+                      <label for="timeHorizon">Time horizon for benefits</label>
+                      <select id="timeHorizon">
+                        <option value="6">6 months</option>
+                        <option value="12" selected>12 months</option>
+                        <option value="24">24 months</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <div class="form-section-header">
+                    <div>
+                      <div class="form-section-title">Scenario</div>
+                      <div class="form-section-caption">
+                        Start with Base for a balanced estimate. You can explore others later.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label>Scenario type</label>
+                      <div class="pill-row" id="scenarioRow">
+                        <button class="pill-option selected" type="button" data-scenario="conservative">
+                          Conservative
+                        </button>
+                        <button class="pill-option" type="button" data-scenario="base">
+                          Base
+                        </button>
+                        <button class="pill-option" type="button" data-scenario="optimistic">
+                          Optimistic
+                        </button>
+                      </div>
+                      <div class="helper-text" id="scenarioDescription">
+                        Conservative – assumes modest behaviour change and a careful view of impact.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="step-footer">
+                  <div class="step-footer-left">
+                    <button class="btn btn-outline" type="button" id="backToStep2">
+                      ← Back
+                    </button>
+                    <button class="btn-ghost btn" type="button" id="resetBtnLeft3">Reset</button>
+                  </div>
+                  <div>
+                    <button class="btn btn-primary" type="button" id="calculateBtn">
+                      Calculate ROI →
+                    </button>
+                  </div>
+                </div>
+
+                <p class="step-hint">
+                  Tip: You can adjust impact areas or cohort details anytime and re-run the calculation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="right-panel">
+        <div class="result-card">
+          <div class="result-inner">
+            <div class="result-header">
+              <div>
+                <h3 class="result-title">Your scenario</h3>
+                <p class="result-subtitle">
+                  Estimated return on your coaching program based on benchmarks and reasonable assumptions.
+                </p>
+              </div>
+              <div class="scenario-chip">
+                <span class="scenario-dot"></span>
+                <span id="scenarioLabel">Waiting for calculation</span>
+              </div>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-metric">
+                <div class="result-metric-label">Estimated ROI</div>
+                <div class="result-metric-value" id="roiValue">—</div>
+                <div class="result-metric-sub">Change in value relative to your total coaching investment.</div>
+              </div>
+              <div class="result-metric">
+                <div class="result-metric-label">Estimated Benefit</div>
+                <div class="result-metric-value" id="benefitValue">—</div>
+                <div class="result-metric-sub">Approximate value generated over the selected time horizon.</div>
+              </div>
+              <div class="result-metric">
+                <div class="result-metric-label">Per 1 invested</div>
+                <div class="result-metric-value" id="perUnitValue">—</div>
+                <div class="result-metric-sub">
+                  How much benefit you might create for each 1 unit of investment.
+                </div>
+              </div>
+              <div class="result-metric">
+                <div class="result-metric-label">Total Investment</div>
+                <div class="result-metric-value" id="investmentValue">—</div>
+                <div class="result-metric-sub">
+                  Estimated size of your coaching program based on your settings.
+                </div>
+              </div>
+            </div>
+
+            <div class="result-helper" id="resultHelperText">
+              Complete all three steps and click “Calculate ROI” on the left to see an estimate.
+            </div>
+          </div>
+        </div>
+
+        <div class="assumptions-card">
+          <div class="assumptions-title">
+            <span>Assumptions &amp; Notes</span>
+          </div>
+          <div class="assumption-bullet">
+            <span>•</span>
+            <span>
+              This calculator uses typical business coaching benchmarks and translates them into a blended
+              “productivity equivalent” improvement on the salary base of your coachees (and, to a smaller extent, their teams).
+            </span>
+          </div>
+          <div class="assumption-bullet">
+            <span>•</span>
+            <span>
+              Region, industry and company size influence benchmark salary and coaching cost assumptions and a small
+              “spillover” factor for larger organisations. You can override these by entering your own salary or cost figures.
+            </span>
+          </div>
+          <div class="assumption-bullet">
+            <span>•</span>
+            <span>
+              Use this as a conversation starter and sanity check – not as a replacement for your own detailed data.
+              You can refine assumptions and salary bands as more information becomes available.
+            </span>
+          </div>
+        </div>
+        <div id="errorBox" class="error-text" style="display:none;"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // --- Config for impact areas -------------------------------------------
+    const IMPACT_AREAS = [
+      {
+        id: "leadingOthers",
+        label: "Leading Others",
+        description:
+          "People leadership, feedback, delegating, building trust and clarity for teams.",
+        baseWeight: 1.0
+      },
+      {
+        id: "selfDevelopment",
+        label: "Self Development",
+        description:
+          "Self-awareness, self-efficacy, resilience and goal-directed self-management.",
+        baseWeight: 0.8
+      },
+      {
+        id: "leadingChange",
+        label: "Leading Change",
+        description:
+          "Driving transformation, handling uncertainty and keeping people engaged during change.",
+        baseWeight: 1.1
+      },
+      {
+        id: "careerManagement",
+        label: "Career Management",
+        description:
+          "Career clarity, internal mobility, retention of key talent and succession readiness.",
+        baseWeight: 0.7
+      },
+      {
+        id: "healthyLife",
+        label: "Leading a Healthy Life",
+        description:
+          "Energy, stress management, mental health, sustainable performance and fewer burnout risks.",
+        baseWeight: 0.9
+      },
+      {
+        id: "communication",
+        label: "Communication",
+        description:
+          "Alignment, expectations, conflict handling and reducing friction in daily collaboration.",
+        baseWeight: 0.85
+      }
+    ];
+
+    const AREA_IMPORTANCE_WEIGHTS = {
+      none: 0,
+      low: 0.5,
+      medium: 1.0,
+      high: 1.5
+    };
+
+    // --- Salary & cost benchmark config -----------------------------------
+    const BASE_SALARY_BY_SENIORITY = {
+      ic: 45000,
+      leaders: 60000,
+      middle: 80000,
+      exec: 120000
+    };
+
+    // Regions: NA, EMEA, APAC, LATAM
+    const REGION_SALARY_FACTORS = {
+      na: 1.2,
+      emea: 1.05,
+      apac: 1.0,
+      latam: 0.75
+    };
+
+    const INDUSTRY_SALARY_FACTORS = {
+      automotive: 1.0,
+      banking_finance: 1.15,
+      education: 0.85,
+      energy: 1.05,
+      entertainment: 1.0,
+      healthcare_pharma: 1.0,
+      hospitality: 0.85,
+      it: 1.1,
+      manufacturing_hitech: 1.05,
+      oil_gas: 1.1,
+      public_sector: 0.85,
+      retail: 0.8,
+      telecom: 1.05,
+      transport_logistics: 0.95
+    };
+
+    const COMPANY_SIZE_SALARY_FACTORS = {
+      size_1_500: 0.95,
+      size_501_1000: 1.0,
+      size_1001_5000: 1.05,
+      size_5001_10000: 1.08,
+      size_10001_plus: 1.1
+    };
+
+    const COMPANY_SIZE_SPILLOVER_FACTORS = {
+      size_1_500: 0.2,
+      size_501_1000: 0.25,
+      size_1001_5000: 0.35,
+      size_5001_10000: 0.45,
+      size_10001_plus: 0.55
+    };
+
+    const REGION_FEE_FACTORS = {
+      na: 1.15,
+      emea: 1.05,
+      apac: 1.0,
+      latam: 0.8
+    };
+
+    const qs = (sel) => document.querySelector(sel);
+    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
+
+    // --- Step navigation / progress ---------------------------------------
+    let currentStep = 1;
+    const TOTAL_STEPS = 3;
+
+    function updateStepUI() {
+      qsa(".step-panel").forEach((panel) => {
+        const stepIndex = Number(panel.dataset.stepPanel);
+        const isActive = stepIndex === currentStep;
+        panel.classList.toggle("active", isActive);
+
+        const bar = panel.querySelector(".progress-bar");
+        const label = panel.querySelector(".stepper-label");
+        if (bar && label) {
+          const progress = (currentStep / TOTAL_STEPS) * 100; // 1/3, 2/3, 3/3
+          bar.style.width = progress + "%";
+          label.textContent = `Step ${currentStep} of ${TOTAL_STEPS}`;
+        }
+      });
+    }
+
+    qs("#nextFromStep1").addEventListener("click", () => {
+      currentStep = 2;
+      updateStepUI();
+    });
+
+    qs("#nextFromStep2").addEventListener("click", () => {
+      currentStep = 3;
+      updateStepUI();
+    });
+
+    qs("#backToStep1").addEventListener("click", () => {
+      currentStep = 1;
+      updateStepUI();
+    });
+
+    qs("#backToStep2").addEventListener("click", () => {
+      currentStep = 2;
+      updateStepUI();
+    });
+
+    // --- Scenario selection ------------------------------------------------
+    let scenario = "conservative";
+    const SCENARIO_DESCRIPTIONS = {
+      conservative:
+        "Conservative – assumes modest behaviour change and a careful view of impact.",
+      base:
+        "Base – reflects typical outcomes of well-run coaching programs with decent engagement.",
+      optimistic:
+        "Optimistic – assumes strong engagement and visible impact across most coachees."
+    };
+
+    qs("#scenarioRow").addEventListener("click", (e) => {
+      const btn = e.target.closest(".pill-option");
+      if (!btn) return;
+      scenario = btn.dataset.scenario;
+      qsa("#scenarioRow .pill-option").forEach((b) =>
+        b.classList.toggle("selected", b === btn)
+      );
+      qs("#scenarioDescription").textContent = SCENARIO_DESCRIPTIONS[scenario];
+    });
+
+    // --- Impact areas rendering (independent controls per area) -----------
+    function renderImpactAreas() {
+      const container = qs("#impactAreasContainer");
+      container.innerHTML = "";
+
+      IMPACT_AREAS.forEach((area) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "impact-area";
+        wrapper.dataset.areaId = area.id;
+
+        wrapper.innerHTML = `
+          <div class="impact-area-header">
+            <div class="impact-area-title">${area.label}</div>
+            <span class="impact-area-chip">Impact area</span>
+          </div>
+          <div class="helper-text">${area.description}</div>
+          <div class="field">
+            <label>How important is this for this coaching program?</label>
+            <div class="pill-row" data-importance-row="${area.id}">
+              <button type="button" class="pill-option selected" data-importance="none">Not a focus</button>
+              <button type="button" class="pill-option" data-importance="low">Some focus</button>
+              <button type="button" class="pill-option" data-importance="medium">Important</button>
+              <button type="button" class="pill-option" data-importance="high">Key focus</button>
+            </div>
+          </div>
+        `;
+
+        const row = wrapper.querySelector(`[data-importance-row="${area.id}"]`);
+        row.addEventListener("click", (e) => {
+          const btn = e.target.closest(".pill-option");
+          if (!btn) return;
+
+          row.querySelectorAll(".pill-option").forEach((b) =>
+            b.classList.toggle("selected", b === btn)
+          );
+
+          wrapper.classList.toggle("active", btn.dataset.importance !== "none");
+        });
+
+        container.appendChild(wrapper);
+      });
+    }
+
+    renderImpactAreas();
+
+    // --- Reset behaviour ---------------------------------------------------
+    function resetAll() {
+      qs("#region").value = "";
+      qs("#industry").value = "";
+      qs("#companySize").value = "";
+
+      qs("#numCoachees").value = "";
+      qs("#seniority").value = "";
+      qs("#avgSalary").value = "";
+
+      qs("#format").value = "";
+      qs("#duration").value = "6";
+      qs("#costPerPerson").value = "";
+
+      qs("#timeHorizon").value = "12";
+
+      scenario = "conservative";
+      qsa("#scenarioRow .pill-option").forEach((b) =>
+        b.classList.toggle("selected", b.dataset.scenario === scenario)
+      );
+      qs("#scenarioDescription").textContent = SCENARIO_DESCRIPTIONS[scenario];
+
+      renderImpactAreas();
+
+      qs("#roiValue").textContent = "—";
+      qs("#benefitValue").textContent = "—";
+      qs("#perUnitValue").textContent = "—";
+      qs("#investmentValue").textContent = "—";
+      qs("#scenarioLabel").textContent = "Waiting for calculation";
+      qs("#resultHelperText").textContent =
+        "Complete all three steps and click “Calculate ROI” on the left to see an estimate.";
+
+      const errorBox = qs("#errorBox");
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+
+      currentStep = 1;
+      updateStepUI();
+    }
+
+    qs("#resetBtnLeft1").addEventListener("click", resetAll);
+    qs("#resetBtnLeft2").addEventListener("click", resetAll);
+    qs("#resetBtnLeft3").addEventListener("click", resetAll);
+
+    // --- Benchmarks: salary and cost --------------------------------------
+    function estimateSalaryPerPerson(seniority, region, industry, companySize) {
+      const base =
+        BASE_SALARY_BY_SENIORITY[seniority] ??
+        60000;
+
+      const regionFactor = REGION_SALARY_FACTORS[region] ?? 1;
+      const industryFactor = INDUSTRY_SALARY_FACTORS[industry] ?? 1;
+      const sizeFactor = COMPANY_SIZE_SALARY_FACTORS[companySize] ?? 1;
+
+      return base * regionFactor * industryFactor * sizeFactor;
+    }
+
+    function getBenchmarkCostPerPerson(seniority, format, durationMonths, region) {
+      let base;
+      switch (seniority) {
+        case "exec":
+          base = 5500;
+          break;
+        case "middle":
+          base = 4000;
+          break;
+        case "leaders":
+          base = 3000;
+          break;
+        case "ic":
+        default:
+          base = 2200;
+          break;
+      }
+
+      let formatFactor = 1;
+      if (format === "1to1") formatFactor = 1.25;
+      else if (format === "group") formatFactor = 0.8;
+      else if (format === "blended") formatFactor = 1.0;
+
+      let durationFactor = 1;
+      const d = Number(durationMonths) || 6;
+      if (d <= 3) durationFactor = 0.6;
+      else if (d >= 12) durationFactor = 1.8;
+
+      const regionFeeFactor = REGION_FEE_FACTORS[region] ?? 1;
+
+      return base * formatFactor * durationFactor * regionFeeFactor;
+    }
+
+    // --- Impact scoring ----------------------------------------------------
+    function collectImpactScore() {
+      const container = qs("#impactAreasContainer");
+      let totalScore = 0;
+      let totalWeight = 0;
+      let activeCount = 0;
+
+      IMPACT_AREAS.forEach((area) => {
+        const card = container.querySelector(`[data-area-id="${area.id}"]`);
+        if (!card) return;
+
+        const row = card.querySelector(`[data-importance-row="${area.id}"]`);
+        if (!row) return;
+        const selected = row.querySelector(".pill-option.selected");
+        const key = selected ? selected.dataset.importance : "none";
+        const factor = AREA_IMPORTANCE_WEIGHTS[key] ?? 0;
+
+        if (factor <= 0) return;
+
+        activeCount++;
+        const areaScore = area.baseWeight * factor;
+        totalScore += areaScore;
+        totalWeight += area.baseWeight;
+      });
+
+      if (activeCount === 0) return { activeCount: 0, blendedFactor: 0 };
+
+      const blended = totalScore / (totalWeight || 1);
+      return { activeCount, blendedFactor: blended };
+    }
+
+    function applyScenarioFactor(value) {
+      if (scenario === "conservative") return value * 0.7;
+      if (scenario === "optimistic") return value * 1.3;
+      return value;
+    }
+
+    function formatNumber(n) {
+      if (!isFinite(n)) return "—";
+      if (Math.abs(n) >= 1000000) {
+        return (n / 1000000).toFixed(2) + "M";
+      }
+      if (Math.abs(n) >= 1000) {
+        return (n / 1000).toFixed(1) + "k";
+      }
+      return n.toFixed(0);
+    }
+
+    function formatPercent(n) {
+      if (!isFinite(n)) return "—";
+      return n.toFixed(0) + "%";
+    }
+
+    // --- Core calculation --------------------------------------------------
+    function calculateROI() {
+      const errorBox = qs("#errorBox");
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+
+      const region = qs("#region").value;
+      const industry = qs("#industry").value;
+      const companySize = qs("#companySize").value;
+
+      const numCoachees = Number(qs("#numCoachees").value);
+      const seniority = qs("#seniority").value;
+      const avgSalaryInput = Number(qs("#avgSalary").value || 0);
+
+      const format = qs("#format").value;
+      const duration = Number(qs("#duration").value);
+      const costPerPersonInput = Number(qs("#costPerPerson").value || 0);
+      const timeHorizonMonths = Number(qs("#timeHorizon").value || 12);
+
+      let messages = [];
+      if (!numCoachees || numCoachees <= 0) {
+        messages.push("Please enter the number of coachees.");
+      }
+      if (!seniority) {
+        messages.push("Please select the seniority of coachees.");
+      }
+      if (!format) {
+        messages.push("Please select the coaching format.");
+      }
+
+      // Need at least either a region (for estimates) or an explicit salary
+      if (!region && !avgSalaryInput) {
+        messages.push("Please select your region or provide an average salary per coachee.");
+      }
+
+      const impactInfo = collectImpactScore();
+      if (impactInfo.activeCount === 0) {
+        messages.push("Please mark at least one impact area as more than 'Not a focus'.");
+      }
+
+      if (messages.length > 0) {
+        errorBox.textContent = messages.join(" ");
+        errorBox.style.display = "block";
+        return;
+      }
+
+      // Salary per person
+      let salaryPerPerson;
+      if (avgSalaryInput > 0) {
+        salaryPerPerson = avgSalaryInput;
+      } else {
+        salaryPerPerson = estimateSalaryPerPerson(
+          seniority,
+          region,
+          industry,
+          companySize
+        );
+      }
+
+      // Spillover via company size
+      const spilloverFactor =
+        COMPANY_SIZE_SPILLOVER_FACTORS[companySize] ?? 0.3;
+      const directBase = salaryPerPerson * numCoachees;
+      const indirectBase = directBase * spilloverFactor;
+      const totalSalaryBase = directBase + indirectBase;
+
+      // Coaching investment
+      const costPerPerson =
+        costPerPersonInput > 0
+          ? costPerPersonInput
+          : getBenchmarkCostPerPerson(seniority, format, duration, region || "emea");
+      const totalInvestment = costPerPerson * numCoachees;
+
+      // Base improvement per year driven by blended impact
+      let baseImprovementPercentPerYear = 1.5 + impactInfo.blendedFactor * 3;
+      baseImprovementPercentPerYear = Math.max(
+        1.0,
+        Math.min(baseImprovementPercentPerYear, 12)
+      );
+
+      baseImprovementPercentPerYear = applyScenarioFactor(
+        baseImprovementPercentPerYear
+      );
+
+      const horizonFactor = timeHorizonMonths / 12;
+      const effectiveImprovementPercent =
+        baseImprovementPercentPerYear * horizonFactor;
+
+      const estimatedBenefit =
+        (effectiveImprovementPercent / 100) * totalSalaryBase;
+
+      let roi = null;
+      let perUnit = null;
+      if (totalInvestment > 0) {
+        roi = ((estimatedBenefit - totalInvestment) / totalInvestment) * 100;
+        perUnit = estimatedBenefit / totalInvestment;
+      }
+
+      qs("#roiValue").textContent =
+        roi === null ? "—" : formatPercent(roi);
+      qs("#benefitValue").textContent =
+        estimatedBenefit > 0 ? formatNumber(estimatedBenefit) : "—";
+      qs("#perUnitValue").textContent =
+        perUnit && isFinite(perUnit) ? perUnit.toFixed(2) : "—";
+      qs("#investmentValue").textContent =
+        totalInvestment > 0 ? formatNumber(totalInvestment) : "—";
+
+      let scenarioLabelText = "";
+      if (scenario === "conservative") scenarioLabelText = "Conservative scenario";
+      else if (scenario === "base") scenarioLabelText = "Base scenario";
+      else scenarioLabelText = "Optimistic scenario";
+
+      qs("#scenarioLabel").textContent = scenarioLabelText;
+
+      qs("#resultHelperText").textContent =
+        `This scenario assumes an aggregated improvement of about ${effectiveImprovementPercent.toFixed(
+          1
+        )}% of the salary base touched by coaching (including a modest spillover to teams) over ${timeHorizonMonths} months. Actual results will depend on coaching quality, engagement and business context.`;
+    }
+
+    qs("#calculateBtn").addEventListener("click", calculateROI);
+
+    // Initial UI state
+    updateStepUI();
+  </script>
+</body>
+</html>
