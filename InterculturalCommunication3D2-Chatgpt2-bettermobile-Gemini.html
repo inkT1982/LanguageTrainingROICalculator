@@ -153,29 +153,30 @@
     .tooltip-country {
       font-weight: 700;
       font-size: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 18px; /* INCREASED GAP */
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: #222222;
     }
 
     .tooltip-metric {
-      margin-top: 12px;
+      margin-top: 14px; /* Slightly increased gap between metrics */
       padding-left: 10px;
       border-left: 4px solid rgba(0, 0, 0, 0.15);
     }
 
     .tooltip-metric-title {
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.08em;
+      font-weight: 900; /* BOLDER */
+      font-size: 15px; /* Slightly increased */
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: #222222; 
+      color: #111111; /* Darker color */
+      margin-bottom: 3px; /* Small gap below title */
     }
 
     .tooltip-metric-text {
-      font-size: 14px;
-      line-height: 1.55;
+      font-size: 13.5px; /* Slightly smaller for better hierarchy */
+      line-height: 1.5;
       color: #555555;
     }
     
@@ -186,6 +187,7 @@
       height: 100%;
       padding: 32px 2vw 40px;
       display: flex;
+      flex-direction: column; /* Added to accommodate the footer */
     }
 
     main {
@@ -364,6 +366,31 @@
         font-size: 20px; /* Slightly smaller for the loop symbol */
     }
     
+    /* *** NEW STYLES FOR SOURCES FOOTER *** */
+    .page-footer {
+      width: 100%;
+      max-width: 1300px;
+      margin: 20px auto 0;
+      padding: 20px 0 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .sources {
+      font-size: 11.5px; /* Small font */
+      line-height: 1.4;
+      color: #888888; /* Grey font */
+      margin: 0;
+    }
+    
+    .sources a {
+      color: #888888;
+      text-decoration: underline;
+      transition: color 0.15s;
+    }
+    
+    .sources a:hover {
+        color: var(--accent);
+    }
     /* ---------------------------------
        UNIVERSAL RESPONSIVENESS REFINEMENTS
        --------------------------------- */
@@ -430,6 +457,14 @@
         font-size: 14px;
         max-width: 90vw; 
       }
+      
+      /* Mobile source text */
+      .page-footer {
+        padding-top: 15px;
+      }
+      .sources {
+        font-size: 10.5px;
+      }
     }
   </style>
 </head>
@@ -475,6 +510,11 @@
         </section>
       </section>
     </main>
+    
+    <footer class="page-footer">
+        <p class="sources" id="text-sources"></p>
+    </footer>
+    
   </div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -499,6 +539,7 @@
             resetTitle: "Reset globe",
             tooltipNoData: "No data for this country in this analysis.",
             tooltipNoMetrics: "This country is included in the matrix, but no metrics are ticked.",
+            sources: 'Sources: “Interethnic communication” John Gumperz, “Cultures and organizations: Software of the Mind” Hofsted, Various works by Edward T. Hall, <a href="https://www.acc.com/sites/default/files/2021-08/Presentation%20The%20culture%20map-%20Breaking%20through%20the%20invisible%20boundaries%20of%20global%20business%20.pdf" target="_blank">The culture map - Breaking through the invisible boundaries of global business (PDF)</a>.',
             metrics: {
                 group_culture: {
                     title: "Group Culture",
@@ -562,6 +603,7 @@
             resetTitle: "Globus zurücksetzen",
             tooltipNoData: "Keine Daten für dieses Land in dieser Analyse.",
             tooltipNoMetrics: "Dieses Land ist in der Matrix enthalten, aber es sind keine Kennzahlen markiert.",
+            sources: 'Quellen: „Interethnic communication“ John Gumperz, „Cultures and organizations: Software of the Mind“ Hofsted, Verschiedene Werke von Edward T. Hall, <a href="https://www.acc.com/sites/default/files/2021-08/Presentation%20The%20culture%20map-%20Breaking%20through%20the%20invisible%20boundaries%20of%20global%20business%20.pdf" target="_blank">The culture map - Breaking through the invisible boundaries of global business (PDF)</a>.',
             metrics: {
                 group_culture: {
                     title: "Gruppenkultur",
@@ -810,6 +852,7 @@
         d3.select("#text-eyebrow").text(data.eyebrow);
         d3.select("#text-header").text(data.header);
         d3.select("#text-subtitle").html(data.subtitle);
+        d3.select("#text-sources").html(data.sources); // <-- New: Update sources text
 
         // 2. Update button titles
         const pauseBtn = d3.select("#pause-toggle-btn");
