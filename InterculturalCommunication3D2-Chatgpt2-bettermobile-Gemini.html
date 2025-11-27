@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interaktiver Globus – Interkulturelle Kommunikation 3D</title>
+  <title>Interactive Globe – Intercultural Communication 3D</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -133,6 +133,14 @@
 
       align-self: stretch;
       margin-top: auto;
+      
+      /* New: Add a gradient mask to fade the bottom crop line */
+      mask-image: linear-gradient(
+        to bottom,
+        black 0%,      /* Full opacity from the top */
+        black 85%,     /* Full opacity down to 85% of the height */
+        transparent 100% /* Fade to transparent from 85% to 100% of the height */
+      );
     }
 
     #map-container {
@@ -436,7 +444,7 @@
 
       .page {
         padding: 20px 4vw 24px;
-        min-height: calc(100vh - 40px);
+        min-height: 100vh;
       }
 
       .hero {
@@ -541,15 +549,15 @@
     <main>
       <section class="hero">
         <header class="page-header">
-          [cite_start]<div class="eyebrow">INFOGRAFIK [cite: 79]</div>
-          [cite_start]<h1>Ein Survival Guide für interkulturelle Kommunikation [cite: 80]</h1>
+          <div class="eyebrow">Infographic</div>
+          <h1>A Survival Guide for Intercultural Communication</h1>
           <div class="header-rule"></div>
         </header>
 
         <section class="subtitle-block">
           <p>
-            [cite_start]Haben Sie sich im Gespräch mit einer fremdsprachigen Person schon einmal missverstanden gefühlt? [cite: 81] Keine Sorge, Missverständnisse sind nicht immer eine Frage mangelhafter Grammatik oder fehlenden Vokabulars: Oft ist es einfach eine Frage der
-            [cite_start]<strong>interkulturellen Kommunikation.</strong> [cite: 82]
+            Have you ever been in a conversation and felt misunderstood? Don’t worry, this is not always due to poor grammar or lack of vocabulary; it is often simply a question of
+            <strong>Intercultural Communication.</strong>
           </p>
         </section>
 
@@ -559,88 +567,88 @@
 
           <div class="map-label">
             <span class="map-label-dot"></span>
-            <span>Globale Kommunikationslandschaft</span>
+            <span>Global communication landscape</span>
           </div>
 
           <div class="zoom-controls">
             <button class="zoom-btn" data-zoom="in" type="button">+</button>
             <button class="zoom-btn" data-zoom="out" type="button">−</button>
-            <button class="zoom-btn zoom-reset" type="button" title="Globus zurücksetzen">⟲</button>
+            <button class="zoom-btn zoom-reset" type="button" title="Reset globe">⟲</button>
           </div>
         </section>
       </section>
 
       <section class="info-grid-wrapper">
-        <div class="info-grid-header">Wichtige interkulturelle Dimensionen</div>
+        <div class="info-grid-header">Key intercultural dimensions</div>
 
         <div class="info-grid">
           <div class="info-card card-group-culture">
-            [cite_start]<div class="info-card-title">Gruppenkultur [cite: 92]</div>
+            <div class="info-card-title">Group Culture</div>
             <div class="info-card-body">
-              Die Gruppe, das „Wir", hat Vorrang. [cite_start]Dies führt zu Beziehungen, die auf mehr Loyalität und Selektivität beruhen. [cite: 93, 94]
+              The group, or “we,” has priority. This leads to relationships that are based on greater loyalty and selectivity.
             </div>
           </div>
 
           <div class="info-card card-individual-culture">
-            [cite_start]<div class="info-card-title">Individuelle Kultur [cite: 97]</div>
+            <div class="info-card-title">Individual Culture</div>
             <div class="info-card-body">
-              Das Individuum steht im Mittelpunkt, also sein Wohlbefinden und sein eigener Wille. [cite_start]Das Ich und der Selbstausdruck haben Priorität. [cite: 98, 99]
+              The focus is on the individual, i.e. his/her wellbeing and individual will. The “I” and self-expression take priority.
             </div>
           </div>
 
           <div class="info-card card-speaking-implicity">
-            [cite_start]<div class="info-card-title">Implizite Sprache [cite: 110]</div>
+            <div class="info-card-title">Speaking Implicity</div>
             <div class="info-card-body">
-              Hier ist der Inhalt der Botschaften eher verschleiert. Es wird mehr impliziert als verstanden. [cite_start]Ein „Ja" kann in Wirklichkeit nur eine höfliche Begrüßung sein. [cite: 111, 112]
+              Here, the content of the messages is somewhat veiled. More is implied than understood. A “yes” might actually just be a polite acknowledgement.
             </div>
           </div>
 
           <div class="info-card card-explicit-language">
-            [cite_start]<div class="info-card-title">Explizite Sprache [cite: 107]</div>
+            <div class="info-card-title">Explicit Language</div>
             <div class="info-card-body">
-              [cite_start]Explizite Sprache ist sehr direkt: ein Ja ist ein Ja, ein Nein ist ein Nein. [cite: 108]
+              Explicit language is very direct: a yes is a yes, a no is a no.
             </div>
           </div>
 
           <div class="info-card card-hierarchical-culture">
-            [cite_start]<div class="info-card-title">Hierarchische Kultur [cite: 115]</div>
+            <div class="info-card-title">Hierarchical Culture</div>
             <div class="info-card-body">
-              [cite_start]Die Hierarchie ist nach wie vor wichtig und bestimmt, wie man spricht und wer mit einem spricht. [cite: 116]
+              Hierarchy is still very important here: communication depends on who you are speaking to and/or who is speaking to you.
             </div>
           </div>
 
           <div class="info-card card-focus-time">
-            [cite_start]<div class="info-card-title">Fokus auf Dauer [cite: 146]</div>
+            <div class="info-card-title">Focus on Time</div>
             <div class="info-card-body">
-              Die Kultur ist monochron. [cite_start]Wir neigen dazu, uns auf bestimmte Zeiten oder Perioden zu konzentrieren. [cite: 147]
+              Monochronic cultures prioritize sticking to a specific timeframe.
             </div>
           </div>
 
           <div class="info-card card-focus-task">
-            [cite_start]<div class="info-card-title">Fokus auf Aufgaben [cite: 141]</div>
+            <div class="info-card-title">Focus on Task</div>
             <div class="info-card-body">
-              [cite_start]Polychrone Kulturen konzentrieren sich auf die zu erledigende Aufgabe; der Zeitrahmen ist weniger wichtig, auch wenn dies Verzögerungen mit sich bringt. [cite: 142]
+              Polychronic cultures focus on completing the task; the timeframe is less important, even if it means delays.
             </div>
           </div>
 
           <div class="info-card card-culture-uncertainty">
-            [cite_start]<div class="info-card-title">Kultur der Ungewissheit [cite: 133]</div>
+            <div class="info-card-title">Culture of Uncertainty</div>
             <div class="info-card-body">
-              Die Menschen akzeptieren Unbekanntes und Veränderungen gelassener. [cite_start]Die Regeln sind weniger streng. [cite: 134]
+              People accept the unknown and changes more calmly. The rules are more flexible.
             </div>
           </div>
 
           <div class="info-card card-change-management">
-            [cite_start]<div class="info-card-title">Veränderungen [cite: 138]</div>
+            <div class="info-card-title">Change Management</div>
             <div class="info-card-body">
-              Veränderungen können als Bedrohung empfunden werden. [cite_start]Um dem entgegenzuwirken, werden strenge Regeln aufgestellt, was die Motivation erhöht. [cite: 139]
+              Changes can feel threatening. To counteract this, strict rules are established, increasing motivation.
             </div>
           </div>
 
           <div class="info-card card-informal-culture">
-            [cite_start]<div class="info-card-title">Informelle Kultur [cite: 119]</div>
+            <div class="info-card-title">Informal Culture</div>
             <div class="info-card-body">
-              Die Kommunikation findet ohne soziale Schichten statt. [cite_start]Gleichheit und offene Kommunikation sind zentrale Werte. [cite: 120]
+              People accept uncertainty and change more calmly. Rules tend to be flexible and open.
             </div>
           </div>
         </div>
@@ -656,71 +664,71 @@
     const tooltip = d3.select("#tooltip");
     const svg = container.append("svg");
 
-    // ----- METRIC DEFINITIONS (Localized) -----
+    // ----- METRIC DEFINITIONS -----
     const metrics = {
       group_culture: {
-        title: "Gruppenkultur",
+        title: "Group Culture",
         color: "#cd5b00",
         description:
-          "Die Gruppe, das „Wir\", hat Vorrang. [cite_start]Beziehungen beruhen auf Loyalität und Selektivität. [cite: 93, 94]"
+          "The group, or “we,” has priority. Relationships are based on loyalty and selectivity."
       },
       individual_culture: {
-        title: "Individuelle Kultur",
+        title: "Individual Culture",
         color: "#ff7900",
         description:
-          "Der Fokus liegt auf dem Individuum und dem Selbstausdruck. [cite_start]Persönliche Ziele haben Priorität. [cite: 98, 99]"
+          "The focus is on the individual and self-expression. Personal goals take priority."
       },
       speaking_implicity: {
-        title: "Implizite Sprache",
+        title: "Speaking Implicity",
         color: "#03649f",
         description:
-          "Botschaften sind verschleiert; mehr wird impliziert als gesagt. [cite_start]Ein „Ja“ kann lediglich eine höfliche Begrüßung sein. [cite: 111, 112]"
+          "Messages are veiled; more is implied than said. A “yes” might simply be polite."
       },
       explicit_language: {
-        title: "Explizite Sprache",
+        title: "Explicit Language",
         color: "#038bc7",
         description:
-          [cite_start]"Die Kommunikation ist sehr direkt: ein Ja ist ein Ja, ein Nein ist ein Nein. [cite: 108]"
+          "Communication is direct: a yes is a yes, a no is a no."
       },
       hierarchical_culture: {
-        title: "Hierarchische Kultur",
+        title: "Hierarchical Culture",
         color: "#d79d00",
         description:
-          [cite_start]"Die Hierarchie ist wichtig und bestimmt, wie man spricht und wer mit einem spricht. [cite: 116]"
+          "Hierarchy matters greatly and shapes how people speak and who speaks first."
       },
       informal_culture: {
-        title: "Informelle Kultur",
+        title: "Informal Culture",
         color: "#f5c500",
         description:
-          "Die Kommunikation findet ohne soziale Schichten statt. [cite_start]Gleichheit und offene Kommunikation sind zentrale Werte. [cite: 120]"
+          "An informal setting where uncertainty and change are handled calmly and casually."
       },
       focus_time: {
-        title: "Fokus auf Dauer",
+        title: "Focus on Time",
         color: "#98bc36",
         description:
-          [cite_start]"Monochrone Kulturen neigen dazu, sich auf bestimmte Zeiten oder Perioden zu konzentrieren. [cite: 147]"
+          "Monochronic cultures prioritize sticking to a specific timeframe."
       },
       culture_uncertainty: {
-        title: "Kultur der Ungewissheit",
+        title: "Culture of Uncertainty",
         color: "#039a82",
         description:
-          "Die Menschen akzeptieren Unbekanntes und Veränderungen gelassener. [cite_start]Die Regeln sind weniger streng. [cite: 134]"
+          "People accept the unknown and change more calmly. Rules are more flexible."
       },
       change_management: {
-        title: "Veränderungen",
+        title: "Change Management",
         color: "#036f64",
         description:
-          [cite_start]"Veränderungen können eine Bedrohung darstellen; strenge Regeln helfen, sich in Kontrolle zu fühlen und motiviert zu bleiben. [cite: 139]"
+          "Change can feel threatening; strict rules help people feel in control and motivated."
       },
       focus_task: {
-        title: "Fokus auf Aufgaben",
+        title: "Focus on Task",
         color: "#70940e",
         description:
-          [cite_start]"Polychrone Kulturen priorisieren die Erledigung der Aufgabe, auch wenn dies Verzögerungen oder Warten mit sich bringt. [cite: 142]"
+          "Polychronic cultures prioritize completing the task, even if this means delays."
       }
     };
 
-    // ----- COUNTRY → METRICS MAPPING (Remains unchanged) -----
+    // ----- COUNTRY → METRICS MAPPING -----
     const countryMetrics = {
       "Afghanistan": ["speaking_implicity","focus_task"],
       "Algeria": ["speaking_implicity","focus_task"],
@@ -879,7 +887,7 @@
       "Zimbabwe": ["focus_task"]
     };
 
-    // ----- ALIASES: TopoJSON name -> matrix name (Remains unchanged) -----
+    // ----- ALIASES: TopoJSON name -> matrix name -----
     const countryNameAliases = {
       "United States of America": "United States",
       "Côte d'Ivoire": "Ivory Coast",
@@ -904,7 +912,7 @@
       return { key: countryName, inList: false };
     }
 
-    // ----- DEFINITIONS: gradient, glow (Remains unchanged) -----
+    // ----- DEFINITIONS: gradient, glow -----
     const defs = svg.append("defs");
 
     const globeGradient = defs.append("radialGradient")
@@ -1097,7 +1105,7 @@
       setZoom(zoomFactor + direction * zoomStep);
     });
 
-    // Tooltip helpers (Localized)
+    // Tooltip helpers
     function buildTooltipHTML(countryName) {
       const { key, inList } = resolveCountryKey(countryName);
       const metricIds = inList ? (countryMetrics[key] || []) : [];
@@ -1108,7 +1116,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              Für dieses Land liegen in dieser Analyse keine Daten vor.
+              No data for this country in this analysis.
             </div>
           </div>`;
         return html;
@@ -1118,7 +1126,7 @@
         html += `
           <div class="tooltip-metric">
             <div class="tooltip-metric-text">
-              Dieses Land ist in der Matrix enthalten, aber es sind keine Merkmale aktiviert.
+              This country is included in the matrix, but no metrics are ticked.
             </div>
           </div>`;
         return html;
@@ -1169,7 +1177,7 @@
             const countryName =
               d.properties.name ||
               d.properties.admin ||
-              "Unbekanntes Land";
+              "Unknown country";
 
             tooltip
               .style("opacity", 1)
