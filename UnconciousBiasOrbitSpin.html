@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cognitive Biases: The Four Fundamentals</title>
+
+  <!-- Roboto font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+
+      /* LIGHT GREY FLOOR + WALL BACKGROUND */
+      background: linear-gradient(
+        to bottom,
+        #f5f5f5 0%,
+        #eeeeee 45%,
+        #e6e6e6 70%,
+        #dddddd 100%
+      );
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      font-weight: 800;
+      color: #111;
+    }
+
+    p.subtitle {
+      max-width: 900px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      margin-bottom: 40px;
+      color: #222;
+    }
+
+    /* Statue container */
+    #statue-wrapper {
+      width: 1200px;
+      height: 700px;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    /* Orbit container (700x700) */
+    #orbit-rotator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 700px;
+      height: 700px;
+      transform: translate(-50%, -50%) rotateX(45deg) rotateZ(120deg);
+      animation: orbitSpin 80s linear infinite;
+      transform-style: preserve-3d;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes orbitSpin {
+      from {
+        transform: translate(-50%, -50%) rotateX(45deg) rotateZ(120deg);
+      }
+      to {
+        transform: translate(-50%, -50%) rotateX(45deg) rotateZ(480deg);
+      }
+    }
+
+    #statue-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #statue {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.15s ease-out;
+      will-change: transform;
+      transform-origin: 50% 90%;
+      position: relative;
+      z-index: 2;
+      pointer-events: none; /* so labels work across whole orbit */
+    }
+
+    #statue-wrapper::after {
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      width: 60%;
+      height: 40px;
+      transform: translateX(-50%);
+      background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0) 70%
+      );
+      filter: blur(8px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Base orbit label (both biases and group titles) */
+    .orbit-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0 50%;
+      font-size: 11px;
+      white-space: nowrap;
+      color: #000;
+      pointer-events: auto;
+      z-index: 3;
+
+      padding: 2px 10px;
+      border-radius: 999px;
+      transition:
+        background-color 0.12s ease-out,
+        color 0.12s ease-out,
+        transform 0.12s ease-out;
+      cursor: pointer;
+    }
+
+    /* Normal (non-group) items hover: black pill */
+    .orbit-label:hover {
+      background-color: #000;
+      color: #EFEFEF;
+      transform: scale(1.08);
+    }
+
+    /* Group titles (secondary level) */
+    .orbit-group-label {
+      font-size: 12px;
+      font-weight: 700;   /* heavier text */
+    }
+
+    /* The numbered circle for group titles */
+    .group-number {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      border-radius: 50%;
+      font-size: 9px;   /* smaller so circle is compact */
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Circle colors by series (applied to the number span) */
+    .group-number.group-series-1 { background-color: #039a82; }  /* base */
+    .group-number.group-series-2 { background-color: #04b89a; }  /* +20% */
+    .group-number.group-series-3 { background-color: #05ccb0; }  /* +35% */
+    .group-number.group-series-4 { background-color: #06e0c6; }  /* +50% */
+
+    /* Group title hover: pill uses same color as its circle, not black */
+    .orbit-group-label.group-series-1:hover {
+      background-color: #039a82;
+      color: #ffffff;
+      transform: scale(1.08);
+    }
+    .orbit-group-label.group-series-2:hover {
+      background-color: #04b89a;
+      color: #ffffff;
+      transform: scale(1.08);
+    }
+    .orbit-group-label.group-series-3:hover {
+      background-color: #05ccb0;
+      color: #ffffff;
+      transform: scale(1.08);
+    }
+    .orbit-group-label.group-series-4:hover {
+      background-color: #06e0c6;
+      color: #ffffff;
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Cognitive Biases: The Four Fundamentals</h1>
+
+  <p class="subtitle">
+    According to the Cognitive Bias Codex, created by John Manoogian III and
+    Buster Benson, there are approximately 180 cognitive biases on a continually 
+    evolving list. This includes four dimensions, each dedicated to a specific 
+    group of cognitive biases (you can also see Appendix for a full list to-date):
+  </p>
+
+  <div id="statue-wrapper">
+
+    <!-- Orbit container -->
+    <div id="orbit-rotator">
+      <div id="statue-ring"></div>
+    </div>
+
+    <!-- Statue -->
+    <img id="statue" src="images/shutterstock_2134770223_cutout.png" alt="Statue" />
+  </div>
+
+  <script>
+    const statue = document.getElementById("statue");
+    const orbitContainer = document.getElementById("orbit-rotator");
+
+    /*********************
+     * 3D Statue Motion  *
+     *********************/
+    let currentRotX = 0;
+    let currentRotY = 0;
+    let targetRotX = 0;
+    let targetRotY = 0;
+
+    window.addEventListener("mousemove", (e) => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const nx = e.clientX / vw - 0.5;
+      const ny = e.clientY / vh - 0.5;
+
+      targetRotY = nx * 35;
+      targetRotX = -ny * 26;
+    });
+
+    window.addEventListener("mouseleave", () => {
+      targetRotX = 0;
+      targetRotY = 0;
+    });
+
+    function animate() {
+      currentRotX += (targetRotX - currentRotX) * 0.15;
+      currentRotY += (targetRotY - currentRotY) * 0.15;
+
+      const translateX = currentRotY * 1.2;
+      const translateY = currentRotX * -0.4;
+
+      statue.style.transform =
+        `rotateX(${currentRotX}deg)
+         rotateY(${currentRotY}deg)
+         translate3d(${translateX}px, ${translateY}px, 0)`;
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    /****************************************
+     * Structured entries with real gaps    *
+     * type: "gap" | "group" | "bias"      *
+     ****************************************/
+    const entries = [
+      // GAP + 1.1 + biases under 1.1
+      { type: "gap" },
+      { type: "group", num: "1.1", series: 1, text: "We notice things already primed in memory or repeated often." },
+      { type: "bias", text: "Availability Heuristic" },
+      { type: "bias", text: "Attentional Bias" },
+      { type: "bias", text: "Illusory Truth Effect" },
+      { type: "bias", text: "Mere Exposure Effect" },
+      { type: "bias", text: "Context Effect" },
+      { type: "bias", text: "Cue-Dependent Forgetting" },
+      { type: "bias", text: "Mood-Congruent Memory Bias" },
+      { type: "bias", text: "Frequency Illusion" },
+      { type: "bias", text: "Baader-Meinhof Phenomenon" },
+      { type: "bias", text: "Empathy Gap" },
+      { type: "bias", text: "Omission Bias" },
+      { type: "bias", text: "Base Rate Fallacy" },
+
+      // GAP + 1.2 + biases
+      { type: "gap" },
+      { type: "group", num: "1.2", series: 1, text: "Bizarre, funny or visually-striking things grab our attention; anthropomorphic things stick out more than non-bizarre/unfunny things." },
+      { type: "bias", text: "Bizarreness Effect" },
+      { type: "bias", text: "Humor Effect" },
+      { type: "bias", text: "Von Restorff Effect" },
+      { type: "bias", text: "Picture Superiority Effect" },
+      { type: "bias", text: "Self-Reference Effect" },
+      { type: "bias", text: "Negativity Bias" },
+
+      // GAP + 1.3 + biases
+      { type: "gap" },
+      { type: "group", num: "1.3", series: 1, text: "We notice when something has changed." },
+      { type: "bias", text: "Anchoring" },
+      { type: "bias", text: "Conservatism Bias" },
+      { type: "bias", text: "Contrast Effect" },
+      { type: "bias", text: "Distinction Bias" },
+      { type: "bias", text: "Framing Effect" },
+      { type: "bias", text: "Money Illusion" },
+      { type: "bias", text: "Weber-Fechner Law" },
+
+      // GAP + 1.4 + biases
+      { type: "gap" },
+      { type: "group", num: "1.4", series: 1, text: "We are drawn to details that confirm our own existing beliefs." },
+      { type: "bias", text: "Confirmation Bias" },
+      { type: "bias", text: "Congruence Bias" },
+      { type: "bias", text: "Post-Purchase Rationalization" },
+      { type: "bias", text: "Choice-Supportive Bias" },
+      { type: "bias", text: "Selective Perception" },
+      { type: "bias", text: "Observer-Expectancy Effect" },
+      { type: "bias", text: "Experimenter’s Bias" },
+      { type: "bias", text: "Observer Effect" },
+      { type: "bias", text: "Expectation Bias" },
+      { type: "bias", text: "Ostrich Effect" },
+      { type: "bias", text: "Subjective Validation" },
+      { type: "bias", text: "Continued Influence Effect" },
+      { type: "bias", text: "Semmelweis Reflex" },
+
+      // GAP + 1.5 + biases
+      { type: "gap" },
+      { type: "group", num: "1.5", series: 1, text: "We notice flaws in others more easily than we notice flaws in ourselves." },
+      { type: "bias", text: "Bias Blind Spot" },
+      { type: "bias", text: "Naïve Cynicism" },
+      { type: "bias", text: "Naïve Realism" },
+
+      // GAP + 2.1 + biases
+      { type: "gap" },
+      { type: "group", num: "2.1", series: 2, text: "We tend to find stories and patterns even when looking at sparse data." },
+      { type: "bias", text: "Confabulation" },
+      { type: "bias", text: "Clustering Illusion" },
+      { type: "bias", text: "Insensitivity to Sample Size" },
+      { type: "bias", text: "Neglect of Probability" },
+      { type: "bias", text: "Anecdotal Fallacy" },
+      { type: "bias", text: "Illusion of Validity" },
+      { type: "bias", text: "Masked Man Fallacy" },
+      { type: "bias", text: "Recency Illusion" },
+      { type: "bias", text: "Hot-Hand Fallacy" },
+      { type: "bias", text: "Illusory Correlation" },
+      { type: "bias", text: "Pareidolia" },
+      { type: "bias", text: "Anthropomorphism" },
+
+      // GAP + 2.2 + biases
+      { type: "gap" },
+      { type: "group", num: "2.2", series: 2, text: "We fill in characteristics from stereotypes, generalities and prior histories." },
+      { type: "bias", text: "Group Attribution Error" },
+      { type: "bias", text: "Ultimate Attribution Error" },
+      { type: "bias", text: "Stereotyping" },
+      { type: "bias", text: "Essentialism" },
+      { type: "bias", text: "Functional Fixedness" },
+      { type: "bias", text: "Moral Credential Effect" },
+      { type: "bias", text: "Just-World Hypothesis" },
+      { type: "bias", text: "Argument From Fallacy" },
+      { type: "bias", text: "Authority Bias" },
+      { type: "bias", text: "Automation Bias" },
+      { type: "bias", text: "Bandwagon Effect" },
+      { type: "bias", text: "Placebo Effect" },
+
+      // GAP + 2.3 + biases
+      { type: "gap" },
+      { type: "group", num: "2.3", series: 2, text: "We imagine things and people we are familiar with or fond of as better." },
+      { type: "bias", text: "Out-Group Homogeneity Bias" },
+      { type: "bias", text: "Cross-Race Effect" },
+      { type: "bias", text: "In-Group Bias" },
+      { type: "bias", text: "Halo Effect" },
+      { type: "bias", text: "Cheerleader Effect" },
+      { type: "bias", text: "Positivity Effect" },
+      { type: "bias", text: "Not Invented Here" },
+      { type: "bias", text: "Reactive Devaluation" },
+      { type: "bias", text: "Well Traveled Road Effect" },
+
+      // GAP + 2.4 + biases
+      { type: "gap" },
+      { type: "group", num: "2.4", series: 2, text: "We simplify probabilities and numbers to make them easier to think about." },
+      { type: "bias", text: "Mental Accounting" },
+      { type: "bias", text: "Appeal to Probability Fallacy" },
+      { type: "bias", text: "Normalcy Bias" },
+      { type: "bias", text: "Murphy’s Law" },
+      { type: "bias", text: "Zero Sum Bias" },
+      { type: "bias", text: "Survivorship Bias" },
+      { type: "bias", text: "Subadditivity Effect" },
+      { type: "bias", text: "Denomination Effect" },
+      { type: "bias", text: "Magic Number 7+-2" },
+
+      // GAP + 2.5 + biases
+      { type: "gap" },
+      { type: "group", num: "2.5", series: 2, text: "We think we know what other people are thinking." },
+      { type: "bias", text: "Illusion of Transparency" },
+      { type: "bias", text: "Curse of Knowledge" },
+      { type: "bias", text: "Spotlight Effect" },
+      { type: "bias", text: "Extrinsic Incentives Bias" },
+      { type: "bias", text: "Illusion of External Agency" },
+      { type: "bias", text: "Illusion of Asymmetric Insight" },
+
+      // GAP + 2.6 + biases
+      { type: "gap" },
+      { type: "group", num: "2.6", series: 2, text: "We project our current mindset and assumptions onto the past and the future." },
+      { type: "bias", text: "Self-Consistency Bias" },
+      { type: "bias", text: "Restraint Bias" },
+      { type: "bias", text: "Projection Bias" },
+      { type: "bias", text: "Pro-Innovation Bias" },
+      { type: "bias", text: "Time-Saving Bias" },
+      { type: "bias", text: "Planning Fallacy" },
+      { type: "bias", text: "Pessimism Bias" },
+      { type: "bias", text: "Impact Bias" },
+      { type: "bias", text: "Declinism" },
+      { type: "bias", text: "Moral Luck" },
+      { type: "bias", text: "Outcome Bias" },
+      { type: "bias", text: "Hindsight Bias" },
+      { type: "bias", text: "Rosy Retrospection" },
+      { type: "bias", text: "Telescoping Effect" },
+
+      // GAP + 3.1 + biases
+      { type: "gap" },
+      { type: "group", num: "3.1", series: 3, text: "To act, we must be confident we can make an impact and feel what we do is important." },
+      { type: "bias", text: "Overconfidence Effect" },
+      { type: "bias", text: "Social Desirability Bias" },
+      { type: "bias", text: "Third-person Effect" },
+      { type: "bias", text: "False Consensus Effect" },
+      { type: "bias", text: "Hard-Easy Effect" },
+      { type: "bias", text: "Lake Wobegone Effect" },
+      { type: "bias", text: "Dunning-Kruger Effect" },
+      { type: "bias", text: "Egocentric Bias" },
+      { type: "bias", text: "Optimism Bias" },
+      { type: "bias", text: "Forer Effect" },
+      { type: "bias", text: "Barnum Effect" },
+      { type: "bias", text: "Self-serving Bias" },
+      { type: "bias", text: "Actor-Observer Bias" },
+      { type: "bias", text: "Illusion of Control" },
+      { type: "bias", text: "Illusory Superiority" },
+      { type: "bias", text: "Fundamental Attribution Error" },
+      { type: "bias", text: "Defensive Attribution Hypothesis" },
+      { type: "bias", text: "Trait Ascription Bias" },
+      { type: "bias", text: "Effort Justification" },
+      { type: "bias", text: "Risk Compensation" },
+      { type: "bias", text: "Peltzman Effect" },
+
+      // GAP + 3.2 + biases
+      { type: "gap" },
+      { type: "group", num: "3.2", series: 3, text: "To stay focused, we favor the immediate, relatable thing in front of us." },
+      { type: "bias", text: "Identifiable Victim Effect" },
+      { type: "bias", text: "Appeal to Novelty" },
+      { type: "bias", text: "Hyperbolic Discounting" },
+
+      // GAP + 3.3 + biases
+      { type: "gap" },
+      { type: "group", num: "3.3", series: 3, text: "To get things done, we tend to complete things we have invested time and energy in." },
+      { type: "bias", text: "Backfire Effect" },
+      { type: "bias", text: "Endowment Effect" },
+      { type: "bias", text: "Processing Difficulty Effect" },
+      { type: "bias", text: "Pseudocertainty Effect" },
+      { type: "bias", text: "Disposition Effect" },
+      { type: "bias", text: "Zero-Risk Bias" },
+      { type: "bias", text: "Unit Bias" },
+      { type: "bias", text: "IKEA Effect" },
+      { type: "bias", text: "Loss Aversion" },
+      { type: "bias", text: "Generation Effect" },
+      { type: "bias", text: "Escalation of Commitment" },
+      { type: "bias", text: "Irrational Escalation" },
+      { type: "bias", text: "Sunk Cost Fallacy" },
+
+      // GAP + 3.4 + biases
+      { type: "gap" },
+      { type: "group", num: "3.4", series: 3, text: "To avoid mistakes, we aim to preserve autonomy and group status, and avoid irreversible decisions." },
+      { type: "bias", text: "Status Quo Bias" },
+      { type: "bias", text: "Social Comparison Effect" },
+      { type: "bias", text: "Decoy Effect" },
+      { type: "bias", text: "Reactance" },
+      { type: "bias", text: "Reverse Psychology" },
+      { type: "bias", text: "System Justification" },
+
+      // GAP + 3.5 + biases
+      { type: "gap" },
+      { type: "group", num: "3.5", series: 3, text: "We favor simple-looking options and complete information over complex, ambiguous options." },
+      { type: "bias", text: "Less-is-better Effect" },
+      { type: "bias", text: "Occam's Razor" },
+      { type: "bias", text: "Conjunction Fallacy" },
+      { type: "bias", text: "Delmore Effect" },
+      { type: "bias", text: "Law of Triviality" },
+      { type: "bias", text: "Bike-Shedding Effect" },
+      { type: "bias", text: "Rhyme-as-reason Effect" },
+      { type: "bias", text: "Belief Bias" },
+      { type: "bias", text: "Information Bias" },
+      { type: "bias", text: "Ambiguity Bias" },
+
+      // GAP + 4.1 + biases
+      { type: "gap" },
+      { type: "group", num: "4.1", series: 4, text: "We edit and reinforce some memories after the fact." },
+      { type: "bias", text: "Misattribution of Memory" },
+      { type: "bias", text: "Source Confusion" },
+      { type: "bias", text: "Cryptomnesia" },
+      { type: "bias", text: "False Memory" },
+      { type: "bias", text: "Suggestibility" },
+      { type: "bias", text: "Spacing Effect" },
+
+      // GAP + 4.2 + biases
+      { type: "gap" },
+      { type: "group", num: "4.2", series: 4, text: "We discard specifics to form generalities." },
+      { type: "bias", text: "Fading Affect Bias" },
+      { type: "bias", text: "Negativity Bias" },
+      { type: "bias", text: "Prejudice" },
+      { type: "bias", text: "Stereotypical Bias" },
+      { type: "bias", text: "Implicit Stereotypes" },
+      { type: "bias", text: "Implicit Associations" },
+
+      // GAP + 4.3 + biases
+      { type: "gap" },
+      { type: "group", num: "4.3", series: 4, text: "We reduce events and lists to their key elements." },
+      { type: "bias", text: "Suffix Effect" },
+      { type: "bias", text: "Serial Position Effect" },
+      { type: "bias", text: "Part-list Cueing Effect" },
+      { type: "bias", text: "Recency Effect" },
+      { type: "bias", text: "Primacy Effect" },
+      { type: "bias", text: "Memory Inhibition" },
+      { type: "bias", text: "Modality Effect" },
+      { type: "bias", text: "Duration Neglect" },
+      { type: "bias", text: "List-length Effect" },
+      { type: "bias", text: "Serial Recall Effect" },
+      { type: "bias", text: "Misinformation Effect" },
+      { type: "bias", text: "Leveling and Sharpening" },
+      { type: "bias", text: "Peak-end Rule" },
+
+      // GAP + 4.4 + biases
+      { type: "gap" },
+      { type: "group", num: "4.4", series: 4, text: "We store memories differently based on how they were experienced." },
+      { type: "bias", text: "Tip of the Tongue Phenomenon" },
+      { type: "bias", text: "Google Effect" },
+      { type: "bias", text: "Next-in-Line Effect" },
+      { type: "bias", text: "Testing Effect" },
+      { type: "bias", text: "Absent-mindedness" },
+      { type: "bias", text: "Levels-of-Processing Effect" }
+    ];
+
+    const orbitRadius = 420;       // base orbit (for group titles)
+    const extraIndent = 50;        // visually “bigger orbit” for normal items
+    const totalEntries = entries.length;
+
+    /********************************************
+     * Render everything around the orbit       *
+     * - gap: occupies angle, renders nothing   *
+     * - group: inner radius, colored circle    *
+     * - bias: outer radius, black hover pill   *
+     ********************************************/
+    entries.forEach((entry, index) => {
+      const angleDeg = (index / totalEntries) * 360 - 90;
+
+      if (entry.type === "gap") {
+        // real empty line: no DOM, but still takes angular space
+        return;
+      }
+
+      const el = document.createElement("div");
+      el.className = "orbit-label";
+      let radius = orbitRadius + extraIndent;
+
+      if (entry.type === "group") {
+        const { num, series, text } = entry;
+        radius = orbitRadius;
+
+        el.classList.add("orbit-group-label", `group-series-${series}`);
+
+        const numSpan = document.createElement("span");
+        numSpan.className = `group-number group-series-${series}`;
+        numSpan.textContent = num;
+
+        el.appendChild(numSpan);
+        el.appendChild(document.createTextNode(text));
+      } else if (entry.type === "bias") {
+        el.textContent = entry.text;
+      }
+
+      el.style.transform =
+        `rotate(${angleDeg}deg) translateX(${radius}px)`;
+
+      orbitContainer.appendChild(el);
+    });
+  </script>
+
+</body>
+</html>
